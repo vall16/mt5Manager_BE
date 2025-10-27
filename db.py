@@ -267,6 +267,37 @@ def insert_trader(trader: Newtrader):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+    # --- DELETE trader ---
+@router.delete("/traders/{trader_id}")
+def delete_trader(trader_id: int):
+    conn = get_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+
+    try:
+        cursor = conn.cursor()
+        # Verifica se il trader esiste
+        cursor.execute("SELECT id FROM traders WHERE id = %s", (trader_id,))
+        row = cursor.fetchone()
+        if not row:
+            cursor.close()
+            conn.close()
+            raise HTTPException(status_code=404, detail="Trader not found")
+
+        # Cancella il trader
+        cursor.execute("DELETE FROM traders WHERE id = %s", (trader_id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return {"status": "success", "message": f"Trader {trader_id} deleted successfully"}
+
+    except Exception as e:
+        print("=== ERRORE DURANTE DELETE TRADER ===")
+        print(e)
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
 if __name__ == "__main__":
     create_user("roberto", "roberto123")
 
