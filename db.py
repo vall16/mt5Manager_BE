@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 import uuid
 import mysql.connector
@@ -17,23 +18,22 @@ import os
 def get_connection():
     try:
         
-        # conn = mysql.connector.connect(
-        #     # host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
-        #     host=os.environ.get("MYSQL_HOST", "127.0.0.1"),
-        #     user=os.environ.get("MYSQL_USER", "trader"),
-        #     password="vibe2025",
-        #     database=os.environ.get("MYSQL_DB", "trader_db"),
-        #     port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
-        # )
+        conn = mysql.connector.connect(
+            host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
+            user=os.environ.get("MYSQL_USER", "trader"),
+            password="vibe2025",
+            database=os.environ.get("MYSQL_DB", "trader_db"),
+            port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
+        )
 
         # db locale 
-        conn = mysql.connector.connect(
-            host="127.0.0.1",       # o "127.0.0.1"
-            user="trader",            # utente MySQL locale
-            password="vibe2025",            # lascia vuoto se non hai password
-            database="trader_db",   # nome del tuo database
-            port=3306               # porta predefinita MySQL
-        )
+        # conn = mysql.connector.connect(
+        #     host="127.0.0.1",       # o "127.0.0.1"
+        #     user="trader",            # utente MySQL locale
+        #     password="vibe2025",            # lascia vuoto se non hai password
+        #     database="trader_db",   # nome del tuo database
+        #     port=3306               # porta predefinita MySQL
+        # )
 
 
         return conn
@@ -222,6 +222,46 @@ def get_traders():
             "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else None,
         })
     return traders
+
+# --- INSERT trader ---
+@router.post("/traders")
+def insert_trader(trader: Trader):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+        INSERT INTO traders 
+        (name, master_server_id, slave_server_id, allocation_percent, 
+         max_drawdown, risk_level, multiplier, note, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        now = datetime.now()
+        values = (
+            trader.name,
+            trader.master_server_id,
+            trader.slave_server_id,
+            trader.allocation_percent,
+            trader.max_drawdown,
+            trader.risk_level,
+            trader.multiplier,
+            trader.note,
+            trader.is_active,
+            now,
+            now
+        )
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        new_id = cursor.lastrowid
+        cursor.close()
+        conn.close()
+
+        return {"status": "success", "id": new_id}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
