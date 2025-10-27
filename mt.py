@@ -5,9 +5,12 @@ import os
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
 from models import LoginRequest, LoginResponse, ServerCheckRequest, UserResponse
 
-from fastapi import FastAPI, Query,HTTPException
+from fastapi import FastAPI, Query,HTTPException, Request
 import MetaTrader5 as mt5
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -584,6 +587,16 @@ def check_server(data: ServerCheckRequest):
         error = mt5.last_error()
         return {"status": "error", "message": f"Cannot connect: {error}"}
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    body = await request.body()
+    print("=== VALIDATION ERROR ===")
+    print("Body ricevuto:", body.decode())
+    print("Errori:", exc.errors())
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors(), "body": body.decode()}
+    )
 
 
 

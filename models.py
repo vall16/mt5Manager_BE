@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
 
 
 class LoginRequest(BaseModel):
@@ -47,18 +47,48 @@ class ServerRequest(BaseModel):
     login: Optional[str] = None
     password: Optional[str] = None
     
+# class Trader(BaseModel):
+#     id: Optional[int]
+#     name: str
+#     status: str  # 'active' | 'inactive'
+#     master_server_id: Optional[int]
+#     slave_server_id: Optional[int]
+#     sl: Optional[float]
+#     tp: Optional[float]
+#     tsl: Optional[float]
+#     moltiplicatore: Optional[float]
+#     fix_lot: Optional[float]
+#     created_at: Optional[str]
+#     updated_at: Optional[str]
+
+
 class Trader(BaseModel):
     id: Optional[int]
     name: str
-    status: str  # 'active' | 'inactive'
+    status: Literal['active','inactive']  # obbliga a uno dei due valori
     master_server_id: Optional[int]
     slave_server_id: Optional[int]
-    sl: Optional[float]
-    tp: Optional[float]
-    tsl: Optional[float]
-    moltiplicatore: Optional[float]
-    fix_lot: Optional[float]
-    created_at: Optional[str]
-    updated_at: Optional[str]
+    sl: Optional[float] = None
+    tp: Optional[float] = None
+    tsl: Optional[float] = None
+    moltiplicatore: Optional[float] = 1.0
+    fix_lot: Optional[float] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+class Newtrader(BaseModel):
+    
+    name: str
+    status: Literal['active','inactive']  # obbliga a uno dei due valori
+    master_server_id: Optional[int]
+    slave_server_id: Optional[int]
+    sl: Optional[float] = None
+    tp: Optional[float] = None
+    tsl: Optional[float] = None
+    moltiplicatore: Optional[float] = 1.0
+    fix_lot: Optional[float] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
 
 

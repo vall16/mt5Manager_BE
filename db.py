@@ -3,7 +3,7 @@ from typing import List
 import uuid
 import mysql.connector
 from mysql.connector import Error
-from models import LoginRequest, LoginResponse, ServerRequest, Trader, UserResponse, ServerResponse
+from models import LoginRequest, LoginResponse, ServerRequest, Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -225,31 +225,34 @@ def get_traders():
 
 # --- INSERT trader ---
 @router.post("/traders")
-def insert_trader(trader: Trader):
+def insert_trader(trader: Newtrader):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-
         query = """
-        INSERT INTO traders 
-        (name, master_server_id, slave_server_id, allocation_percent, 
-         max_drawdown, risk_level, multiplier, note, is_active, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO traders
+        (name, master_server_id, slave_server_id, 
+         sl, tp, tsl, moltiplicatore, fix_lot, is_active, created_at, updated_at)
+        VALUES (%s,  %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+
         now = datetime.now()
+
         values = (
             trader.name,
             trader.master_server_id,
             trader.slave_server_id,
-            trader.allocation_percent,
-            trader.max_drawdown,
-            trader.risk_level,
-            trader.multiplier,
-            trader.note,
-            trader.is_active,
+            trader.sl,
+            trader.tp,
+            trader.tsl,
+            trader.moltiplicatore or 1.0,
+            trader.fix_lot,
+            trader.status == 'active',  # converte 'active'/'inactive' in booleano
             now,
             now
         )
+
+
 
         cursor.execute(query, values)
         conn.commit()
