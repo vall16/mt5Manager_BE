@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 
 
 class LoginRequest(BaseModel):
@@ -91,4 +91,33 @@ class Newtrader(BaseModel):
     updated_at: Optional[str] = None
 
 
+class GetLastCandleRequest(BaseModel):
+    symbol: str
+    timeframe: str
+    start: int = 0
+    count: int = 10
+class GetLastDealsHistoryRequest(BaseModel):
+    symbol: Optional[str] = None
 
+class BuyRequest(BaseModel):
+    symbol: str
+    lot: float
+    sl_point: float
+    tp_point: float
+    deviation: float
+    magic: int
+    comment: str = ""
+
+class SellRequest(BuyRequest):
+    pass
+
+class CloseRequest(BaseModel):
+    symbol: str
+    magic: int
+    deviation: float
+
+class DealsAllResponse(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    data: List[dict]

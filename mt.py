@@ -8,7 +8,9 @@ from typing import List, Optional
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from models import LoginRequest, LoginResponse, ServerCheckRequest, UserResponse
+from models import LoginRequest, LoginResponse, BuyRequest, \
+ServerCheckRequest, UserResponse,GetLastCandleRequest,SellRequest, \
+CloseRequest,GetLastDealsHistoryRequest,DealsAllResponse
 
 from fastapi import FastAPI, Query,HTTPException, Request
 import MetaTrader5 as mt5
@@ -46,39 +48,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# --- MODELS ---
-class GetLastCandleRequest(BaseModel):
-    symbol: str
-    timeframe: str
-    start: int = 0
-    count: int = 10
-
-class GetLastDealsHistoryRequest(BaseModel):
-    symbol: Optional[str] = None
-
-class BuyRequest(BaseModel):
-    symbol: str
-    lot: float
-    sl_point: float
-    tp_point: float
-    deviation: float
-    magic: int
-    comment: str = ""
-
-class SellRequest(BuyRequest):
-    pass
-
-class CloseRequest(BaseModel):
-    symbol: str
-    magic: int
-    deviation: float
-
-class DealsAllResponse(BaseModel):
-    total: int
-    limit: int
-    offset: int
-    data: List[dict]
 
 # --- HELPER ---
 DEAL_TYPES = {
