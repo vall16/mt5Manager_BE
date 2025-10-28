@@ -526,3 +526,43 @@ Traceback (most recent call last):
          ^^^^^^^^
 NameError: name 'MT5_PATH' is not defined
 2025-10-28 14:26:54,637 - WARNING - MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.
+2025-10-28 15:48:43,007 - INFO - Starting API
+2025-10-28 15:48:43,022 - INFO - Starting API
+2025-10-28 15:48:44,467 - INFO - Starting API
+2025-10-28 15:48:44,576 - INFO - Avvio dell'app FastAPI...
+2025-10-28 15:48:44,576 - ERROR - Errore durante l'inizializzazione MT5: name 'MT5_PATH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\crist\mt5Manager_BE\mt.py", line 143, in startup_event
+    path=MT5_PATH, # type: ignore
+         ^^^^^^^^
+NameError: name 'MT5_PATH' is not defined
+2025-10-28 15:48:44,586 - WARNING - MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.
+2025-10-28 15:48:44,704 - INFO - Starting API
+2025-10-28 15:48:44,890 - INFO - Avvio dell'app FastAPI...
+2025-10-28 15:48:44,890 - ERROR - Errore durante l'inizializzazione MT5: name 'MT5_PATH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\crist\mt5Manager_BE\mt.py", line 143, in startup_event
+    path=MT5_PATH, # type: ignore
+         ^^^^^^^^
+NameError: name 'MT5_PATH' is not defined
+2025-10-28 15:48:44,893 - WARNING - MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.
+2025-10-28 15:49:43,424 - INFO - Starting API
+2025-10-28 15:49:43,644 - INFO - Starting API
+2025-10-28 15:49:44,152 - INFO - Starting API
+2025-10-28 15:49:44,302 - INFO - Avvio dell'app FastAPI...
+2025-10-28 15:49:44,303 - ERROR - Errore durante l'inizializzazione MT5: name 'MT5_PATH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\crist\mt5Manager_BE\mt.py", line 143, in startup_event
+    path=MT5_PATH, # type: ignore
+         ^^^^^^^^
+NameError: name 'MT5_PATH' is not defined
+2025-10-28 15:49:44,312 - WARNING - MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.
+2025-10-28 15:49:44,491 - INFO - Starting API
+2025-10-28 15:49:44,622 - INFO - Avvio dell'app FastAPI...
+2025-10-28 15:49:44,622 - ERROR - Errore durante l'inizializzazione MT5: name 'MT5_PATH' is not defined
+Traceback (most recent call last):
+  File "C:\Users\crist\mt5Manager_BE\mt.py", line 143, in startup_event
+    path=MT5_PATH, # type: ignore
+         ^^^^^^^^
+NameError: name 'MT5_PATH' is not defined
+2025-10-28 15:49:44,625 - WARNING - MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.

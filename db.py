@@ -299,8 +299,101 @@ def delete_trader(trader_id: int):
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+# from fastapi import APIRouter, HTTPException
+# from datetime import datetime
+# import MetaTrader5 as mt5
+# import mysql.connector
+
+# router = APIRouter()
+
+
 @router.post("/traders/{trader_id}/copy_orders")
 def copy_orders(trader_id: int):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # 1️⃣ Recupera info del trader (master e slave)
+    cursor.execute("""
+        SELECT t.id, t.moltiplicatore, t.fix_lot, 
+               ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd,
+               ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd
+        FROM traders t
+        JOIN servers ms ON ms.id = t.master_server_id
+        JOIN servers ss ON ss.id = t.slave_server_id
+        WHERE t.id = %s
+    """, (trader_id,))
+    trader = cursor.fetchone()
+    if not trader:
+        raise HTTPException(status_code=404, detail="Trader non trovato")
+
+    # 2️⃣ Connessione al master
+    if not mt5.initialize(trader["master_name"], login=int(trader["master_user"]), password=trader["master_pwd"]):
+        raise HTTPException(status_code=500, detail="Connessione al master fallita")
+
+    master_positions = mt5.positions_get()
+    if not master_positions:
+        mt5.shutdown()
+        raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
+
+    # 3️⃣ Connessione allo slave
+    mt5.shutdown()
+    if not mt5.initialize(trader["slave_name"], login=int(trader["slave_user"]), password=trader["slave_pwd"]):
+        raise HTTPException(status_code=500, detail="Connessione allo slave fallita")
+
+    # 4️⃣ Copia ogni ordine master
+    for pos in master_positions:
+        symbol = pos.symbol
+        order_type = "buy" if pos.type == 0 else "sell"
+        volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)
+
+        # 🔹 invio ordine sullo slave
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": volume,
+            "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
+            "price": mt5.symbol_info_tick(symbol).ask if order_type == "buy" else mt5.symbol_info_tick(symbol).bid,
+            "sl": pos.sl,
+            "tp": pos.tp,
+            "deviation": 10,
+            "magic": 123456,
+            "comment": f"Copied from master {trader_id}",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+
+        result = mt5.order_send(request)
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            print(f"Errore copia {symbol}: {result.comment}")
+            continue
+
+        slave_ticket = result.order
+
+        # 5️⃣ Inserisci nel DB master_orders + slave_orders
+        cursor.execute("""
+            INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            trader_id, pos.ticket, symbol, order_type, pos.volume,
+            pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+        ))
+        master_order_id = cursor.lastrowid
+
+        cursor.execute("""
+            INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            trader_id, master_order_id, slave_ticket, symbol, order_type, volume,
+            request["price"], pos.sl, pos.tp
+        ))
+
+    conn.commit()
+    mt5.shutdown()
+    cursor.close()
+    conn.close()
+
+    return {"status": "ok", "message": "Ordini copiati con successo"}
+
     # 1. Recupera il trader master
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
