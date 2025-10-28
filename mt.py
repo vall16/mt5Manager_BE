@@ -8,6 +8,8 @@ from typing import List, Optional
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from fastapi_utils.tasks import repeat_every
+
 from models import LoginRequest, LoginResponse, BuyRequest, \
 ServerCheckRequest, UserResponse,GetLastCandleRequest,SellRequest, \
 CloseRequest,GetLastDealsHistoryRequest,DealsAllResponse
@@ -486,42 +488,6 @@ def login(req: LoginRequest):
     conn.close()
     return LoginResponse(success=False, message="Invalid credentials", user=None)
 
-# from fastapi import FastAPI
-# from pydantic import BaseModel
-# import MetaTrader5 as mt5
-
-# app = FastAPI()
-
-
-# @app.post("/check-server")
-# def check_server(data: ServerCheckRequest):
-#     # Disconnetti eventuale sessione MT5 aperta
-#     mt5.shutdown()
-
-#     # Inizializza MT5 con server, login e passwordd
-#     connected = mt5.initialize(
-#         server=data.server,
-#         login=data.login,
-#         password=data.password,
-#         # path=r"C:\Program Files\MetaTrader 5\terminal64.exe",
-
-#     )
-# #     959911
-# # Qpnldan1@1
-# # VTMarkets-Demo
-# # {
-# #   "server": "VTMarkets-Demo",
-# #   "login": 959911,
-# #   "password": "Qpnldan1@1",
-# #   "port": 443
-# # }
-
-#     if connected:
-#         mt5.shutdown()
-#         return {"status": "success", "message": "Server reachable and login valid"}
-#     else:
-#         error = mt5.last_error()
-#         return {"status": "error", "message": f"Cannot connect: {error}"}
 
 @app.post("/check-server")
 def check_server(data: ServerCheckRequest):
@@ -567,6 +533,70 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors(), "body": body.decode()}
     )
 
+from fastapi_utils.tasks import repeat_every
+
+@router.on_event("startup")
+@repeat_every(seconds=10)  # ogni 10 secondi, puoi cambiare
+def auto_copy_trading():
+    """
+    Replica automaticamente gli ordini dai master ai relativi slave.
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1. Recupera tutti i trader attivi che hanno slave
+        cursor.execute("""
+            SELECT t.id as master_id, t.master_server_id, t.slave_server_id
+            FROM traders t
+            WHERE t.is_active= 1
+              AND t.slave_server_id IS NOT NULL
+        """)
+        masters = cursor.fetchall()
+
+        for master in masters:
+            master_id = master["master_id"]
+            slave_id = master["slave_server_id"]
+
+            # 2. Ordini aperti sul master
+            cursor.execute("SELECT * FROM orders WHERE trader_id=%s AND status='open'", (master_id,))
+            master_orders = cursor.fetchall()
+
+            # 3. Replica sugli slave
+            for order in master_orders:
+                # Controlla se ordine già copiato per evitare duplicati
+                cursor.execute("""
+                    SELECT id FROM orders
+                    WHERE trader_id=%s AND symbol=%s AND magic=%s AND status='open'
+                """, (slave_id, order["symbol"], order["magic"]))
+                if cursor.fetchone():
+                    continue  # già copiato
+
+                # Applica moltiplicatore dello slave se presente
+                cursor.execute("SELECT moltiplicatore FROM traders WHERE id=%s", (slave_id,))
+                slave_mult = cursor.fetchone()
+                lot_multiplier = slave_mult["moltiplicatore"] if slave_mult else 1
+
+                cursor.execute("""
+                    INSERT INTO orders
+                    (trader_id, symbol, lot, sl, tp, magic, comment, status)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, 'open')
+                """, (
+                    slave_id,
+                    order["symbol"],
+                    order["lot"] * lot_multiplier,
+                    order["sl"],
+                    order["tp"],
+                    order["magic"],
+                    f"Copy from trader {master_id}"
+                ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print("Errore copytrading automatico:", e)
 
 
 # --- UVICORN RUN ---

@@ -8,10 +8,10 @@ res = mt5.initialize(path)
 print(res, mt5.last_error())
 
 
- {
-   "server": "VTMarkets-Demo",
-   "login": 959911,
-   "password": "Qpnldan1@1",
-   "port": 443,
-   "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
- }
+#  {
+#    "server": "VTMarkets-Demo",
+#    "login": 959911,
+#    "password": "Qpnldan1@1",
+#    "port": 443,
+#    "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
+#  }

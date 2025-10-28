@@ -18,22 +18,22 @@ import os
 def get_connection():
     try:
         
-        conn = mysql.connector.connect(
-            host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
-            user=os.environ.get("MYSQL_USER", "trader"),
-            password="vibe2025",
-            database=os.environ.get("MYSQL_DB", "trader_db"),
-            port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
-        )
+        # conn = mysql.connector.connect(
+        #     host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
+        #     user=os.environ.get("MYSQL_USER", "trader"),
+        #     password="vibe2025",
+        #     database=os.environ.get("MYSQL_DB", "trader_db"),
+        #     port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
+        # )
 
         # db locale 
-        # conn = mysql.connector.connect(
-        #     host="127.0.0.1",       # o "127.0.0.1"
-        #     user="trader",            # utente MySQL locale
-        #     password="vibe2025",            # lascia vuoto se non hai password
-        #     database="trader_db",   # nome del tuo database
-        #     port=3306               # porta predefinita MySQL
-        # )
+        conn = mysql.connector.connect(
+            host="127.0.0.1",       # o "127.0.0.1"
+            user="trader",            # utente MySQL locale
+            password="vibe2025",            # lascia vuoto se non hai password
+            database="trader_db",   # nome del tuo database
+            port=3306               # porta predefinita MySQL
+        )
 
 
         return conn
@@ -297,6 +297,38 @@ def delete_trader(trader_id: int):
         print("=== ERRORE DURANTE DELETE TRADER ===")
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+@router.post("/traders/{trader_id}/copy_orders")
+def copy_orders(trader_id: int):
+    # 1. Recupera il trader master
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM traders WHERE id=%s", (trader_id,))
+    master_trader = cursor.fetchone()
+    if not master_trader:
+        raise HTTPException(status_code=404, detail="Master trader not found")
+
+    # 2. Recupera gli ordini aperti sul master (da tabella orders)
+    cursor.execute("SELECT * FROM orders WHERE trader_id=%s AND status='open'", (trader_id,))
+    master_orders = cursor.fetchall()
+
+    # 3. Replica gli ordini sugli slave
+    cursor.execute("SELECT * FROM traders WHERE master_server_id=%s AND status=1", (master_trader["master_server_id"],))
+    slave_traders = cursor.fetchall()
+
+    for slave in slave_traders:
+        for order in master_orders:
+            cursor.execute("""
+                INSERT INTO orders
+                (trader_id, symbol, lot, sl, tp, magic, comment)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (slave["id"], order["symbol"], order["lot"]*slave.get("moltiplicatore",1),
+                  order["sl"], order["tp"], order["magic"], order["comment"]))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"status": "success", "copied_orders": len(master_orders)*len(slave_traders)}
+
 
 if __name__ == "__main__":
     create_user("roberto", "roberto123")
