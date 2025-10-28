@@ -490,8 +490,10 @@ def login(req: LoginRequest):
 
 
 @app.post("/check-server")
-def check_server(data: ServerCheckRequest):
+async def check_server(data: ServerCheckRequest):
     # Verifica che il path esista
+    print("Ricevuto dal client:", data.dict())
+
     if not os.path.exists(data.path):
         return {"status": "error", "message": f"Terminal not found at {data.path}"}
 
