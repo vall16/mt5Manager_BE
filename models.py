@@ -121,3 +121,8 @@ class DealsAllResponse(BaseModel):
     limit: int
     offset: int
     data: List[dict]
+
+# Modello per aggiornamento trader
+class TraderServersUpdate(BaseModel):
+    master_server_id: Optional[int] = None
+    slave_server_id: Optional[int] = None

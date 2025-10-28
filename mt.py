@@ -8,11 +8,11 @@ from typing import List, Optional
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from fastapi_utils.tasks import repeat_every
+# from fastapi_utils.tasks import repeat_every
 
 from models import LoginRequest, LoginResponse, BuyRequest, \
 ServerCheckRequest, UserResponse,GetLastCandleRequest,SellRequest, \
-CloseRequest,GetLastDealsHistoryRequest,DealsAllResponse
+CloseRequest,GetLastDealsHistoryRequest,DealsAllResponse,TraderServersUpdate
 
 from fastapi import FastAPI, Query,HTTPException, Request
 import MetaTrader5 as mt5
@@ -533,6 +533,36 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors(), "body": body.decode()}
     )
 
+@app.put("/traders/{trader_id}/servers")
+def update_trader_servers(trader_id: int, update: TraderServersUpdate):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Controlla se il trader esiste
+    cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+    trader = cursor.fetchone()
+    if not trader:
+        cursor.close()
+        conn.close()
+        raise HTTPException(status_code=404, detail="Trader not found")
+
+    # Aggiorna i server
+    cursor.execute("""
+        UPDATE traders
+        SET master_server_id = %s,
+            slave_server_id = %s
+        WHERE id = %s
+    """, (update.master_server_id, update.slave_server_id, trader_id))
+    
+    conn.commit()
+
+    # Recupera il trader aggiornato
+    cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+    updated_trader = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return updated_trader
 
 
     """

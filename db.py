@@ -7,7 +7,7 @@ from models import LoginRequest, LoginResponse, ServerRequest, Trader, Newtrader
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_utils.tasks import repeat_every
+# from fastapi_utils.tasks import repeat_every
 
 # app = FastAPI()
 router = APIRouter()
