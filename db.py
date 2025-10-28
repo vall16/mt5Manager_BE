@@ -7,6 +7,7 @@ from models import LoginRequest, LoginResponse, ServerRequest, Trader, Newtrader
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utils.tasks import repeat_every
 
 # app = FastAPI()
 router = APIRouter()
@@ -328,6 +329,7 @@ def copy_orders(trader_id: int):
     cursor.close()
     conn.close()
     return {"status": "success", "copied_orders": len(master_orders)*len(slave_traders)}
+
 
 
 if __name__ == "__main__":

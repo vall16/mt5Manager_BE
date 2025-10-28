@@ -533,11 +533,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors(), "body": body.decode()}
     )
 
-from fastapi_utils.tasks import repeat_every
 
-@router.on_event("startup")
-@repeat_every(seconds=10)  # ogni 10 secondi, puoi cambiare
-def auto_copy_trading():
+
     """
     Replica automaticamente gli ordini dai master ai relativi slave.
     """
