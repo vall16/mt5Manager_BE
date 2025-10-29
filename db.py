@@ -456,8 +456,14 @@ def copy_orders(trader_id: int):
         print(f"Nessuna posizione sul master")
         raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
+    # Stampa tutte le posizioni trovate
+    print("=== POSIZIONI SUL MASTER ===")
+    for pos in master_positions:
+        print(f"[MASTER] {pos._asdict()}")  # aggiunge il tag [MASTER] davanti ai dettagli
 
-    # 2️⃣ Connessione al server slave MT5
+
+
+    # # 3️⃣ Connessione allo slave MT5
     if not mt5.initialize(
         path=r"C:\Program Files\MetaTrader 5\terminal64.exe",
         login=int(trader["slave_user"]),
@@ -471,13 +477,39 @@ def copy_orders(trader_id: int):
             detail=f"Connessione al server fallita: {last_err}"
     )
     print(f"Connessione allo slave {trader['slave_user']} riuscita!")
-    # master_positions = mt5.positions_get()
-    # if not master_positions:
-    #     mt5.shutdown()
-    #     cursor.close()
-    #     conn.close()
-    #     raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
+
+    # 4️⃣ Copia ogni ordine master sullo slave
+    for pos in master_positions:
+
+        symbol = pos.symbol
+        order_type = "buy" if pos.type == 0 else "sell"
+        volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)    
+
+        # Stampa volume per debug
+        print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
+
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": volume,
+            "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
+            "price": mt5.symbol_info_tick(symbol).ask if order_type == "buy" else mt5.symbol_info_tick(symbol).bid,
+            "sl": pos.sl,
+            "tp": pos.tp,
+            "deviation": 10,
+            "magic": 123456,
+            "comment": f"Copied from master {trader_id}",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+
+        result = mt5.order_send(request)
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            print(f"Errore copia {symbol}: {result.comment}")
+            continue
+
+        slave_ticket = result.order
 
     # Restituiamo solo i dati del trader come test
     return {"message": "Trader info retrieved", "trader": trader}
