@@ -480,36 +480,72 @@ def copy_orders(trader_id: int):
 
 
     # 4️⃣ Copia ogni ordine master sullo slave
+    import traceback
+
     for pos in master_positions:
+        try:
+            symbol = pos.symbol
+            order_type = "buy" if pos.type == 0 else "sell"
+            volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)
+            print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
 
-        symbol = pos.symbol
-        order_type = "buy" if pos.type == 0 else "sell"
-        volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)    
+            # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
+            sym_info = mt5.symbol_info(symbol)
+            if sym_info is None:
+                print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
+                continue
 
-        # Stampa volume per debug
-        print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
+            if not sym_info.visible:
+                print(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
+                if not mt5.symbol_select(symbol, True):
+                    print(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
+                    continue
+                else:
+                    print(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
 
-        request = {
-            "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": symbol,
-            "volume": volume,
-            "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
-            "price": mt5.symbol_info_tick(symbol).ask if order_type == "buy" else mt5.symbol_info_tick(symbol).bid,
-            "sl": pos.sl,
-            "tp": pos.tp,
-            "deviation": 10,
-            "magic": 123456,
-            "comment": f"Copied from master {trader_id}",
-            "type_time": mt5.ORDER_TIME_GTC,
-            "type_filling": mt5.ORDER_FILLING_IOC,
-        }
+            tick = mt5.symbol_info_tick(symbol)
+            if not tick:
+                print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
+                continue
 
-        result = mt5.order_send(request)
-        if result.retcode != mt5.TRADE_RETCODE_DONE:
-            print(f"Errore copia {symbol}: {result.comment}")
-            continue
+            request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": volume,
+                "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
+                "price": tick.ask if order_type == "buy" else tick.bid,
+                "sl": pos.sl,
+                "tp": pos.tp,
+                "deviation": 10,
+                "magic": 123456,
+                "comment": f"Copied from master {trader_id}",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
 
-        slave_ticket = result.order
+            print(f"🔁 Invio ordine su slave: {request}")
+            result = mt5.order_send(request)
+
+            if result is None:
+                print(f"❌ Errore invio ordine {symbol}: {mt5.last_error()}")
+                continue
+
+            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                print(f"❌ Errore copia {symbol}: retcode={result.retcode}, comment={result.comment}")
+                continue
+
+            print(f"✅ Copiato {symbol}: ticket {result.order}")
+
+        except Exception as e:
+            print("❌ Eccezione durante la copia ordine:")
+            print(traceback.format_exc())
+        continue
+
+    # ✅ Pulizia finale
+    mt5.shutdown()
+    cursor.close()
+    conn.close()
+
 
     # Restituiamo solo i dati del trader come test
     return {"message": "Trader info retrieved", "trader": trader}
