@@ -8,6 +8,8 @@ from typing import List, Optional
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+
+
 # from fastapi_utils.tasks import repeat_every
 
 from models import LoginRequest, LoginResponse, BuyRequest, \
@@ -38,17 +40,19 @@ logging.info("Starting API")
 # --- FASTAPI APP ---
 app = FastAPI()
 
-app.include_router(db_router)
 
 
 # --- CORS ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # il tuo frontend Angular
+    allow_origins=["http://localhost:4200","http://127.0.0.1:4200"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(db_router)
+
 
 
 # --- HELPER ---
@@ -535,6 +539,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors(), "body": body.decode()}
     )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)},
+    )
+
+
 @app.put("/traders/{trader_id}/servers")
 def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     conn = get_connection()
@@ -567,67 +579,7 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     return updated_trader
 
 
-    """
-    Replica automaticamente gli ordini dai master ai relativi slave.
-    """
-    try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # 1. Recupera tutti i trader attivi che hanno slave
-        cursor.execute("""
-            SELECT t.id as master_id, t.master_server_id, t.slave_server_id
-            FROM traders t
-            WHERE t.is_active= 1
-              AND t.slave_server_id IS NOT NULL
-        """)
-        masters = cursor.fetchall()
-
-        for master in masters:
-            master_id = master["master_id"]
-            slave_id = master["slave_server_id"]
-
-            # 2. Ordini aperti sul master
-            cursor.execute("SELECT * FROM orders WHERE trader_id=%s AND status='open'", (master_id,))
-            master_orders = cursor.fetchall()
-
-            # 3. Replica sugli slave
-            for order in master_orders:
-                # Controlla se ordine già copiato per evitare duplicati
-                cursor.execute("""
-                    SELECT id FROM orders
-                    WHERE trader_id=%s AND symbol=%s AND magic=%s AND status='open'
-                """, (slave_id, order["symbol"], order["magic"]))
-                if cursor.fetchone():
-                    continue  # già copiato
-
-                # Applica moltiplicatore dello slave se presente
-                cursor.execute("SELECT moltiplicatore FROM traders WHERE id=%s", (slave_id,))
-                slave_mult = cursor.fetchone()
-                lot_multiplier = slave_mult["moltiplicatore"] if slave_mult else 1
-
-                cursor.execute("""
-                    INSERT INTO orders
-                    (trader_id, symbol, lot, sl, tp, magic, comment, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, 'open')
-                """, (
-                    slave_id,
-                    order["symbol"],
-                    order["lot"] * lot_multiplier,
-                    order["sl"],
-                    order["tp"],
-                    order["magic"],
-                    f"Copy from trader {master_id}"
-                ))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-    except Exception as e:
-        print("Errore copytrading automatico:", e)
-
-
+   
 # --- UVICORN RUN ---
 if __name__ == "__main__":
     import uvicorn
