@@ -112,17 +112,17 @@ def close_all(symbol, magic, deviation):
         res.append(mt5.order_send(request))
     return res
 
-# --- STARTUP EVENT ---
-# @app.on_event("startup") --- originale con il login
-# def startup_event():
+# --- STARTUP EVENT originale col login---
+@app.on_event("startup")
+def startup_event():
     path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
     if not os.path.exists(path):
         logging.error(f"MetaTrader5 path not found: {path}")
         raise FileNotFoundError(f"{path} does not exist")
     
-    # login = os.environ.get("ACCOUNT")
-    # password = os.environ.get("PASSWORD")
-    # server = os.environ.get("SERVER")
+    login = os.environ.get("ACCOUNT")
+    password = os.environ.get("PASSWORD")
+    server = os.environ.get("SERVER")
 
     # --- CREDENZIALI HARD-CODED ---
     login = "959911"
@@ -134,29 +134,31 @@ def close_all(symbol, magic, deviation):
     logging.info("MT5 initialized successfully")
 
 # versione che non si logga
-@app.on_event("startup")
-def startup_event():
-    logging.info("Avvio dell'app FastAPI...")
+# @app.on_event("startup")
+# def startup_event():
+#     logging.info("Avvio dell'app FastAPI...")
     
-    # Chiude eventuali sessioni MT5 aperte
-    mt5.shutdown()
+#     # Chiude eventuali sessioni MT5 aperte
+#     mt5.shutdown()
     
-    try:
-        # Inizializza MT5 con timeout
-        if not mt5.initialize(
-            path=MT5_PATH, # type: ignore
-            login=int(MT5_LOGIN), # type: ignore
-            password=str(MT5_PASSWORD), # type: ignore
-            server=MT5_SERVER, # type: ignore
-            timeout=5000  # 5 secondi
-        ):
-            logging.error(f"MT5 initialize failed: {mt5.last_error()}")
-            logging.warning("MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.")
-        else:
-            logging.info("MT5 initialized successfully")
-    except Exception as e:
-        logging.exception(f"Errore durante l'inizializzazione MT5: {e}")
-        logging.warning("MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.")
+#     try:
+#         # Inizializza MT5 con timeout
+#         if not mt5.initialize(
+#             path=MT5_PATH, # type: ignore
+#             login=int(MT5_LOGIN), # type: ignore
+#             password=str(MT5_PASSWORD), # type: ignore
+#             server=MT5_SERVER, # type: ignore
+#             timeout=5000  # 5 secondi
+#         ):
+#             logging.error(f"MT5 initialize failed: {mt5.last_error()}")
+#             logging.warning("MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.")
+#         else:
+#             logging.info("MT5 initialized successfully")
+#     except Exception as e:
+#         logging.exception(f"Errore durante l'inizializzazione MT5: {e}")
+#         logging.warning("MT5 non inizializzato, alcune funzionalità potrebbero non funzionare.")
+
+
 # --- ENDPOINTS ---
 @app.get("/healthz")
 def healthz():

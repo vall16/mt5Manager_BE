@@ -457,7 +457,7 @@ def copy_orders(trader_id: int):
         raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
 
-    # 2️⃣ Connessione al server MT5
+    # 2️⃣ Connessione al server slave MT5
     if not mt5.initialize(
         path=r"C:\Program Files\MetaTrader 5\terminal64.exe",
         login=int(trader["slave_user"]),
