@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from dotenv import load_dotenv
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -35,6 +36,10 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 logging.info("Starting API")
+
+
+# Carica variabili dal file .env
+load_dotenv()
 
 # --- FASTAPI APP ---
 app = FastAPI()
@@ -67,6 +72,46 @@ DEAL_TYPES = {
     # mt5.DEAL_TYPE_SWAP: "SWAP",
     # mt5.DEAL_TYPE_CLOSE_BY: "CLOSE_BY"
 }
+
+import os
+import logging
+from dotenv import load_dotenv
+import MetaTrader5 as mt5
+from fastapi import FastAPI
+
+app = FastAPI()
+
+# Carica variabili dal file .env
+load_dotenv()
+
+@app.on_event("startup")
+def startup_event():
+    path = os.getenv("MT5_PATH", r"C:\Program Files\MetaTrader 5\terminal64.exe")
+    if not os.path.exists(path):
+        logging.error(f"MetaTrader5 path not found: {path}")
+        raise FileNotFoundError(f"{path} does not exist")
+
+    login = os.getenv("ACCOUNT")
+    password = os.getenv("PASSWORD")
+    server = os.getenv("SERVER")
+
+    if not (login and password and server):
+        logging.error("Variabili d'ambiente MT5 mancanti nel .env")
+        raise RuntimeError("MT5 credentials missing")
+
+    try:
+        login_int = int(login)
+    except ValueError:
+        logging.error(f"Login MT5 non valido: {login}")
+        raise
+
+    if not mt5.initialize(path, login=login_int, password=password, server=server):
+        last_err = mt5.last_error()
+        logging.error(f"MT5 initialize failed: {last_err}")
+        raise RuntimeError(f"MT5 initialize failed: {last_err}")
+
+    logging.info(f"MT5 initialized successfully: account {login} on server {server}")
+
 
 def get_trade_mode_description(mode):
     modes = {
@@ -112,8 +157,8 @@ def close_all(symbol, magic, deviation):
     return res
 
 # --- STARTUP EVENT originale col login---
-@app.on_event("startup")
-def startup_event():
+# @app.on_event("startup")
+# def startup_event():
     path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
     if not os.path.exists(path):
         logging.error(f"MetaTrader5 path not found: {path}")
@@ -131,6 +176,10 @@ def startup_event():
         logging.error(f"MT5 initialize failed: {mt5.last_error()}")
         raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
     logging.info("MT5 initialized successfully")
+
+
+
+
 
 # versione che non si logga
 # @app.on_event("startup")
