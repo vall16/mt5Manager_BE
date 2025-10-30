@@ -9,7 +9,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 
-
 # from fastapi_utils.tasks import repeat_every
 
 from models import LoginRequest, LoginResponse, BuyRequest, \

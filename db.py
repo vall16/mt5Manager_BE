@@ -516,7 +516,7 @@ def copy_orders(trader_id: int):
             # print(f"  filling_mode: {info.filling_mode}")
             # print(f"  trade_mode: {info.trade_mode}")
             # print(f"  trade_exemode: {info.trade_exemode}")
-            
+
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
@@ -535,15 +535,29 @@ def copy_orders(trader_id: int):
             print(f"🔁 Invio ordine su slave: {request}")
             result = mt5.order_send(request)
 
-            if result is None:
-                print(f"❌ Errore invio ordine {symbol}: {mt5.last_error()}")
-                continue
+            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+                # 🔹 Inserimento nel DB master_orders
+                cursor.execute("""
+                    INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    trader_id, pos.ticket, symbol, order_type, pos.volume,
+                    pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+                ))
+                master_order_id = cursor.lastrowid
 
-            if result.retcode != mt5.TRADE_RETCODE_DONE:
-                print(f"❌ Errore copia {symbol}: retcode={result.retcode}, comment={result.comment}")
-                continue
+                # 🔹 Inserimento nel DB slave_orders
+                cursor.execute("""
+                    INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                """, (
+                    trader_id, master_order_id, result.order, symbol, order_type, volume,
+                    request["price"], pos.sl, pos.tp
+                ))
+                conn.commit()
+                print(f"✅ Ordine copiato e registrato: {symbol}")
 
-            print(f"✅ Copiato {symbol}: ticket {result.order}")
+
 
         except Exception as e:
             print("❌ Eccezione durante la copia ordine:")
