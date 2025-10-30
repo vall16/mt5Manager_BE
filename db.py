@@ -304,7 +304,7 @@ def delete_trader(trader_id: int):
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-# funziona che copia gli ordini del master sullo slave e aggiorna le tabelle relative nel db
+# funziona che copia gli ordini del master sullo slave e aggiorna le tabelle relative nel
 @router.post("/traders/{trader_id}/copy_orders")
 def copy_orders(trader_id: int):
     conn = get_connection()

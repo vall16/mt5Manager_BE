@@ -159,23 +159,23 @@ def close_all(symbol, magic, deviation):
 # --- STARTUP EVENT originale col login---
 # @app.on_event("startup")
 # def startup_event():
-    path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
-    if not os.path.exists(path):
-        logging.error(f"MetaTrader5 path not found: {path}")
-        raise FileNotFoundError(f"{path} does not exist")
+    # path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+    # if not os.path.exists(path):
+    #     logging.error(f"MetaTrader5 path not found: {path}")
+    #     raise FileNotFoundError(f"{path} does not exist")
     
-    login = os.environ.get("ACCOUNT")
-    password = os.environ.get("PASSWORD")
-    server = os.environ.get("SERVER")
+    # login = os.environ.get("ACCOUNT")
+    # password = os.environ.get("PASSWORD")
+    # server = os.environ.get("SERVER")
 
-    # --- CREDENZIALI HARD-CODED ---
-    login = "959911"
-    password = "Qpnldan1@1"
-    server = "VTMarkets-Demo"
-    if not mt5.initialize(path, login=int(login), password=str(password), server=server):
-        logging.error(f"MT5 initialize failed: {mt5.last_error()}")
-        raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
-    logging.info("MT5 initialized successfully")
+    # # --- CREDENZIALI HARD-CODED ---
+    # login = "959911"
+    # password = "Qpnldan1@1"
+    # server = "VTMarkets-Demo"
+    # if not mt5.initialize(path, login=int(login), password=str(password), server=server):
+    #     logging.error(f"MT5 initialize failed: {mt5.last_error()}")
+    #     raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
+    # logging.info("MT5 initialized successfully")
 
 
 
