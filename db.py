@@ -1,4 +1,5 @@
 from datetime import datetime
+from logging import info
 from typing import List
 import uuid
 import mysql.connector
@@ -495,6 +496,7 @@ def copy_orders(trader_id: int):
                 print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
                 continue
 
+
             if not sym_info.visible:
                 print(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
                 if not mt5.symbol_select(symbol, True):
@@ -507,7 +509,14 @@ def copy_orders(trader_id: int):
             if not tick:
                 print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
                 continue
-
+            
+            sym_info = mt5.symbol_info(symbol)
+            info = mt5.symbol_info(symbol)
+            # print(f"Symbol info for {symbol}:")
+            # print(f"  filling_mode: {info.filling_mode}")
+            # print(f"  trade_mode: {info.trade_mode}")
+            # print(f"  trade_exemode: {info.trade_exemode}")
+            
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
@@ -520,7 +529,7 @@ def copy_orders(trader_id: int):
                 "magic": 123456,
                 "comment": f"Copied from master {trader_id}",
                 "type_time": mt5.ORDER_TIME_GTC,
-                "type_filling": mt5.ORDER_FILLING_IOC,
+                # "type_filling": filling_mode, dà errore..
             }
 
             print(f"🔁 Invio ordine su slave: {request}")
