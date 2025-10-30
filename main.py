@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
 import MetaTrader5 as mt5
 
+# i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
 

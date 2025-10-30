@@ -424,3 +424,13 @@
 2025-10-30 16:12:21,323 - INFO - Starting API
 2025-10-30 16:12:22,026 - INFO - Starting API
 2025-10-30 16:12:22,199 - INFO - MT5 initialized successfully
+2025-10-30 16:13:54,997 - ERROR - Validation error: [{'type': 'int_parsing', 'loc': ('body', 'login'), 'msg': 'Input should be a valid integer, unable to parse string as an integer', 'input': 'pippo'}] for body {"server":"william","login":"pippo","password":"prova","port":222,"path":"C:\\Program Files\\MetaTrader 5\\terminal64.exe"}
+2025-10-30 16:24:32,579 - ERROR - Unhandled exception: invalid literal for int() with base 10: 'trader4'
+2025-10-30 16:29:37,961 - INFO - Starting API
+2025-10-30 16:29:39,026 - INFO - Starting API
+2025-10-30 16:29:45,489 - INFO - MT5 initialized successfully
+2025-10-30 16:32:26,863 - ERROR - Unhandled exception: 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+2025-10-30 16:32:30,184 - ERROR - Unhandled exception: 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+2025-10-30 16:32:47,289 - ERROR - Unhandled exception: 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+2025-10-30 16:41:39,971 - INFO - Starting API
+2025-10-30 16:41:41,803 - INFO - Starting API
