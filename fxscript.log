@@ -434,3 +434,19 @@
 2025-10-30 16:32:47,289 - ERROR - Unhandled exception: 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
 2025-10-30 16:41:39,971 - INFO - Starting API
 2025-10-30 16:41:41,803 - INFO - Starting API
+2025-10-30 16:41:50,902 - INFO - MT5 initialized successfully
+2025-10-30 17:03:12,885 - INFO - Starting API
+2025-10-30 17:03:13,371 - INFO - Starting API
+2025-10-30 17:03:13,400 - INFO - MT5 initialized successfully
+2025-10-30 17:15:06,960 - INFO - Starting API
+2025-10-30 17:15:07,498 - INFO - Starting API
+2025-10-30 17:15:07,537 - INFO - MT5 initialized successfully
+2025-10-30 17:18:34,046 - INFO - Starting API
+2025-10-30 17:18:40,365 - INFO - Starting API
+2025-10-30 17:18:41,246 - INFO - MT5 initialized successfully
+2025-10-30 17:26:07,460 - INFO - Starting API
+2025-10-30 17:26:08,056 - INFO - Starting API
+2025-10-30 17:26:08,872 - INFO - MT5 initialized successfully
+2025-10-30 17:28:55,446 - INFO - Starting API
+2025-10-30 17:28:57,058 - INFO - Starting API
+2025-10-30 17:28:57,475 - INFO - MT5 initialized successfully

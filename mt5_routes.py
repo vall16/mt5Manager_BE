@@ -1,7 +1,8 @@
+from datetime import datetime
 import os
 import MetaTrader5 as mt5
 import logging
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from models import (
     LoginRequest, LoginResponse, BuyRequest, SellRequest, CloseRequest,
     GetLastCandleRequest, GetLastDealsHistoryRequest, DealsAllResponse,
@@ -18,6 +19,25 @@ def login(request: LoginRequest):
         raise HTTPException(status_code=400, detail="MT5 login failed")
     info = mt5.account_info()
     return {"login": info.login, "server": info.server, "balance": info.balance}
+
+# --- ACCOUNT INFO & MARGIN ---
+@router.get("/account/info")
+def account_info():
+    info = mt5.account_info()
+    return info._asdict() if info else {"error": mt5.last_error()}
+
+@router.get("/account/margin")
+def account_margin():
+    info = mt5.account_info()
+    if info:
+        return {
+            "balance": info.balance,
+            "equity": info.equity,
+            "margin": info.margin,
+            "margin_level": info.margin_level,
+        }
+    return {"error": mt5.last_error()}
+
 
 # --- SYMBOLS ---
 @router.get("/symbols/tradable")
@@ -38,6 +58,52 @@ def symbols_tradable():
             "point": s.point
         })
     return result
+
+# --verfica la tradibilità di un simbolo
+@router.get("/diagnostic/{symbol}")
+def diagnostic(symbol: str):
+    info = {}
+
+    # 1) Terminale inizializzato?
+    info["initialized"] = mt5.initialize()
+
+    # 2) Account info
+    acc = mt5.account_info()
+    info["account_connected"] = acc is not None
+    if acc:
+        info["trade_allowed"] = acc.trade_allowed
+        info["trade_mode"] = acc.trade_mode
+        info["margin_mode"] = acc.margin_mode
+
+    # 3) Simbolo
+    sym = mt5.symbol_info(symbol)
+    info["symbol_exists"] = sym is not None
+    if sym:
+        info["symbol_tradable"] = sym.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL
+        info["symbol_trade_mode"] = sym.trade_mode
+        # Se non selezionato → selezioniamolo
+        info["symbol_selected"] = sym.select if sym.select else mt5.symbol_select(symbol, True)
+
+    # 4) Prova ORDER_CHECK (simulazione ordine)
+    if sym and acc:
+        tick = mt5.symbol_info_tick(symbol)
+        req = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": 0.1,
+            "type": mt5.ORDER_TYPE_BUY,
+            "price": tick.ask if tick else 0,
+            "sl": 0,
+            "tp": 0,
+            "deviation": 10,
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+        check = mt5.order_check(req)
+        info["order_check"] = check._asdict() if check else mt5.last_error()
+
+    return info
+
 
 # --- BUY ORDER ---
 @router.post("/order/buy")
@@ -118,3 +184,67 @@ async def check_server(data: ServerCheckRequest):
         # Inizializzazione fallita
         error = mt5.last_error()
         return {"status": "error", "message": f"Cannot connect: {error}"}
+
+@router.post("/order/sell")
+def order_sell(req: SellRequest):
+    tick = mt5.symbol_info_tick(req.symbol)
+    if not tick:
+        return {"error": mt5.last_error()}
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": req.symbol,
+        "volume": req.lot,
+        "type": mt5.ORDER_TYPE_SELL,
+        "price": tick.bid,
+        "sl": tick.bid + req.sl_point * mt5.symbol_info(req.symbol).point,
+        "tp": tick.bid - req.tp_point * mt5.symbol_info(req.symbol).point,
+        "deviation": req.deviation,
+        "magic": req.magic,
+        "comment": req.comment,
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_IOC,
+    }
+    result = mt5.order_send(request)
+    return result._asdict() if result else {"error": mt5.last_error()}
+
+# --- ORDERS HISTORY : NON ANCORA ESEGUITI !---
+@router.get("/orders/history", summary="Storico ordini", description="Restituisce lo storico ordini tra due date.")
+def orders_history(
+    from_date: str = Query("2024-01-01 00:00:00", description="Data inizio"),
+    to_date: str = Query(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description="Data fine"),
+):
+    try:
+        from_dt = datetime.strptime(from_date, "%Y-%m-%d %H:%M:%S")
+        to_dt = datetime.strptime(to_date, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return {"error": "Formato data non valido. Usa YYYY-MM-DD HH:MM:SS"}
+
+    orders = mt5.history_orders_get(from_dt, to_dt)
+    if orders is None:
+        return {"error": mt5.last_error()}
+    return [o._asdict() for o in orders]
+
+
+# --- ORDER MODIFY ---
+@router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
+def order_modify(
+    symbol: str,
+    ticket: int,
+    new_sl: float,
+    new_tp: float,
+):
+    position = mt5.positions_get(ticket=ticket)
+    if not position:
+        return {"error": f"Posizione {ticket} non trovata."}
+    pos = position[0]
+    request = {
+        "action": mt5.TRADE_ACTION_SLTP,
+        "symbol": symbol,
+        "position": ticket,
+        "sl": new_sl,
+        "tp": new_tp,
+        "magic": pos.magic,
+        "comment": "modify SL/TP",
+    }
+    result = mt5.order_send(request)
+    return result._asdict() if result else {"error": mt5.last_error()}
