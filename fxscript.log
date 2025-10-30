@@ -111,3 +111,316 @@
 2025-10-30 14:22:51,600 - INFO - Starting API
 2025-10-30 14:22:51,784 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
 2025-10-30 14:22:51,833 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:37:50,209 - INFO - Starting API
+2025-10-30 14:37:50,222 - INFO - Starting API
+2025-10-30 14:37:51,113 - INFO - Starting API
+2025-10-30 14:37:51,347 - INFO - Starting API
+2025-10-30 14:37:51,513 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:37:51,595 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:41:27,812 - INFO - Starting API
+2025-10-30 14:41:27,912 - INFO - Starting API
+2025-10-30 14:41:28,681 - INFO - Starting API
+2025-10-30 14:41:28,837 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:41:28,897 - INFO - Starting API
+2025-10-30 14:41:29,408 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:42:34,807 - INFO - Starting API
+2025-10-30 14:42:34,813 - INFO - Starting API
+2025-10-30 14:42:35,401 - INFO - Starting API
+2025-10-30 14:42:35,443 - INFO - Starting API
+2025-10-30 14:42:35,535 - ERROR - Variabili d'ambiente MT5 mancanti nel .env
+2025-10-30 14:42:35,569 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:43:35,921 - INFO - Starting API
+2025-10-30 14:43:37,222 - INFO - Starting API
+2025-10-30 14:43:37,303 - INFO - Starting API
+2025-10-30 14:43:37,582 - ERROR - Variabili d'ambiente MT5 mancanti nel .env
+2025-10-30 14:43:37,917 - INFO - Starting API
+2025-10-30 14:43:38,239 - INFO - MT5 initialized successfully: account 959911 on server VTMarkets-Demo
+2025-10-30 14:43:38,241 - INFO - MT5 initialized successfully
+2025-10-30 14:43:58,758 - INFO - Starting API
+2025-10-30 14:43:59,388 - INFO - Starting API
+2025-10-30 14:43:59,451 - INFO - MT5 initialized successfully
+2025-10-30 14:43:59,628 - INFO - Starting API
+2025-10-30 14:43:59,980 - INFO - Starting API
+2025-10-30 14:44:00,338 - INFO - MT5 initialized successfully
+2025-10-30 14:47:02,631 - INFO - Starting API
+2025-10-30 14:47:02,910 - INFO - Starting API
+2025-10-30 14:47:03,888 - INFO - Starting API
+2025-10-30 14:47:04,163 - INFO - Starting API
+2025-10-30 14:47:04,216 - INFO - MT5 initialized successfully
+2025-10-30 14:47:05,847 - INFO - MT5 initialized successfully
+2025-10-30 14:47:43,149 - INFO - Starting API
+2025-10-30 14:47:43,620 - INFO - Starting API
+2025-10-30 14:47:44,161 - INFO - Starting API
+2025-10-30 14:47:44,207 - INFO - Starting API
+2025-10-30 14:47:44,399 - INFO - MT5 initialized successfully
+2025-10-30 14:47:44,457 - INFO - MT5 initialized successfully
+2025-10-30 14:47:50,764 - INFO - === NEW REQUEST ===
+2025-10-30 14:47:50,765 - INFO - Path: /servers
+2025-10-30 14:47:50,766 - INFO - Method: GET
+2025-10-30 14:47:50,767 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:47:50,770 - INFO - Response status: 404
+2025-10-30 14:47:50,770 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:47:50,971 - INFO - === NEW REQUEST ===
+2025-10-30 14:47:50,971 - INFO - Path: /traders
+2025-10-30 14:47:50,971 - INFO - Method: GET
+2025-10-30 14:47:50,971 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:47:50,972 - INFO - Response status: 404
+2025-10-30 14:47:50,973 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:50:27,235 - INFO - === NEW REQUEST ===
+2025-10-30 14:50:27,235 - INFO - Path: /servers
+2025-10-30 14:50:27,235 - INFO - Method: GET
+2025-10-30 14:50:27,236 - INFO - Headers: {'user-agent': 'Mozilla/5.0 (Windows NT; Windows NT 10.0; it-IT) WindowsPowerShell/5.1.19041.6456', 'host': '127.0.0.1:8080', 'connection': 'Keep-Alive'}
+2025-10-30 14:50:27,237 - INFO - Response status: 404
+2025-10-30 14:50:27,237 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:50:44,150 - INFO - === NEW REQUEST ===
+2025-10-30 14:50:44,150 - INFO - Path: /servers
+2025-10-30 14:50:44,151 - INFO - Method: GET
+2025-10-30 14:50:44,151 - INFO - Headers: {'user-agent': 'Mozilla/5.0 (Windows NT; Windows NT 10.0; it-IT) WindowsPowerShell/5.1.19041.6456', 'host': '127.0.0.1:8080', 'connection': 'Keep-Alive'}
+2025-10-30 14:50:44,152 - INFO - Response status: 404
+2025-10-30 14:50:44,152 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:50:59,479 - INFO - === NEW REQUEST ===
+2025-10-30 14:50:59,479 - INFO - Path: /servers
+2025-10-30 14:50:59,479 - INFO - Method: GET
+2025-10-30 14:50:59,479 - INFO - Headers: {'host': '127.0.0.1:8080', 'user-agent': 'curl/8.13.0', 'accept': '*/*'}
+2025-10-30 14:50:59,481 - INFO - Response status: 404
+2025-10-30 14:50:59,481 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:54:13,692 - INFO - === NEW REQUEST ===
+2025-10-30 14:54:13,693 - INFO - Path: /servers
+2025-10-30 14:54:13,693 - INFO - Method: GET
+2025-10-30 14:54:13,693 - INFO - Headers: {'host': '127.0.0.1:8080', 'user-agent': 'curl/8.13.0', 'accept': '*/*'}
+2025-10-30 14:54:13,694 - INFO - Response status: 404
+2025-10-30 14:54:13,694 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:55:17,088 - INFO - Starting API
+2025-10-30 14:55:21,699 - INFO - Starting API
+2025-10-30 14:55:22,161 - INFO - Starting API
+2025-10-30 14:55:22,487 - INFO - MT5 initialized successfully
+2025-10-30 14:55:37,691 - INFO - === NEW REQUEST ===
+2025-10-30 14:55:37,692 - INFO - Path: /servers
+2025-10-30 14:55:37,692 - INFO - Method: GET
+2025-10-30 14:55:37,692 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:55:37,693 - INFO - Response status: 404
+2025-10-30 14:55:37,693 - INFO - Response headers: {'content-length': '22', 'content-type': 'application/json'}
+2025-10-30 14:55:52,566 - INFO - === NEW REQUEST ===
+2025-10-30 14:55:52,567 - INFO - Path: /test_db
+2025-10-30 14:55:52,567 - INFO - Method: GET
+2025-10-30 14:55:52,567 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:55:53,014 - INFO - Response status: 200
+2025-10-30 14:55:53,014 - INFO - Response headers: {'content-length': '76', 'content-type': 'application/json'}
+2025-10-30 14:59:10,813 - INFO - === NEW REQUEST ===
+2025-10-30 14:59:10,813 - INFO - Path: /docs
+2025-10-30 14:59:10,813 - INFO - Method: GET
+2025-10-30 14:59:10,813 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:59:10,814 - INFO - Response status: 200
+2025-10-30 14:59:10,814 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 14:59:11,352 - INFO - === NEW REQUEST ===
+2025-10-30 14:59:11,352 - INFO - Path: /openapi.json
+2025-10-30 14:59:11,352 - INFO - Method: GET
+2025-10-30 14:59:11,352 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:59:11,417 - INFO - Response status: 200
+2025-10-30 14:59:11,418 - INFO - Response headers: {'content-length': '14731', 'content-type': 'application/json'}
+2025-10-30 14:59:18,159 - INFO - === NEW REQUEST ===
+2025-10-30 14:59:18,159 - INFO - Path: /healthz
+2025-10-30 14:59:18,159 - INFO - Method: GET
+2025-10-30 14:59:18,159 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:59:18,166 - INFO - Response status: 200
+2025-10-30 14:59:18,166 - INFO - Response headers: {'content-length': '15', 'content-type': 'application/json'}
+2025-10-30 14:59:40,243 - INFO - === NEW REQUEST ===
+2025-10-30 14:59:40,244 - INFO - Path: /docs
+2025-10-30 14:59:40,244 - INFO - Method: GET
+2025-10-30 14:59:40,244 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:59:40,245 - INFO - Response status: 200
+2025-10-30 14:59:40,245 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 14:59:40,489 - INFO - === NEW REQUEST ===
+2025-10-30 14:59:40,489 - INFO - Path: /openapi.json
+2025-10-30 14:59:40,489 - INFO - Method: GET
+2025-10-30 14:59:40,489 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 14:59:40,490 - INFO - Response status: 200
+2025-10-30 14:59:40,491 - INFO - Response headers: {'content-length': '14731', 'content-type': 'application/json'}
+2025-10-30 15:00:31,261 - INFO - === NEW REQUEST ===
+2025-10-30 15:00:31,262 - INFO - Path: /docs
+2025-10-30 15:00:31,262 - INFO - Method: GET
+2025-10-30 15:00:31,262 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:00:31,263 - INFO - Response status: 200
+2025-10-30 15:00:31,263 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 15:00:31,624 - INFO - === NEW REQUEST ===
+2025-10-30 15:00:31,624 - INFO - Path: /openapi.json
+2025-10-30 15:00:31,624 - INFO - Method: GET
+2025-10-30 15:00:31,624 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:00:31,626 - INFO - Response status: 200
+2025-10-30 15:00:31,626 - INFO - Response headers: {'content-length': '14731', 'content-type': 'application/json'}
+2025-10-30 15:02:00,573 - INFO - === NEW REQUEST ===
+2025-10-30 15:02:00,574 - INFO - Path: /test_db
+2025-10-30 15:02:00,574 - INFO - Method: GET
+2025-10-30 15:02:00,574 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:02:00,621 - INFO - Response status: 200
+2025-10-30 15:02:00,621 - INFO - Response headers: {'content-length': '76', 'content-type': 'application/json'}
+2025-10-30 15:02:38,136 - INFO - Starting API
+2025-10-30 15:02:41,749 - INFO - Starting API
+2025-10-30 15:02:42,556 - INFO - Starting API
+2025-10-30 15:02:42,609 - INFO - MT5 initialized successfully
+2025-10-30 15:02:54,256 - INFO - === NEW REQUEST ===
+2025-10-30 15:02:54,258 - INFO - Path: /docs
+2025-10-30 15:02:54,258 - INFO - Method: GET
+2025-10-30 15:02:54,259 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:02:54,260 - INFO - Response status: 200
+2025-10-30 15:02:54,261 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 15:02:56,020 - INFO - === NEW REQUEST ===
+2025-10-30 15:02:56,021 - INFO - Path: /openapi.json
+2025-10-30 15:02:56,024 - INFO - Method: GET
+2025-10-30 15:02:56,024 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:02:56,026 - INFO - Response status: 200
+2025-10-30 15:02:56,026 - INFO - Response headers: {'content-length': '14731', 'content-type': 'application/json'}
+2025-10-30 15:07:33,875 - INFO - Starting API
+2025-10-30 15:07:34,125 - INFO - Starting API
+2025-10-30 15:07:34,473 - INFO - Starting API
+2025-10-30 15:07:34,485 - INFO - Starting API
+2025-10-30 15:07:35,146 - INFO - Starting API
+2025-10-30 15:07:35,238 - INFO - Starting API
+2025-10-30 15:07:35,305 - INFO - Starting API
+2025-10-30 15:07:35,426 - INFO - Starting API
+2025-10-30 15:07:35,555 - INFO - MT5 initialized successfully
+2025-10-30 15:07:35,740 - INFO - MT5 initialized successfully
+2025-10-30 15:07:35,822 - INFO - MT5 initialized successfully
+2025-10-30 15:07:36,067 - INFO - MT5 initialized successfully
+2025-10-30 15:07:42,226 - INFO - === NEW REQUEST ===
+2025-10-30 15:07:42,226 - INFO - Path: /servers
+2025-10-30 15:07:42,226 - INFO - Method: GET
+2025-10-30 15:07:42,226 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:07:42,463 - INFO - Response status: 200
+2025-10-30 15:07:42,463 - INFO - Response headers: {'content-length': '1224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:07:42,508 - INFO - === NEW REQUEST ===
+2025-10-30 15:07:42,508 - INFO - Path: /traders
+2025-10-30 15:07:42,509 - INFO - Method: GET
+2025-10-30 15:07:42,509 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:07:42,557 - INFO - Response status: 200
+2025-10-30 15:07:42,558 - INFO - Response headers: {'content-length': '230', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:08:27,667 - INFO - Starting API
+2025-10-30 15:08:29,197 - INFO - Starting API
+2025-10-30 15:08:29,423 - INFO - Starting API
+2025-10-30 15:08:30,089 - INFO - MT5 initialized successfully
+2025-10-30 15:08:31,305 - INFO - Starting API
+2025-10-30 15:08:31,622 - INFO - Starting API
+2025-10-30 15:08:31,741 - INFO - MT5 initialized successfully
+2025-10-30 15:08:32,536 - INFO - Starting API
+2025-10-30 15:08:33,337 - INFO - MT5 initialized successfully
+2025-10-30 15:08:35,858 - INFO - Starting API
+2025-10-30 15:08:36,797 - INFO - Starting API
+2025-10-30 15:08:36,933 - INFO - MT5 initialized successfully
+2025-10-30 15:08:51,231 - INFO - === NEW REQUEST ===
+2025-10-30 15:08:51,231 - INFO - Path: /servers
+2025-10-30 15:08:51,232 - INFO - Method: GET
+2025-10-30 15:08:51,232 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:08:51,384 - INFO - Response status: 200
+2025-10-30 15:08:51,384 - INFO - Response headers: {'content-length': '1224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:09:06,736 - INFO - === NEW REQUEST ===
+2025-10-30 15:09:06,736 - INFO - Path: /servers
+2025-10-30 15:09:06,736 - INFO - Method: GET
+2025-10-30 15:09:06,737 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:09:06,797 - INFO - Response status: 200
+2025-10-30 15:09:06,797 - INFO - Response headers: {'content-length': '1224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:09:33,248 - INFO - === NEW REQUEST ===
+2025-10-30 15:09:33,249 - INFO - Path: /traders/1/copy_orders
+2025-10-30 15:09:33,249 - INFO - Method: OPTIONS
+2025-10-30 15:09:33,249 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'accept': '*/*', 'access-control-request-method': 'POST', 'access-control-request-headers': 'content-type', 'origin': 'http://localhost:4200', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'cross-site', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:09:33,251 - INFO - Response status: 200
+2025-10-30 15:09:33,251 - INFO - Response headers: {'vary': 'Origin', 'access-control-allow-methods': 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT', 'access-control-max-age': '600', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'access-control-allow-headers': 'content-type', 'content-length': '2', 'content-type': 'text/plain; charset=utf-8'}
+2025-10-30 15:09:33,359 - INFO - === NEW REQUEST ===
+2025-10-30 15:09:33,359 - INFO - Path: /traders/1/copy_orders
+2025-10-30 15:09:33,359 - INFO - Method: POST
+2025-10-30 15:09:33,360 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'content-length': '2', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:09:47,921 - INFO - Response status: 200
+2025-10-30 15:09:47,922 - INFO - Response headers: {'content-length': '304', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:13:23,488 - INFO - Starting API
+2025-10-30 15:13:24,300 - INFO - Starting API
+2025-10-30 15:13:29,622 - INFO - MT5 initialized successfully
+2025-10-30 15:17:42,809 - INFO - === NEW REQUEST ===
+2025-10-30 15:17:42,810 - INFO - Path: /servers
+2025-10-30 15:17:42,810 - INFO - Method: GET
+2025-10-30 15:17:42,810 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:17:42,979 - INFO - Response status: 200
+2025-10-30 15:17:42,980 - INFO - Response headers: {'content-length': '1224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:17:49,414 - INFO - === NEW REQUEST ===
+2025-10-30 15:17:49,414 - INFO - Path: /check-server
+2025-10-30 15:17:49,414 - INFO - Method: OPTIONS
+2025-10-30 15:17:49,415 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'accept': '*/*', 'access-control-request-method': 'POST', 'access-control-request-headers': 'content-type', 'origin': 'http://localhost:4200', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'cross-site', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:17:49,415 - INFO - Response status: 200
+2025-10-30 15:17:49,416 - INFO - Response headers: {'vary': 'Origin', 'access-control-allow-methods': 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT', 'access-control-max-age': '600', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'access-control-allow-headers': 'content-type', 'content-length': '2', 'content-type': 'text/plain; charset=utf-8'}
+2025-10-30 15:17:49,454 - INFO - === NEW REQUEST ===
+2025-10-30 15:17:49,455 - INFO - Path: /check-server
+2025-10-30 15:17:49,455 - INFO - Method: POST
+2025-10-30 15:17:49,455 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'content-length': '139', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:17:55,311 - INFO - Response status: 200
+2025-10-30 15:17:55,312 - INFO - Response headers: {'content-length': '104', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:17:59,213 - INFO - === NEW REQUEST ===
+2025-10-30 15:17:59,213 - INFO - Path: /check-server
+2025-10-30 15:17:59,213 - INFO - Method: POST
+2025-10-30 15:17:59,213 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'content-length': '136', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:18:01,973 - INFO - Response status: 200
+2025-10-30 15:18:01,974 - INFO - Response headers: {'content-length': '104', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:21:05,852 - INFO - === NEW REQUEST ===
+2025-10-30 15:21:05,852 - INFO - Path: /traders/1/servers
+2025-10-30 15:21:05,852 - INFO - Method: OPTIONS
+2025-10-30 15:21:05,852 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'accept': '*/*', 'access-control-request-method': 'PUT', 'access-control-request-headers': 'content-type', 'origin': 'http://localhost:4200', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'cross-site', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:21:05,853 - INFO - Response status: 200
+2025-10-30 15:21:05,853 - INFO - Response headers: {'vary': 'Origin', 'access-control-allow-methods': 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT', 'access-control-max-age': '600', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'access-control-allow-headers': 'content-type', 'content-length': '2', 'content-type': 'text/plain; charset=utf-8'}
+2025-10-30 15:21:05,898 - INFO - === NEW REQUEST ===
+2025-10-30 15:21:05,898 - INFO - Path: /traders/1/servers
+2025-10-30 15:21:05,899 - INFO - Method: PUT
+2025-10-30 15:21:05,899 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'content-length': '42', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:21:06,101 - INFO - Response status: 200
+2025-10-30 15:21:06,102 - INFO - Response headers: {'content-length': '224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:21:17,358 - INFO - === NEW REQUEST ===
+2025-10-30 15:21:17,359 - INFO - Path: /traders/1/servers
+2025-10-30 15:21:17,359 - INFO - Method: PUT
+2025-10-30 15:21:17,359 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'content-length': '42', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:4200', 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:4200/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:21:17,404 - INFO - Response status: 200
+2025-10-30 15:21:17,404 - INFO - Response headers: {'content-length': '224', 'content-type': 'application/json', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:4200', 'vary': 'Origin'}
+2025-10-30 15:46:06,299 - INFO - Starting API
+2025-10-30 15:46:06,639 - INFO - Starting API
+2025-10-30 15:46:06,689 - INFO - MT5 initialized successfully
+2025-10-30 15:50:32,399 - INFO - Starting API
+2025-10-30 15:50:33,030 - INFO - Starting API
+2025-10-30 15:50:33,200 - INFO - MT5 initialized successfully
+2025-10-30 15:53:55,137 - INFO - Starting API
+2025-10-30 15:53:59,833 - INFO - Starting API
+2025-10-30 15:54:00,251 - INFO - Starting API
+2025-10-30 15:54:00,279 - INFO - MT5 initialized successfully
+2025-10-30 15:54:21,024 - INFO - === NEW REQUEST ===
+2025-10-30 15:54:21,025 - INFO - Path: /docs
+2025-10-30 15:54:21,025 - INFO - Method: GET
+2025-10-30 15:54:21,025 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:54:21,026 - INFO - Response status: 200
+2025-10-30 15:54:21,027 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 15:54:21,726 - INFO - === NEW REQUEST ===
+2025-10-30 15:54:21,726 - INFO - Path: /openapi.json
+2025-10-30 15:54:21,726 - INFO - Method: GET
+2025-10-30 15:54:21,727 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:54:21,864 - INFO - Response status: 200
+2025-10-30 15:54:21,865 - INFO - Response headers: {'content-length': '20928', 'content-type': 'application/json'}
+2025-10-30 15:54:49,582 - INFO - === NEW REQUEST ===
+2025-10-30 15:54:49,583 - INFO - Path: /docs
+2025-10-30 15:54:49,583 - INFO - Method: GET
+2025-10-30 15:54:49,583 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:54:49,584 - INFO - Response status: 200
+2025-10-30 15:54:49,584 - INFO - Response headers: {'content-length': '931', 'content-type': 'text/html; charset=utf-8'}
+2025-10-30 15:54:49,804 - INFO - === NEW REQUEST ===
+2025-10-30 15:54:49,805 - INFO - Path: /openapi.json
+2025-10-30 15:54:49,805 - INFO - Method: GET
+2025-10-30 15:54:49,805 - INFO - Headers: {'host': '127.0.0.1:8080', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://127.0.0.1:8080/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,cs;q=0.6,fr;q=0.5,ru;q=0.4,und;q=0.3'}
+2025-10-30 15:54:49,811 - INFO - Response status: 200
+2025-10-30 15:54:49,812 - INFO - Response headers: {'content-length': '20928', 'content-type': 'application/json'}
+2025-10-30 15:56:12,663 - INFO - Starting API
+2025-10-30 15:56:15,641 - INFO - Starting API
+2025-10-30 15:56:15,928 - INFO - Starting API
+2025-10-30 15:56:15,963 - INFO - MT5 initialized successfully
+2025-10-30 16:01:15,715 - INFO - Starting API
+2025-10-30 16:01:16,166 - INFO - Starting API
+2025-10-30 16:01:16,192 - INFO - MT5 initialized successfully
+2025-10-30 16:04:49,722 - INFO - Starting API
+2025-10-30 16:04:50,413 - INFO - Starting API
+2025-10-30 16:04:50,544 - INFO - MT5 initialized successfully
+2025-10-30 16:06:08,968 - ERROR - Unhandled exception: name 'os' is not defined
+2025-10-30 16:06:13,747 - ERROR - Unhandled exception: name 'os' is not defined
+2025-10-30 16:12:21,323 - INFO - Starting API
+2025-10-30 16:12:22,026 - INFO - Starting API
+2025-10-30 16:12:22,199 - INFO - MT5 initialized successfully

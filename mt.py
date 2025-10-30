@@ -39,17 +39,17 @@ logging.info("Starting API")
 
 
 # Carica variabili dal file .env
-load_dotenv()
+# load_dotenv()
 
 # --- FASTAPI APP ---
 app = FastAPI()
 
+origins = ["http://localhost:4200", "http://127.0.0.1:4200"]
 
-
-# --- CORS ---
+# Middleware CORS "standard"
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200","http://127.0.0.1:4200"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,44 +73,37 @@ DEAL_TYPES = {
     # mt5.DEAL_TYPE_CLOSE_BY: "CLOSE_BY"
 }
 
-import os
-import logging
-from dotenv import load_dotenv
-import MetaTrader5 as mt5
-from fastapi import FastAPI
-
-app = FastAPI()
 
 # Carica variabili dal file .env
-load_dotenv()
+# load_dotenv()
 
-@app.on_event("startup")
-def startup_event():
-    path = os.getenv("MT5_PATH", r"C:\Program Files\MetaTrader 5\terminal64.exe")
-    if not os.path.exists(path):
-        logging.error(f"MetaTrader5 path not found: {path}")
-        raise FileNotFoundError(f"{path} does not exist")
+# @app.on_event("startup")
+# def startup_event():
+#     path = os.getenv("MT5_PATH", r"C:\Program Files\MetaTrader 5\terminal64.exe")
+#     if not os.path.exists(path):
+#         logging.error(f"MetaTrader5 path not found: {path}")
+#         raise FileNotFoundError(f"{path} does not exist")
 
-    login = os.getenv("ACCOUNT")
-    password = os.getenv("PASSWORD")
-    server = os.getenv("SERVER")
+#     login = os.getenv("ACCOUNT")
+#     password = os.getenv("PASSWORD")
+#     server = os.getenv("SERVER")
 
-    if not (login and password and server):
-        logging.error("Variabili d'ambiente MT5 mancanti nel .env")
-        raise RuntimeError("MT5 credentials missing")
+#     if not (login and password and server):
+#         logging.error("Variabili d'ambiente MT5 mancanti nel .env")
+#         raise RuntimeError("MT5 credentials missing")
 
-    try:
-        login_int = int(login)
-    except ValueError:
-        logging.error(f"Login MT5 non valido: {login}")
-        raise
+#     try:
+#         login_int = int(login)
+#     except ValueError:
+#         logging.error(f"Login MT5 non valido: {login}")
+#         raise
 
-    if not mt5.initialize(path, login=login_int, password=password, server=server):
-        last_err = mt5.last_error()
-        logging.error(f"MT5 initialize failed: {last_err}")
-        raise RuntimeError(f"MT5 initialize failed: {last_err}")
+#     if not mt5.initialize(path, login=login_int, password=password, server=server):
+#         last_err = mt5.last_error()
+#         logging.error(f"MT5 initialize failed: {last_err}")
+#         raise RuntimeError(f"MT5 initialize failed: {last_err}")
 
-    logging.info(f"MT5 initialized successfully: account {login} on server {server}")
+#     logging.info(f"MT5 initialized successfully: account {login} on server {server}")
 
 
 def get_trade_mode_description(mode):
@@ -157,27 +150,38 @@ def close_all(symbol, magic, deviation):
     return res
 
 # --- STARTUP EVENT originale col login---
-# @app.on_event("startup")
-# def startup_event():
-    # path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
-    # if not os.path.exists(path):
-    #     logging.error(f"MetaTrader5 path not found: {path}")
-    #     raise FileNotFoundError(f"{path} does not exist")
+@app.on_event("startup")
+def startup_event():
+    path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+    if not os.path.exists(path):
+        logging.error(f"MetaTrader5 path not found: {path}")
+        raise FileNotFoundError(f"{path} does not exist")
     
-    # login = os.environ.get("ACCOUNT")
-    # password = os.environ.get("PASSWORD")
-    # server = os.environ.get("SERVER")
+    login = os.environ.get("ACCOUNT")
+    password = os.environ.get("PASSWORD")
+    server = os.environ.get("SERVER")
 
-    # # --- CREDENZIALI HARD-CODED ---
-    # login = "959911"
-    # password = "Qpnldan1@1"
-    # server = "VTMarkets-Demo"
-    # if not mt5.initialize(path, login=int(login), password=str(password), server=server):
-    #     logging.error(f"MT5 initialize failed: {mt5.last_error()}")
-    #     raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
-    # logging.info("MT5 initialized successfully")
+    # --- CREDENZIALI HARD-CODED ---
+    login = "959911"
+    password = "Qpnldan1@1"
+    server = "VTMarkets-Demo"
+    if not mt5.initialize(path, login=int(login), password=str(password), server=server):
+        logging.error(f"MT5 initialize failed: {mt5.last_error()}")
+        raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
+    logging.info("MT5 initialized successfully")
 
 
+# Middleware di debug per loggare ogni richiesta
+@app.middleware("http")
+async def log_cors_debug(request: Request, call_next):
+    logging.info("=== NEW REQUEST ===")
+    logging.info(f"Path: {request.url.path}")
+    logging.info(f"Method: {request.method}")
+    logging.info(f"Headers: {dict(request.headers)}")
+    response = await call_next(request)
+    logging.info(f"Response status: {response.status_code}")
+    logging.info(f"Response headers: {dict(response.headers)}")
+    return response
 
 
 

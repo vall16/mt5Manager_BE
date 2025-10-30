@@ -4,20 +4,17 @@ from typing import List
 import uuid
 import mysql.connector
 from mysql.connector import Error
-from models import LoginRequest, LoginResponse, ServerRequest, Trader, Newtrader,UserResponse, ServerResponse
+from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
-# from fastapi_utils.tasks import repeat_every
-
-# app = FastAPI()
-router = APIRouter()
-
-
-
 import bcrypt
 import os
+
+# from fastapi_utils.tasks import repeat_every
+
+router = APIRouter()
 
 def get_connection():
     try:
@@ -113,20 +110,47 @@ def create_user(username: str, password: str):
     conn.close()
     print(f"User {username} creato con successo. ID: {user_id}")
 
+# @router.get("/servers", response_model=List[ServerResponse])
+# def get_servers():
+#     conn = get_connection()
+#     if not conn:
+#         raise HTTPException(status_code=500, detail="Database connection failed")
+
+#     cursor = conn.cursor(dictionary=True)
+#     cursor.execute("SELECT * FROM servers")
+#     rows = cursor.fetchall()
+
+#     cursor.close()
+#     conn.close()
+
+#     return rows
+
+
 @router.get("/servers", response_model=List[ServerResponse])
 def get_servers():
-    conn = get_connection()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Database connection failed")
+    try:
+        conn = get_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Database connection failed")
 
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM servers")
-    rows = cursor.fetchall()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM servers")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-    cursor.close()
-    conn.close()
+        return rows
 
-    return rows
+    except mysql.connector.Error as db_err:
+        # Errore specifico MySQL
+        detail = f"MySQL error {db_err.errno}: {db_err.msg}"
+        print(f"❌ {detail}")
+        raise HTTPException(status_code=500, detail=detail)
+
+    except Exception as e:
+        # Qualsiasi altro errore
+        print(f"❌ Errore imprevisto in get_servers: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 @router.post("/servers")
 def insert_server(server: ServerRequest):
@@ -303,6 +327,37 @@ def delete_trader(trader_id: int):
         print("=== ERRORE DURANTE DELETE TRADER ===")
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+@router.put("/traders/{trader_id}/servers")
+def update_trader_servers(trader_id: int, update: TraderServersUpdate):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Controlla se il trader esiste
+    cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+    trader = cursor.fetchone()
+    if not trader:
+        cursor.close()
+        conn.close()
+        raise HTTPException(status_code=404, detail="Trader not found")
+
+    # Aggiorna i server
+    cursor.execute("""
+        UPDATE traders
+        SET master_server_id = %s,
+            slave_server_id = %s
+        WHERE id = %s
+    """, (update.master_server_id, update.slave_server_id, trader_id))
+    
+    conn.commit()
+
+    # Recupera il trader aggiornato
+    cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+    updated_trader = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return updated_trader
 
 # funziona che copia gli ordini del master sullo slave e aggiorna le tabelle relative nel
 @router.post("/traders/{trader_id}/copy_orders")
