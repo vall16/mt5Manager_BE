@@ -164,8 +164,8 @@ def insert_server(server: ServerRequest):
 
         query = """
             INSERT INTO servers 
-            (user, pwd, server, platform, ip, port, is_active, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            (user, pwd, server, platform, ip, path, port, is_active, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s,NOW(), NOW())
         """
 
         values = (
@@ -174,6 +174,7 @@ def insert_server(server: ServerRequest):
             server.server,
             server.platform,
             server.ip,
+            server.path,
             server.port,
             server.is_active
         )

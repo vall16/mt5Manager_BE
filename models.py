@@ -23,6 +23,7 @@ class ServerResponse(BaseModel):
     server: str
     platform: str
     ip: str
+    path: Optional[str] = None   # 👈 cambia qui
     port: int
     is_active: bool
     created_at: datetime
@@ -41,6 +42,7 @@ class ServerRequest(BaseModel):
     server: str
     platform: str
     ip: str
+    path: str
     port: int
     is_active: bool
     path: Optional[str] = None

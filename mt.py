@@ -5,6 +5,7 @@ import os
 # import time
 # import traceback
 from datetime import datetime, timedelta
+import socket
 from typing import List, Optional
 
 from dotenv import load_dotenv
@@ -548,41 +549,85 @@ def login(req: LoginRequest):
     conn.close()
     return LoginResponse(success=False, message="Invalid credentials", user=None)
 
-
-@app.post("/check-server")
+@router.post("/check-server")
 async def check_server(data: ServerCheckRequest):
-    # Verifica che il path esista
-    print("Ricevuto dal client:", data.dict())
+    """
+    Verifica se MetaTrader5 è attivo:
+    - in locale (path eseguibile)
+    - oppure su un server remoto (socket check)
+    """
 
-    if not os.path.exists(data.path):
-        return {"status": "error", "message": f"Terminal not found at {data.path}"}
+    # 1️⃣ Se esiste il path locale → tenta inizializzazione MT5 locale
+    if data.path and os.path.exists(data.path):
+        print(f"🖥️ Tentativo di inizializzazione locale: {data.path}")
+        if mt5.initialize(
+            path=data.path,
+            server=data.server,
+            login=data.login,
+            password=data.password,
+            port=data.port
+        ):
+            info = mt5.account_info()
+            version = mt5.version()
+            mt5.shutdown()
+            return {
+                "status": "success",
+                "mode": "local",
+                "message": f"Connessione locale a {data.server} riuscita",
+                "mt5_version": version,
+                "account": info._asdict() if info else None
+            }
+        else:
+            error = mt5.last_error()
+            return {"status": "error", "mode": "local", "message": f"Errore locale: {error}"}
 
-    # Chiude eventuale sessione precedente
-    if mt5.initialize():
-        mt5.shutdown()
-
-    # Prova a inizializzare MT5
-    connected = mt5.initialize(
-        path=data.path,
-        server=data.server,
-        login=data.login,
-        password=data.password,
-        port=data.port
-    )
-
-    if connected:
-        # Inizializzazione ok
-        version = mt5.version()
-        mt5.shutdown()
+    # 2️⃣ Altrimenti → check remoto via socket TCP
+    print(f"🌐 Tentativo di connessione remota a {data.server}:{data.port}")
+    try:
+        sock = socket.create_connection((data.server, data.port), timeout=3)
+        sock.close()
         return {
             "status": "success",
-            "message": "Server reachable and login valid",
-            "mt5_version": version
+            "mode": "remote",
+            "message": f"Server {data.server}:{data.port} raggiungibile (ping ok)"
         }
-    else:
-        # Inizializzazione fallita
-        error = mt5.last_error()
-        return {"status": "error", "message": f"Cannot connect: {error}"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Connessione remota fallita: {e}")
+
+# @app.post("/check-server")
+# async def check_server(data: ServerCheckRequest):
+#     # Verifica che il path esista
+#     print("Ricevuto dal client:", data.dict())
+
+#     if not os.path.exists(data.path):
+#         return {"status": "error", "message": f"Terminal not found at {data.path}"}
+
+#     # Chiude eventuale sessione precedente
+#     if mt5.initialize():
+#         mt5.shutdown()
+
+#     # Prova a inizializzare MT5
+#     connected = mt5.initialize(
+#         path=data.path,
+#         server=data.server,
+#         login=data.login,
+#         password=data.password,
+#         port=data.port
+#     )
+
+#     if connected:
+#         # Inizializzazione ok
+#         version = mt5.version()
+#         mt5.shutdown()
+#         return {
+#             "status": "success",
+#             "message": "Server reachable and login valid",
+#             "mt5_version": version
+#         }
+#     else:
+#         # Inizializzazione fallita
+#         error = mt5.last_error()
+#         return {"status": "error", "message": f"Cannot connect: {error}"}
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):

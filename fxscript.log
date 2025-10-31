@@ -450,3 +450,102 @@
 2025-10-30 17:28:55,446 - INFO - Starting API
 2025-10-30 17:28:57,058 - INFO - Starting API
 2025-10-30 17:28:57,475 - INFO - MT5 initialized successfully
+2025-10-31 11:29:23,875 - INFO - Starting API
+2025-10-31 11:29:25,189 - INFO - Starting API
+2025-10-31 11:29:30,979 - INFO - MT5 initialized successfully
+2025-10-31 12:16:47,745 - INFO - Starting API
+2025-10-31 12:16:48,629 - INFO - Starting API
+2025-10-31 12:16:54,925 - INFO - MT5 initialized successfully
+2025-10-31 14:35:52,209 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 14:37:52,834 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 14:38:51,036 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 14:40:22,895 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 14:45:49,417 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 14:46:28,731 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 16:04:47,960 - INFO - Starting API
+2025-10-31 16:04:49,262 - INFO - Starting API
+2025-10-31 16:05:04,817 - INFO - MT5 initialized successfully
+2025-10-31 16:14:38,238 - INFO - Starting API
+2025-10-31 16:14:38,697 - INFO - Starting API
+2025-10-31 16:14:38,746 - INFO - MT5 initialized successfully
+2025-10-31 16:25:54,585 - INFO - Starting API
+2025-10-31 16:25:55,110 - INFO - Starting API
+2025-10-31 16:25:55,228 - INFO - MT5 initialized successfully
+2025-10-31 16:39:45,841 - INFO - Starting API
+2025-10-31 16:39:49,326 - INFO - Starting API
+2025-10-31 16:39:49,485 - INFO - MT5 initialized successfully
+2025-10-31 16:42:12,414 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 16:42:18,131 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 16:49:17,369 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:01:49,289 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:16:47,933 - INFO - Starting API
+2025-10-31 17:16:48,629 - INFO - Starting API
+2025-10-31 17:16:48,715 - INFO - MT5 initialized successfully
+2025-10-31 17:17:37,051 - INFO - Starting API
+2025-10-31 17:17:37,634 - INFO - Starting API
+2025-10-31 17:17:37,670 - INFO - MT5 initialized successfully
+2025-10-31 17:18:12,436 - INFO - Starting API
+2025-10-31 17:18:14,093 - INFO - Starting API
+2025-10-31 17:18:14,173 - INFO - MT5 initialized successfully
+2025-10-31 17:19:03,199 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:20:20,683 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:24:14,790 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:26:56,133 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:31:28,329 - INFO - Starting API
+2025-10-31 17:31:29,116 - INFO - Starting API
+2025-10-31 17:31:29,531 - INFO - MT5 initialized successfully
+2025-10-31 17:31:31,252 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:31:32,140 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:31:34,668 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:31:48,496 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:32:20,865 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:32:25,725 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:33:21,815 - INFO - Starting API
+2025-10-31 17:33:22,495 - INFO - Starting API
+2025-10-31 17:33:22,596 - INFO - MT5 initialized successfully
+2025-10-31 17:36:01,431 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:39:14,639 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'path'), 'msg': 'Field required', 'input': {'server': 'MetaQuotes-Demo', 'login': '5041922476', 'password': 'Zh@1TcKl', 'port': 443}}] for body {"server":"MetaQuotes-Demo","login":"5041922476","password":"Zh@1TcKl","port":443}
+2025-10-31 17:40:48,017 - INFO - Starting API
+2025-10-31 17:40:50,763 - INFO - Starting API
+2025-10-31 17:40:51,441 - INFO - MT5 initialized successfully
+2025-10-31 17:41:02,181 - ERROR - Unhandled exception: 4 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'path'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-10-31 17:43:52,796 - INFO - Starting API
+2025-10-31 17:43:53,373 - INFO - Starting API
+2025-10-31 17:43:53,476 - INFO - MT5 initialized successfully
+2025-10-31 20:01:53,537 - INFO - Starting API
+2025-10-31 20:01:55,035 - INFO - Starting API
