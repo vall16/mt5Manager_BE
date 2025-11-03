@@ -8,7 +8,7 @@ from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpda
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-# import MetaTrader5 as mt5
+import MetaTrader5 as mt5
 import bcrypt
 import os
 
