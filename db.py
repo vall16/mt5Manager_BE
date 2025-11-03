@@ -152,6 +152,53 @@ def get_servers():
         print(f"❌ Errore imprevisto in get_servers: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
+# @router.post("/servers")
+# def insert_server(server: ServerRequest):
+
+#     conn = get_connection()
+#     if not conn:
+#         raise HTTPException(status_code=500, detail="Database connection failed")
+
+#     try:
+#         cursor = conn.cursor()
+
+#         print("Dati ricevuti:", server.dict())
+#         # print("Query:", query)
+#         print("Values:", values)
+
+
+#         query = """
+#             INSERT INTO servers 
+#             (user, pwd, server, platform, ip, path, port, is_active, created_at, updated_at)
+#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s,NOW(), NOW())
+#         """
+
+#         values = (
+#             server.user,
+#             server.pwd,
+#             server.server,
+#             server.platform,
+#             server.ip,
+#             server.path,
+#             server.port,
+#             server.is_active
+#         )
+
+
+#         cursor.execute(query, values)
+#         conn.commit()
+
+#         new_id = cursor.lastrowid
+
+#         cursor.close()
+#         conn.close()
+
+#         return {"message": "Server added successfully", "id": new_id}
+
+#     except Error as e:
+#         print(f"Errore DB: {e}")
+#         raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
 @router.post("/servers")
 def insert_server(server: ServerRequest):
 
@@ -162,10 +209,11 @@ def insert_server(server: ServerRequest):
     try:
         cursor = conn.cursor()
 
+        # --- Preparazione ---
         query = """
             INSERT INTO servers 
-            (user, pwd, server, platform, ip, path, port, is_active, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s,NOW(), NOW())
+            (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
         """
 
         values = (
@@ -179,20 +227,34 @@ def insert_server(server: ServerRequest):
             server.is_active
         )
 
+        print("\n🧩 [DEBUG SQL] Tentativo di INSERT su 'servers' ...")
+        print("Query SQL:", query)
+        print("Valori:", values)
 
+        # --- Esecuzione ---
         cursor.execute(query, values)
         conn.commit()
 
         new_id = cursor.lastrowid
+        print(f"✅ [OK] Inserito record servers.id={new_id}")
 
         cursor.close()
         conn.close()
 
         return {"message": "Server added successfully", "id": new_id}
 
-    except Error as e:
-        print(f"Errore DB: {e}")
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    except Exception as e:
+        import traceback
+        print("\n❌ [ERRORE SQL]")
+        print("Tipo errore:", type(e).__name__)
+        print("Dettaglio:", str(e))
+        traceback.print_exc()
+        try:
+            conn.rollback()
+        except:
+            pass
+        raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
+
 
 @router.delete("/servers/{server_id}")
 def delete_server(server_id: int):
@@ -365,17 +427,20 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
 def copy_orders(trader_id: int):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    # print(f"🚀 entrato BE")
+    print(f"🚀 entrato BE")
 
     # 1️⃣ Recupera info del trader (master e slave)
     cursor.execute("""
+        
+
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
-               ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd,
-               ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd
+            ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path,
+            ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path
         FROM traders t
         JOIN servers ms ON ms.id = t.master_server_id
         JOIN servers ss ON ss.id = t.slave_server_id
-        WHERE t.id = %s
+        WHERE t.id = %s;
+
     """, (trader_id,))
     trader = cursor.fetchone()
         # 👇 Stampa in console backend
@@ -394,7 +459,7 @@ def copy_orders(trader_id: int):
     
     # 2️⃣ Connessione al master MT5
     if not mt5.initialize(
-        path=r"C:\Program Files\MetaTrader 5\terminal64.exe",
+        path=trader["master_path"],
         login=int(trader["master_user"]),
         password=trader["master_pwd"],
         server=trader["master_name"]
@@ -424,7 +489,7 @@ def copy_orders(trader_id: int):
 
     # # 3️⃣ Connessione allo slave MT5
     if not mt5.initialize(
-        path=r"C:\Program Files\MetaTrader 5\terminal64.exe",
+        path=trader["slave_path"],
         login=int(trader["slave_user"]),
         password=trader["slave_pwd"],
         server=trader["slave_name"]
