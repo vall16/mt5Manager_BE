@@ -5,16 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
-import requests
-
-# import MetaTrader5 as mt5
+import MetaTrader5 as mt5
 
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
-
-# MT5_API_URL = "http://127.0.0.1:8081"
-# MT5_API_KEY = "superkey123"
 
 # --- LOGGING ---
 log_file_path = "./fxscript.log"
@@ -43,42 +38,21 @@ app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
 
 # --- STARTUP ---
-# @app.on_event("startup")
-# def startup_event():
-#     login_data = {
-#         "login": 959911,
-#         "password": "Qpnldan1@1",
-#         "server": "VTMarkets-Demo"
-#     }
-
-#     try:
-#         response = requests.post(
-#             f"{MT5_API_URL}/login",
-#             json=login_data,
-#             headers={"x-api-key": MT5_API_KEY},
-#             timeout=5
-#         )
-#         if response.status_code != 200:
-#             logging.error(f"MT5 API login failed: {response.text}")
-#             raise RuntimeError(f"MT5 API login failed: {response.text}")
-
-#         logging.info(f"✅ MT5 API connected: {response.json()}")
-#     except Exception as e:
-#         logging.error(f"❌ Error contacting MT5 API: {e}")
-#         raise
-
-# --- STARTUP ---
 @app.on_event("startup")
 def startup_event():
-    """
-    Evento di avvio dell'API Manager:
-    - verifica connessione al DB
-    - crea file di log
-    - NON inizializza MetaTrader
-    """
-    logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
+    path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+    if not os.path.exists(path):
+        logging.error(f"MetaTrader5 path not found: {path}")
+        raise FileNotFoundError(f"{path} does not exist")
 
+    login = "959911"
+    password = "Qpnldan1@1"
+    server = "VTMarkets-Demo"
 
+    if not mt5.initialize(path, login=int(login), password=password, server=server):
+        logging.error(f"MT5 initialize failed: {mt5.last_error()}")
+        raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
+    logging.info("MT5 initialized successfully")
 
 # --- ERROR HANDLERS ---
 @app.exception_handler(RequestValidationError)
@@ -97,21 +71,12 @@ async def global_exception_handler(request: Request, exc: Exception):
 def root():
     return {"status": "running", "message": "MT5 Manager API active"}
 
-# @app.get("/healthz")
-# def healthz():
-#     info = mt5.account_info()
-#     if info:
-#         return {"status": "ok", "account": info.login}
-#     return {"status": "error", "details": mt5.last_error()}
-
-# @app.get("/healthz")
-# def healthz():
-#     try:
-#         response = requests.get(f"{MT5_API_URL}/healthz", headers={"x-api-key": MT5_API_KEY})
-#         return response.json()
-#     except Exception as e:
-#         return {"status": "error", "detail": str(e)}
-
+@app.get("/healthz")
+def healthz():
+    info = mt5.account_info()
+    if info:
+        return {"status": "ok", "account": info.login}
+    return {"status": "error", "details": mt5.last_error()}
 
 # --- RUN SERVER ---
 if __name__ == "__main__":
