@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from pydantic_settings  import BaseSettings
 
 class Settings(BaseSettings):
@@ -5,8 +6,13 @@ class Settings(BaseSettings):
     API_PORT: int = 8081
     API_NAME: str = "MT5 API"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+class Config:
+    env_file = ".env"
+    env_file_encoding = "utf-8"
+    
+class InitRequest(BaseModel):
+    path: str
+
+
 
 settings = Settings()

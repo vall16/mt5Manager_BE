@@ -4,11 +4,12 @@ from typing import List
 import uuid
 import mysql.connector
 from mysql.connector import Error
+import requests
 from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-# import MetaTrader5 as mt5
+import MetaTrader5 as mt5
 import bcrypt
 import os
 
@@ -419,11 +420,11 @@ def copy_orders(trader_id: int):
         
 
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
-            ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path,
-            ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path
-        FROM traders t
-        JOIN servers ms ON ms.id = t.master_server_id
-        JOIN servers ss ON ss.id = t.slave_server_id
+       ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
+       ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
+            FROM traders t
+            JOIN servers ms ON ms.id = t.master_server_id
+            JOIN servers ss ON ss.id = t.slave_server_id
         WHERE t.id = %s;
 
     """, (trader_id,))
@@ -435,6 +436,8 @@ def copy_orders(trader_id: int):
     print(trader["master_name"])
     print(trader["master_user"])
     print(trader["master_pwd"])
+    print(trader["master_ip"])
+    print(trader["master_port"])
 
 
     if not trader:
@@ -443,49 +446,159 @@ def copy_orders(trader_id: int):
         raise HTTPException(status_code=404, detail="Trader non trovato")
     
     # 2️⃣ Connessione al master MT5
-    if not mt5.initialize(
-        path=trader["master_path"],
-        login=int(trader["master_user"]),
-        password=trader["master_pwd"],
-        server=trader["master_name"]
-    ):
-        last_err = mt5.last_error()
-        conn.close()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Connessione al master fallita: {last_err}"
-    )
-    print(f"Connessione al master {trader['master_user']} riuscita!")
+    # if not mt5.initialize(
+    #     path=trader["master_path"],
+    #     login=int(trader["master_user"]),
+    #     password=trader["master_pwd"],
+    #     server=trader["master_name"]
+    # ):
+    #     last_err = mt5.last_error()
+    #     conn.close()
+    #     raise HTTPException(
+    #         status_code=500,
+    #         detail=f"Connessione al master fallita: {last_err}"
+    # )
+    # print(f"Connessione al master {trader['master_user']} riuscita!")
 
-    master_positions = mt5.positions_get()
-    if not master_positions:
-        mt5.shutdown()
-        cursor.close()
-        conn.close()
-        print(f"Nessuna posizione sul master")
-        raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
+    """
+    Inizializza e connette il master MT5 remoto tramite API HTTP.
+    """
+
+    base_url = f"http://{trader['master_ip']}:{trader['master_port']}"
+
+    # 1️⃣ Inizializza terminale remoto
+    init_url = f"{base_url}/init-mt5"
+    init_body = {"path": trader["master_path"]}
+    health_url = f"{base_url}/health"
+
+    print(f"🔍 Verifico stato terminale remoto su {health_url}...")
+    # try:
+    health_resp = requests.get(health_url, timeout=5)
+    if health_resp.status_code == 200:
+        health_data = health_resp.json()
+        if health_data.get("status") == "ok":
+            print(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
+        else:
+            # raise Exception("MT5 non inizializzato, serve init")
+            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            resp = requests.post(init_url, json=init_body, timeout=10)
+            if resp.status_code != 200:
+                raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
+
+            print(f"✅ Init OK su {base_url}")
+
+        
+    # 2️⃣ Login remoto a master
+    login_url = f"{base_url}/login"
+    login_body = {
+        "login": int(trader["master_user"]),
+        "password": trader["master_pwd"],
+        "server": trader["master_name"]
+    }
+
+    print(f"🔹 Connessione al master via {login_url}")
+    resp = requests.post(login_url, json=login_body, timeout=10)
+    if resp.status_code != 200:
+        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+
+    data = resp.json()
+    print(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {data.get('balance')}")
+
+    # URL base del server master
+    base_url = f"http://{trader['master_ip']}:{trader['master_port']}"
+
+    try:
+        positions_url = f"{base_url}/positions"
+        print(f"🔹 Recupero posizioni dal master via {positions_url}")
+
+        resp = requests.get(positions_url, timeout=10)
+        if resp.status_code != 200:
+            print(f"❌ Errore API master: {resp.text}")
+            raise HTTPException(status_code=resp.status_code, detail=f"Errore dal master API: {resp.text}")
+
+        master_positions = resp.json()
+        # master_positions = data.get("positions", [])
+
+        if not master_positions:
+            print("⚠️ Nessuna posizione aperta sul master.")
+            raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
+
+        print(f"✅ Posizioni master ricevute: {len(master_positions)}")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Errore di connessione al master API: {e}")
+        raise HTTPException(status_code=500, detail=f"Errore connessione al master: {str(e)}")
+
 
     # Stampa tutte le posizioni trovate
     print("=== POSIZIONI SUL MASTER ===")
     for pos in master_positions:
-        print(f"[MASTER] {pos._asdict()}")  # aggiunge il tag [MASTER] davanti ai dettagli
-
+        print(f"[MASTER] {pos}")  # pos è già un dict
 
 
     # # 3️⃣ Connessione allo slave MT5
-    if not mt5.initialize(
-        path=trader["slave_path"],
-        login=int(trader["slave_user"]),
-        password=trader["slave_pwd"],
-        server=trader["slave_name"]
-    ):
-        last_err = mt5.last_error()
-        conn.close()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Connessione al server fallita: {last_err}"
-    )
-    print(f"Connessione allo slave {trader['slave_user']} riuscita!")
+    """
+    Inizializza e connette il slave MT5 remoto tramite API HTTP.
+    """
+
+    base_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+    # 1️⃣ Inizializza terminale remoto
+    init_url = f"{base_url}/init-mt5"
+    init_body = {"path": trader["slave_path"]}
+    health_url = f"{base_url}/health"
+
+    print(f"🔍 Verifico stato terminale remoto su {health_url}...")
+    # try:
+    health_resp = requests.get(health_url, timeout=5)
+    if health_resp.status_code == 200:
+        health_data = health_resp.json()
+        if health_data.get("status") == "ok":
+            print(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
+            # ---prova altrimenti va in errore !
+            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            resp = requests.post(init_url, json=init_body, timeout=30)
+        else:
+            # raise Exception("MT5 non inizializzato, serve init")
+            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            resp = requests.post(init_url, json=init_body, timeout=30)
+            if resp.status_code != 200:
+                raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
+
+            print(f"✅ Init OK su {base_url}")
+    
+
+    # 2️⃣ Login remoto a slave
+    login_url = f"{base_url}/login"
+    login_body = {
+        "login": int(trader["slave_user"]),
+        "password": trader["slave_pwd"],
+        "server": trader["slave_name"]
+    }
+    print("=" * 80)
+    print("🔹 Tentativo di connessione allo SLAVE")
+    print(f"🌐 URL login: {login_url}")
+    print(f"👤 Login data:")
+    print(f"   - Login ID: {trader['slave_user']}")
+    print(f"   - Password: {trader['slave_pwd']}")
+    print(f"   - Server:   {trader['slave_name']}")
+    print("=" * 80)
+
+
+    print(f"🔹 Connessione allo slave via {login_url}")
+    try:
+        resp = requests.post(login_url, json=login_body, timeout=30)
+        print(f"📡 Status code: {resp.status_code}")
+        print(f"📩 Response: {resp.text}")
+    except Exception as e:
+        print(f"❌ Errore chiamata login slave: {e}")
+        raise
+
+    if resp.status_code != 200:
+        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+
+    data = resp.json()
+    print(f"✅ Connessione allo slave {trader['slave_user']} riuscita! Bilancio: {data.get('balance')}")
 
 
     # 4️⃣ Copia ogni ordine master sullo slave
@@ -493,9 +606,9 @@ def copy_orders(trader_id: int):
 
     for pos in master_positions:
         try:
-            symbol = pos.symbol
-            order_type = "buy" if pos.type == 0 else "sell"
-            volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)
+            symbol = pos["symbol"]
+            order_type = "buy" if pos["type"] == 0 else "sell"
+            volume = trader["fix_lot"] or round(pos["volume"] * float(trader["moltiplicatore"]), 2)
             print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
 
             # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave

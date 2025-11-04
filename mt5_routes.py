@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import socket
 import MetaTrader5 as mt5
 import logging
 from fastapi import APIRouter, HTTPException, Query
@@ -152,38 +153,57 @@ def close_all():
 
 @router.post("/check-server")
 async def check_server(data: ServerCheckRequest):
-    # Verifica che il path esista
-    print("Ricevuto dal client:", data.dict())
+    """
+    Verifica se un server MT5 è raggiungibile sulla rete tramite host e porta.
+    """
+    print("Verifica server remoto:", data.dict())
 
-    if not os.path.exists(data.path):
-        return {"status": "error", "message": f"Terminal not found at {data.path}"}
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(10)  # timeout di 2 secondi per la connessione
 
-    # Chiude eventuale sessione precedente
-    if mt5.initialize():
-        mt5.shutdown()
+    try:
+        sock.connect((data.host, data.port))
+        print("Verifica server remoto:OK")
+        return {"status": "success", "message": f"Server reachable at {data.host}:{data.port}"}
+    except Exception as e:
+        return {"status": "error", "message": f"Cannot connect: {e}"}
+    finally:
+        sock.close()
 
-    # Prova a inizializzare MT5
-    connected = mt5.initialize(
-        path=data.path,
-        server=data.server,
-        login=data.login,
-        password=data.password,
-        port=data.port
-    )
+# @router.post("/check-server")
+# async def check_server(data: ServerCheckRequest):
+#     # Verifica che il path esista
+#     print("Ricevuto dal client:", data.dict())
 
-    if connected:
-        # Inizializzazione ok
-        version = mt5.version()
-        mt5.shutdown()
-        return {
-            "status": "success",
-            "message": "Server reachable and login valid",
-            "mt5_version": version
-        }
-    else:
-        # Inizializzazione fallita
-        error = mt5.last_error()
-        return {"status": "error", "message": f"Cannot connect: {error}"}
+#     if not os.path.exists(data.path):
+#         return {"status": "error", "message": f"Terminal not found at {data.path}"}
+
+#     # Chiude eventuale sessione precedente
+#     if mt5.initialize():
+#         mt5.shutdown()
+
+#     # Prova a inizializzare MT5
+#     connected = mt5.initialize(
+#         path=data.path,
+#         server=data.server,
+#         login=data.login,
+#         password=data.password,
+#         port=data.port
+#     )
+
+#     if connected:
+#         # Inizializzazione ok
+#         version = mt5.version()
+#         mt5.shutdown()
+#         return {
+#             "status": "success",
+#             "message": "Server reachable and login valid",
+#             "mt5_version": version
+#         }
+#     else:
+#         # Inizializzazione fallita
+#         error = mt5.last_error()
+#         return {"status": "error", "message": f"Cannot connect: {error}"}
 
 @router.post("/order/sell")
 def order_sell(req: SellRequest):

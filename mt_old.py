@@ -25,8 +25,8 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 # from db import get_connection   # <--- IMPORT da db.py
-from db import *
-from db import router as db_router
+from db_new import *
+from db_new import router as db_router
 
 import bcrypt
 

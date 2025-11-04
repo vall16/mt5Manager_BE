@@ -4,11 +4,12 @@ from typing import List
 import uuid
 import mysql.connector
 from mysql.connector import Error
+import requests
 from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-import MetaTrader5 as mt5
+# import MetaTrader5 as mt5
 import bcrypt
 import os
 
@@ -412,175 +413,99 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
 def copy_orders(trader_id: int):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    print(f"🚀 entrato BE")
 
     # 1️⃣ Recupera info del trader (master e slave)
     cursor.execute("""
-        
-
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
-            ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path,
-            ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path
+               ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd,
+               ms.ip AS master_ip, ms.port AS master_port,
+               ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd,
+               ss.ip AS slave_ip, ss.port AS slave_port
         FROM traders t
         JOIN servers ms ON ms.id = t.master_server_id
         JOIN servers ss ON ss.id = t.slave_server_id
-        WHERE t.id = %s;
-
+        WHERE t.id = %s
     """, (trader_id,))
     trader = cursor.fetchone()
-        # 👇 Stampa in console backend
-    print("=== Trader Info ===")
-    print(trader)
-    print("===================")
-    print(trader["master_name"])
-    print(trader["master_user"])
-    print(trader["master_pwd"])
-
 
     if not trader:
-        # conn.close()
-
-        raise HTTPException(status_code=404, detail="Trader non trovato")
-    
-    # 2️⃣ Connessione al master MT5
-    if not mt5.initialize(
-        path=trader["master_path"],
-        login=int(trader["master_user"]),
-        password=trader["master_pwd"],
-        server=trader["master_name"]
-    ):
-        last_err = mt5.last_error()
-        conn.close()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Connessione al master fallita: {last_err}"
-    )
-    print(f"Connessione al master {trader['master_user']} riuscita!")
-
-    master_positions = mt5.positions_get()
-    if not master_positions:
-        mt5.shutdown()
         cursor.close()
         conn.close()
-        print(f"Nessuna posizione sul master")
+        raise HTTPException(status_code=404, detail="Trader non trovato")
+
+    # Funzione interna per login all'API MT5 locale
+    def mt5_login(ip, port, login, password, server_name):
+        url = f"http://{ip}:{port}/login"
+        payload = {
+            "login": int(login),
+            "password": password,
+            "server": server_name
+        }
+        try:
+            resp = requests.post(url, json=payload, timeout=10)
+            resp.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Errore comunicazione con MT5 API {server_name}: {str(e)}"
+            )
+
+    # 2️⃣ Login master
+    mt5_login(trader["master_ip"], trader["master_port"], trader["master_user"],
+              trader["master_pwd"], trader["master_name"])
+    print(f"Connessione al master {trader['master_user']} riuscita!")
+
+    # 3️⃣ Recupera posizioni master
+    master_url = f"http://{trader['master_ip']}:{trader['master_port']}/positions"
+    try:
+        resp = requests.get(master_url, timeout=10)
+        resp.raise_for_status()
+        master_positions = resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Errore recupero posizioni master: {str(e)}")
+
+    if not master_positions:
         raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
-    # Stampa tutte le posizioni trovate
-    print("=== POSIZIONI SUL MASTER ===")
-    for pos in master_positions:
-        print(f"[MASTER] {pos._asdict()}")  # aggiunge il tag [MASTER] davanti ai dettagli
-
-
-
-    # # 3️⃣ Connessione allo slave MT5
-    if not mt5.initialize(
-        path=trader["slave_path"],
-        login=int(trader["slave_user"]),
-        password=trader["slave_pwd"],
-        server=trader["slave_name"]
-    ):
-        last_err = mt5.last_error()
-        conn.close()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Connessione al server fallita: {last_err}"
-    )
+    # 4️⃣ Login slave
+    mt5_login(trader["slave_ip"], trader["slave_port"], trader["slave_user"],
+              trader["slave_pwd"], trader["slave_name"])
     print(f"Connessione allo slave {trader['slave_user']} riuscita!")
 
+    slave_url = f"http://{trader['slave_ip']}:{trader['slave_port']}/order"
 
-    # 4️⃣ Copia ogni ordine master sullo slave
-    import traceback
-
+    # 5️⃣ Copia ordini dal master allo slave
     for pos in master_positions:
+        symbol = pos["symbol"]
+        order_type = "buy" if pos["type"] == 0 else "sell"
+        volume = trader["fix_lot"] or round(pos["volume"] * float(trader["moltiplicatore"]), 2)
+
+        order_payload = {
+            "action": 0,  # mt5.TRADE_ACTION_DEAL
+            "symbol": symbol,
+            "volume": volume,
+            "type": 0 if order_type == "buy" else 1,  # BUY=0, SELL=1
+            "price": pos.get("price_open", 0),
+            "sl": pos.get("sl", 0),
+            "tp": pos.get("tp", 0),
+            "deviation": 10,
+            "magic": 123456,
+            "comment": f"Copied from master {trader_id}"
+        }
+
         try:
-            symbol = pos.symbol
-            order_type = "buy" if pos.type == 0 else "sell"
-            volume = trader["fix_lot"] or round(pos.volume * float(trader["moltiplicatore"]), 2)
-            print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
+            resp = requests.post(slave_url, json=order_payload, timeout=10)
+            resp.raise_for_status()
+            # puoi registrare l'ordine sul DB qui se vuoi
+            print(f"Ordine copiato su slave: {symbol}")
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️ Errore invio ordine su slave {symbol}: {str(e)}")
+            continue
 
-            # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
-            sym_info = mt5.symbol_info(symbol)
-            if sym_info is None:
-                print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
-                continue
-
-
-            if not sym_info.visible:
-                print(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
-                if not mt5.symbol_select(symbol, True):
-                    print(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
-                    continue
-                else:
-                    print(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
-
-            tick = mt5.symbol_info_tick(symbol)
-            if not tick:
-                print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
-                continue
-            
-            sym_info = mt5.symbol_info(symbol)
-            info = mt5.symbol_info(symbol)
-            # print(f"Symbol info for {symbol}:")
-            # print(f"  filling_mode: {info.filling_mode}")
-            # print(f"  trade_mode: {info.trade_mode}")
-            # print(f"  trade_exemode: {info.trade_exemode}")
-
-            request = {
-                "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": symbol,
-                "volume": volume,
-                "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
-                "price": tick.ask if order_type == "buy" else tick.bid,
-                "sl": pos.sl,
-                "tp": pos.tp,
-                "deviation": 10,
-                "magic": 123456,
-                "comment": f"Copied from master {trader_id}",
-                "type_time": mt5.ORDER_TIME_GTC,
-                # "type_filling": filling_mode, dà errore..
-            }
-
-            print(f"🔁 Invio ordine su slave: {request}")
-            result = mt5.order_send(request)
-
-            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-                # 🔹 Inserimento nel DB master_orders
-                cursor.execute("""
-                    INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    trader_id, pos.ticket, symbol, order_type, pos.volume,
-                    pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
-                ))
-                master_order_id = cursor.lastrowid
-
-                # 🔹 Inserimento nel DB slave_orders
-                cursor.execute("""
-                    INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                """, (
-                    trader_id, master_order_id, result.order, symbol, order_type, volume,
-                    request["price"], pos.sl, pos.tp
-                ))
-                conn.commit()
-                print(f"✅ Ordine copiato e registrato: {symbol}")
-
-
-
-        except Exception as e:
-            print("❌ Eccezione durante la copia ordine:")
-            print(traceback.format_exc())
-        continue
-
-    # ✅ Pulizia finale
-    mt5.shutdown()
     cursor.close()
     conn.close()
-
-
-    # Restituiamo solo i dati del trader come test
-    return {"message": "Trader info retrieved", "trader": trader}
-
+    return {"message": "Ordini copiati con successo", "trader": trader, "positions_copied": len(master_positions)}
 
 
 

@@ -30,11 +30,16 @@ class ServerResponse(BaseModel):
     updated_at: datetime
 
 class ServerCheckRequest(BaseModel):
-    server: str
-    login: int
-    password: str
+    host: str
     port: int
-    path:str
+
+
+# class ServerCheckRequest(BaseModel):
+#     server: str
+#     login: int
+#     password: str
+#     port: int
+#     path:str
 
 class ServerRequest(BaseModel):
     user: str
