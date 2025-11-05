@@ -689,11 +689,6 @@ def copy_orders(trader_id: int):
             print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
 
             # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
-            # sym_info = mt5.symbol_info(symbol)
-            # if sym_info is None:
-            #     print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
-            #     continue
-
             info_url = f"{base_url}/symbol_info/{symbol}"
             print(f"🔍 Richiedo info simbolo allo slave: {info_url}")
             
@@ -739,31 +734,6 @@ def copy_orders(trader_id: int):
             print(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
         
-            # sym_info = mt5.symbol_info(symbol)
-            # info = mt5.symbol_info(symbol)
-            # # print(f"Symbol info for {symbol}:")
-            # # print(f"  filling_mode: {info.filling_mode}")
-            # # print(f"  trade_mode: {info.trade_mode}")
-            # # print(f"  trade_exemode: {info.trade_exemode}")
-
-            # request = {
-            #     "action": mt5.TRADE_ACTION_DEAL,
-            #     "symbol": symbol,
-            #     "volume": volume,
-            #     "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
-            #     "price": tick.ask if order_type == "buy" else tick.bid,
-            #     "sl": pos.sl,
-            #     "tp": pos.tp,
-            #     "deviation": 10,
-            #     "magic": 123456,
-            #     "comment": f"Copied from master {trader_id}",
-            #     "type_time": mt5.ORDER_TIME_GTC,
-            #     # "type_filling": filling_mode, dà errore..
-            # }
-
-            # print(f"🔁 Invio ordine su slave: {request}")
-            # result = mt5.order_send(request)
-
             # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
             request = {
                 "symbol": symbol,
@@ -802,8 +772,12 @@ def copy_orders(trader_id: int):
                     INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
-                    trader_id, pos.ticket, symbol, order_type, pos.volume,
-                    pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+                    # trader_id, pos.ticket, symbol, order_type, pos.volume,
+                    # pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+
+                    trader_id, pos.get("ticket"), symbol, order_type, pos.get("volume"),
+                    pos.get("price_open"), pos.get("sl"), pos.get("tp"),
+                    datetime.fromtimestamp(pos.get("time"))
                 ))
                 master_order_id = cursor.lastrowid
 
@@ -812,8 +786,7 @@ def copy_orders(trader_id: int):
                     INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
                 """, (
-                    trader_id, master_order_id, result.order, symbol, order_type, volume,
-                    request["price"], pos.sl, pos.tp
+                    trader_id, master_order_id, result.get("result", {}).get("order"), symbol, order_type, volume, request["price"], pos.get("sl"), pos.get("tp")
                 ))
                 conn.commit()
                 print(f"✅ Ordine copiato e registrato: {symbol}")
