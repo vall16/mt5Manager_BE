@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from logging import info
 from typing import List
 import uuid
@@ -715,10 +716,10 @@ def copy_orders(trader_id: int):
             else:
                 print(f"✅ Simbolo {symbol} è già visibile sullo slave.")
 
-            tick = mt5.symbol_info_tick(symbol)
-            if not tick:
-                print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
-                continue
+            # tick = mt5.symbol_info_tick(symbol)
+            # if not tick:
+            #     print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
+            #     continue
 
             # 🔹 2️⃣ Recupero tick dal server slave via API
             tick_url = f"{base_url}/symbol_tick/{symbol}"
@@ -738,33 +739,64 @@ def copy_orders(trader_id: int):
             print(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
         
-            
-            sym_info = mt5.symbol_info(symbol)
-            info = mt5.symbol_info(symbol)
-            # print(f"Symbol info for {symbol}:")
-            # print(f"  filling_mode: {info.filling_mode}")
-            # print(f"  trade_mode: {info.trade_mode}")
-            # print(f"  trade_exemode: {info.trade_exemode}")
+            # sym_info = mt5.symbol_info(symbol)
+            # info = mt5.symbol_info(symbol)
+            # # print(f"Symbol info for {symbol}:")
+            # # print(f"  filling_mode: {info.filling_mode}")
+            # # print(f"  trade_mode: {info.trade_mode}")
+            # # print(f"  trade_exemode: {info.trade_exemode}")
 
+            # request = {
+            #     "action": mt5.TRADE_ACTION_DEAL,
+            #     "symbol": symbol,
+            #     "volume": volume,
+            #     "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
+            #     "price": tick.ask if order_type == "buy" else tick.bid,
+            #     "sl": pos.sl,
+            #     "tp": pos.tp,
+            #     "deviation": 10,
+            #     "magic": 123456,
+            #     "comment": f"Copied from master {trader_id}",
+            #     "type_time": mt5.ORDER_TIME_GTC,
+            #     # "type_filling": filling_mode, dà errore..
+            # }
+
+            # print(f"🔁 Invio ordine su slave: {request}")
+            # result = mt5.order_send(request)
+
+            # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
             request = {
-                "action": mt5.TRADE_ACTION_DEAL,
                 "symbol": symbol,
                 "volume": volume,
-                "type": mt5.ORDER_TYPE_BUY if order_type == "buy" else mt5.ORDER_TYPE_SELL,
-                "price": tick.ask if order_type == "buy" else tick.bid,
-                "sl": pos.sl,
-                "tp": pos.tp,
-                "deviation": 10,
-                "magic": 123456,
+                "type": "buy" if order_type == "buy" else "sell",
+                "price": tick["ask"] if order_type == "buy" else tick["bid"],
+                "sl": pos["sl"],
+                "tp": pos["tp"],
                 "comment": f"Copied from master {trader_id}",
-                "type_time": mt5.ORDER_TIME_GTC,
-                # "type_filling": filling_mode, dà errore..
             }
 
-            print(f"🔁 Invio ordine su slave: {request}")
-            result = mt5.order_send(request)
+            # 🔹 3️⃣ Invio ordine allo slave via API
+            order_url = f"{base_url}/order"
+            print(f"🔁 Invio ordine allo slave via API: {order_url}")
+            print(f"🧾 Dati inviati: {json.dumps(request, indent=2)}")
 
-            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+            try:
+                resp_order = requests.post(order_url, json=request, timeout=20)
+
+                if resp_order.status_code != 200:
+                    print(f"❌ Errore invio ordine allo slave: {resp_order.text}")
+                    continue
+
+                result = resp_order.json()
+                print(f"✅ Risposta dallo slave: {result}")
+
+            except requests.exceptions.RequestException as e:
+                print(f"⚠️ Errore di connessione con lo slave: {e}")
+                continue
+
+            # if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+            if result and result.get("result", {}).get("retcode") == mt5.TRADE_RETCODE_DONE:
+
                 # 🔹 Inserimento nel DB master_orders
                 cursor.execute("""
                     INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)

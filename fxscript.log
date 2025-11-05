@@ -219,3 +219,31 @@
 2025-11-05 15:16:09,965 - INFO - Starting API
 2025-11-05 15:16:10,664 - INFO - Starting API
 2025-11-05 15:16:10,847 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:29:55,357 - INFO - Starting API
+2025-11-05 15:29:55,833 - INFO - Starting API
+2025-11-05 15:29:55,921 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:33:49,778 - INFO - Starting API
+2025-11-05 15:33:51,072 - INFO - Starting API
+2025-11-05 15:33:51,390 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:36:10,283 - INFO - Starting API
+2025-11-05 15:36:10,809 - INFO - Starting API
+2025-11-05 15:36:10,856 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:38:05,547 - INFO - Starting API
+2025-11-05 15:38:05,962 - INFO - Starting API
+2025-11-05 15:38:06,010 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:39:13,086 - INFO - Starting API
+2025-11-05 15:39:13,405 - INFO - Starting API
+2025-11-05 15:39:13,441 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:41:15,166 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Read timed out. (read timeout=30)
+2025-11-05 15:43:51,587 - INFO - Starting API
+2025-11-05 15:43:52,057 - INFO - Starting API
+2025-11-05 15:43:52,089 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:44:39,093 - INFO - Starting API
+2025-11-05 15:44:41,459 - INFO - Starting API
+2025-11-05 15:44:41,552 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 15:49:47,274 - INFO - Starting API
+2025-11-05 15:49:49,978 - INFO - Starting API
+2025-11-05 15:49:50,072 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 16:13:39,622 - INFO - Starting API
+2025-11-05 16:13:40,599 - INFO - Starting API
+2025-11-05 16:13:40,698 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

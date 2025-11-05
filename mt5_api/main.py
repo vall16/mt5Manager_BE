@@ -185,14 +185,55 @@ def get_symbol_tick(symbol: str):
         return {"error": "no tick available"}
     return {"bid": tick.bid, "ask": tick.ask, "last": tick.last}
 
+@app.get("/terminal_info")
+def get_terminal_info():
+    try:
+        info = mt5.terminal_info()
+        if info is None:
+            raise HTTPException(status_code=500, detail="Impossibile ottenere terminal info")
+        return info._asdict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/order")
 def send_order(order: dict):
+    print(f"📩 Ricevuto ordine dallo slave: {order}")
+
+    # 🔹 Conversione dei tipi numerici
+    order["volume"] = float(order.get("volume", 0))
+    order["price"] = float(order.get("price", 0))
+    order["sl"] = float(order.get("sl", 0)) if order.get("sl") else 0.0
+    order["tp"] = float(order.get("tp", 0)) if order.get("tp") else 0.0
+
+    # 🔹 Traduzione tipo ordine testuale → costante MT5
+    order_type = order.get("type")
+    if order_type == "buy":
+        order["type"] = mt5.ORDER_TYPE_BUY
+    elif order_type == "sell":
+        order["type"] = mt5.ORDER_TYPE_SELL
+    else:
+        raise HTTPException(status_code=400, detail=f"Invalid order type: {order_type}")
+
+    # 🔹 Aggiunge parametri mancanti richiesti da MT5
+    order.setdefault("action", mt5.TRADE_ACTION_DEAL)
+    order.setdefault("deviation", 10)
+    order.setdefault("type_time", mt5.ORDER_TIME_GTC)
+    order.setdefault("magic", 123456)
+
+    print(f"🚀 Inviando ordine a MetaTrader5: {order}")
     result = mt5.order_send(order)
+
+    if result is None:
+        raise HTTPException(status_code=500, detail=f"MT5 order_send() returned None")
+
     if result.retcode != mt5.TRADE_RETCODE_DONE:
+        print(f"❌ Errore invio ordine: {result}")
         raise HTTPException(status_code=400, detail=f"Trade failed: {result.comment}")
+
+    print(f"✅ Ordine eseguito correttamente: {result}")
     return {"message": "✅ Order sent", "result": result._asdict()}
+
 
 if __name__ == "__main__":
     import uvicorn

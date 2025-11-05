@@ -2,9 +2,13 @@ per i miei test:
 sono da lanciare da C:\Users\crist\mt5Manager_BE\mt5_api !!
 nel main di mt5_api !
 
-python main.py "C:\MT5_1\terminal64.exe" 9000 
+
+python main.py "C:\Program Files\MetaTrader 5\terminal64.exe" 9000
+master
+python main.py "C:\MT5_1\terminal64.exe" 9001
 (metaquotes-demo)
-python main.py "C:\Program Files\MetaTrader 5\terminal64.exe" 9001 
+slave
+ 
 
 
 MASTER
@@ -25,6 +29,7 @@ Password: OmOy*zJ8
 x back-end
 python main.py
 
+senza costraint sul nome
 CREATE TABLE `servers2` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user` varchar(100) NOT NULL,
