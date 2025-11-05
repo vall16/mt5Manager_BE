@@ -157,6 +157,34 @@ def get_positions():
         raise HTTPException(status_code=400, detail="Cannot get positions")
     return [p._asdict() for p in positions]
 
+@app.get("/symbol_info/{symbol}")
+def get_symbol_info(symbol: str):
+    info = mt5.symbol_info(symbol)
+    if not info:
+        return {"error": "symbol not found"}
+    return {
+        "name": info.name,
+        "visible": info.visible,
+        "trade_mode": info.trade_mode,
+        "spread": info.spread,
+        "point": info.point
+    }
+
+@app.post("/symbol_select")
+def select_symbol(data: dict):
+    symbol = data.get("symbol")
+    if not symbol:
+        return {"error": "missing symbol"}
+    success = mt5.symbol_select(symbol, True)
+    return {"symbol": symbol, "enabled": success}
+
+@app.get("/symbol_tick/{symbol}")
+def get_symbol_tick(symbol: str):
+    tick = mt5.symbol_info_tick(symbol)
+    if not tick:
+        return {"error": "no tick available"}
+    return {"bid": tick.bid, "ask": tick.ask, "last": tick.last}
+
 
 
 @app.post("/order")

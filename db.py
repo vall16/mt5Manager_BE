@@ -497,8 +497,8 @@ def copy_orders(trader_id: int):
        ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
        ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
             FROM traders t
-            JOIN servers ms ON ms.id = t.master_server_id
-            JOIN servers ss ON ss.id = t.slave_server_id
+            JOIN servers2 ms ON ms.id = t.master_server_id
+            JOIN servers2 ss ON ss.id = t.slave_server_id
         WHERE t.id = %s;
 
     """, (trader_id,))
@@ -678,6 +678,8 @@ def copy_orders(trader_id: int):
     # 4️⃣ Copia ogni ordine master sullo slave
     import traceback
 
+    base_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    
     for pos in master_positions:
         try:
             symbol = pos["symbol"]
@@ -686,24 +688,56 @@ def copy_orders(trader_id: int):
             print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
 
             # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
-            sym_info = mt5.symbol_info(symbol)
-            if sym_info is None:
-                print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
+            # sym_info = mt5.symbol_info(symbol)
+            # if sym_info is None:
+            #     print(f"⚠️ Simbolo {symbol} non trovato sullo slave.")
+            #     continue
+
+            info_url = f"{base_url}/symbol_info/{symbol}"
+            print(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+            
+            resp = requests.get(info_url, timeout=10)
+
+            sym_info = resp.json()
+
+            if resp.status_code != 200:
+                print(f"⚠️ Impossibile ottenere info per {symbol} dallo slave: {resp.text}")
                 continue
 
-
-            if not sym_info.visible:
+                
+            if not sym_info.get("visible", False):
                 print(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
                 if not mt5.symbol_select(symbol, True):
                     print(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
                     continue
                 else:
                     print(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
+            else:
+                print(f"✅ Simbolo {symbol} è già visibile sullo slave.")
 
             tick = mt5.symbol_info_tick(symbol)
             if not tick:
                 print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
                 continue
+
+            # 🔹 2️⃣ Recupero tick dal server slave via API
+            tick_url = f"{base_url}/symbol_tick/{symbol}"
+            print(f"📡 Richiedo tick allo slave: {tick_url}")
+
+            
+            resp_tick = requests.get(tick_url, timeout=10)
+            if resp_tick.status_code != 200:
+                print(f"⚠️ Nessun tick disponibile per {symbol} dallo slave: {resp_tick.text}")
+                continue
+
+            tick = resp_tick.json()
+            if not tick or "bid" not in tick or "ask" not in tick:
+                print(f"⚠️ Tick incompleto o non valido per {symbol}: {tick}")
+                continue
+
+            print(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
+
+        
             
             sym_info = mt5.symbol_info(symbol)
             info = mt5.symbol_info(symbol)
