@@ -21,6 +21,7 @@ class ServerResponse(BaseModel):
     user: str
     pwd: str
     server: str
+    server_alias: Optional[str] = None 
     platform: str
     ip: str
     path: Optional[str] = None   # 👈 cambia qui
@@ -45,6 +46,7 @@ class ServerRequest(BaseModel):
     user: str
     pwd: Optional[str] = None
     server: str
+    server_alias: str
     platform: str
     ip: str
     path: str

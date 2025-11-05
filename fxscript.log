@@ -100,3 +100,55 @@
 2025-11-03 16:19:49,476 - INFO - Starting API
 2025-11-03 16:19:50,282 - INFO - Starting API
 2025-11-03 16:19:50,447 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-04 21:57:26,734 - INFO - Starting API
+2025-11-04 21:57:30,098 - INFO - Starting API
+2025-11-04 21:57:30,437 - INFO - Starting API
+2025-11-04 21:57:30,461 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-04 22:34:10,172 - INFO - Starting API
+2025-11-04 22:34:10,608 - INFO - Starting API
+2025-11-04 22:34:10,667 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-04 22:35:00,844 - INFO - Starting API
+2025-11-04 22:35:01,478 - INFO - Starting API
+2025-11-04 22:35:01,589 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-04 22:35:29,329 - INFO - Starting API
+2025-11-04 22:35:29,927 - INFO - Starting API
+2025-11-04 22:35:29,966 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-04 22:35:47,376 - INFO - Starting API
+2025-11-04 22:35:48,103 - INFO - Starting API
+2025-11-04 22:35:48,181 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:20:31,356 - INFO - Starting API
+2025-11-05 11:20:31,911 - INFO - Starting API
+2025-11-05 11:20:31,996 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:22:57,115 - INFO - Starting API
+2025-11-05 11:22:57,457 - INFO - Starting API
+2025-11-05 11:22:57,477 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:23:45,518 - ERROR - Unhandled exception: 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`trader_db`.`traders`, CONSTRAINT `fk_master_server` FOREIGN KEY (`master_server_id`) REFERENCES `servers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE)
+2025-11-05 11:26:10,226 - ERROR - Unhandled exception: 'NoneType' object is not subscriptable
+2025-11-05 11:34:57,690 - INFO - Starting API
+2025-11-05 11:34:58,000 - INFO - Starting API
+2025-11-05 11:34:58,027 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:40:14,620 - INFO - Starting API
+2025-11-05 11:40:14,832 - INFO - Starting API
+2025-11-05 11:40:14,866 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:41:46,031 - INFO - Starting API
+2025-11-05 11:41:46,387 - INFO - Starting API
+2025-11-05 11:41:46,409 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:47:42,894 - INFO - Starting API
+2025-11-05 11:47:43,362 - INFO - Starting API
+2025-11-05 11:47:43,501 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:57:42,483 - INFO - Starting API
+2025-11-05 11:57:43,632 - INFO - Starting API
+2025-11-05 11:57:44,170 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 11:57:53,942 - ERROR - Unhandled exception: 5 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'server_alias'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 1, 'server_alias'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 2, 'server_alias'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 3, 'server_alias'), 'msg': 'Input should be a valid string', 'input': None}
+  {'type': 'string_type', 'loc': ('response', 4, 'server_alias'), 'msg': 'Input should be a valid string', 'input': None}
+
+2025-11-05 11:58:42,629 - INFO - Starting API
+2025-11-05 11:58:42,911 - INFO - Starting API
+2025-11-05 11:58:42,952 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-05 12:08:07,047 - INFO - Starting API
+2025-11-05 12:08:07,258 - INFO - Starting API
+2025-11-05 12:08:07,357 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

@@ -3,7 +3,8 @@ from logging import info
 from typing import List
 import uuid
 import mysql.connector
-from mysql.connector import Error
+# from mysql.connector import Error
+from mysql.connector import Error as MySQLError
 import requests
 from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
@@ -39,7 +40,7 @@ def get_connection():
 
 
         return conn
-    except Error as e:
+    except MySQLError as e:
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
 
 
@@ -120,7 +121,8 @@ def get_servers():
             raise HTTPException(status_code=500, detail="Database connection failed")
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM servers")
+        # cursor.execute("SELECT * FROM servers")
+        cursor.execute("SELECT * FROM servers2")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -185,6 +187,64 @@ def get_servers():
 #         print(f"Errore DB: {e}")
 #         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+# @router.post("/servers")
+# def insert_server(server: ServerRequest):
+
+#     conn = get_connection()
+#     if not conn:
+#         raise HTTPException(status_code=500, detail="Database connection failed")
+
+#     try:
+#         cursor = conn.cursor()
+
+#         # --- Preparazione ---
+#         query = """
+#             INSERT INTO servers 
+#             (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
+#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+#         """
+
+#         values = (
+#             server.user,
+#             server.pwd,
+#             server.server,
+#             server.platform,
+#             server.ip,
+#             server.path,
+#             server.port,
+#             server.is_active
+#         )
+
+#         print("\n🧩 [DEBUG SQL] Tentativo di INSERT su 'servers' ...")
+#         print("Query SQL:", query)
+#         print("Valori:", values)
+
+#         # --- Esecuzione ---
+#         cursor.execute(query, values)
+#         conn.commit()
+
+#         new_id = cursor.lastrowid
+#         print(f"✅ [OK] Inserito record servers.id={new_id}")
+
+#         cursor.close()
+#         conn.close()
+
+#         return {"message": "Server added successfully", "id": new_id}
+
+#     except Exception as e:
+#         import traceback
+#         print("\n❌ [ERRORE SQL]")
+#         print("Tipo errore:", type(e).__name__)
+#         print("Dettaglio:", str(e))
+#         traceback.print_exc()
+#         try:
+#             conn.rollback()
+#         except:
+#             pass
+#         raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
+
+# from mysql.connector import Error as MySQLError
+
 @router.post("/servers")
 def insert_server(server: ServerRequest):
 
@@ -195,17 +255,18 @@ def insert_server(server: ServerRequest):
     try:
         cursor = conn.cursor()
 
-        # --- Preparazione ---
         query = """
-            INSERT INTO servers 
-            (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            # INSERT INTO servers 
+            INSERT INTO servers2 
+            (`user`, `pwd`, `server`,`server_alias`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
+            VALUES (%s, %s, %s, %s,%s, %s, %s, %s, %s, NOW(), NOW())
         """
 
         values = (
             server.user,
             server.pwd,
             server.server,
+            server.server_alias,
             server.platform,
             server.ip,
             server.path,
@@ -217,7 +278,6 @@ def insert_server(server: ServerRequest):
         print("Query SQL:", query)
         print("Valori:", values)
 
-        # --- Esecuzione ---
         cursor.execute(query, values)
         conn.commit()
 
@@ -229,9 +289,21 @@ def insert_server(server: ServerRequest):
 
         return {"message": "Server added successfully", "id": new_id}
 
+    except MySQLError as e:
+        import traceback
+        print("\n❌ [ERRORE SQL MySQL]")
+        print("Codice errore:", e.errno)
+        print("Dettaglio:", e.msg)
+        traceback.print_exc()
+        try:
+            conn.rollback()
+        except:
+            pass
+        raise HTTPException(status_code=500, detail=f"MySQL Error {e.errno}: {e.msg}")
+
     except Exception as e:
         import traceback
-        print("\n❌ [ERRORE SQL]")
+        print("\n❌ [ERRORE GENERICO]")
         print("Tipo errore:", type(e).__name__)
         print("Dettaglio:", str(e))
         traceback.print_exc()
@@ -239,7 +311,7 @@ def insert_server(server: ServerRequest):
             conn.rollback()
         except:
             pass
-        raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
+        raise HTTPException(status_code=500, detail=f"Errore: {str(e)}")
 
 
 @router.delete("/servers/{server_id}")
@@ -251,7 +323,8 @@ def delete_server(server_id: int):
     try:
         cursor = conn.cursor()
         # Verifica se il server esiste
-        cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
+        # cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
+        cursor.execute("SELECT id FROM servers2 WHERE id = %s", (server_id,))
         row = cursor.fetchone()
         if not row:
             cursor.close()
@@ -259,7 +332,8 @@ def delete_server(server_id: int):
             raise HTTPException(status_code=404, detail="Server not found")
 
         # Cancella il server
-        cursor.execute("DELETE FROM servers WHERE id = %s", (server_id,))
+        # cursor.execute("DELETE FROM servers WHERE id = %s", (server_id,))
+        cursor.execute("DELETE FROM servers2 WHERE id = %s", (server_id,))
         conn.commit()
 
         cursor.close()
@@ -267,7 +341,7 @@ def delete_server(server_id: int):
 
         return {"message": f"Server {server_id} deleted successfully"}
 
-    except Error as e:
+    except MySQLError as e:
         print("=== ERRORE DURANTE DELETE SERVER ===")
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
