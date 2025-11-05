@@ -1,13 +1,14 @@
 from datetime import datetime
 import os
 import socket
+import subprocess
 import MetaTrader5 as mt5
 import logging
 from fastapi import APIRouter, HTTPException, Query
 from models import (
     LoginRequest, LoginResponse, BuyRequest, SellRequest, CloseRequest,
     GetLastCandleRequest, GetLastDealsHistoryRequest, DealsAllResponse,
-    ServerCheckRequest, TraderServersUpdate
+    ServerCheckRequest, ServerRequest, TraderServersUpdate
 )
 
 router = APIRouter()
@@ -244,6 +245,30 @@ def orders_history(
         return {"error": mt5.last_error()}
     return [o._asdict() for o in orders]
 
+@router.post("/start_server")
+async def start_server(server: ServerRequest):
+    """
+    Avvia un terminale MetaTrader 5 per il server indicato.
+    """
+    print(f"🚀 Avvio server {server.server} ({server.platform})...")
+
+    if not os.path.exists(server.path):
+        raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
+
+    try:
+        # 🔹 Lancia il terminale MetaTrader come nuovo processo
+        subprocess.Popen([server.path], shell=False)
+        print(f"✅ Terminal avviato da: {server.path}")
+
+        return {
+            "status": "success",
+            "message": f"Terminal started for {server.server}",
+            "path": server.path
+        }
+
+    except Exception as e:
+        print(f"❌ Errore avvio terminal: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # --- ORDER MODIFY ---
 @router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
