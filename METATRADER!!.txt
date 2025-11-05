@@ -3,9 +3,9 @@ sono da lanciare da C:\Users\crist\mt5Manager_BE\mt5_api !!
 nel main di mt5_api !
 
 
-python main.py "C:\Program Files\MetaTrader 5\terminal64.exe" 9000
+python main.py "C:\Program Files\MetaTrader 5\terminal64.exe" 127.0.0.1:9000
 master
-python main.py "C:\MT5_1\terminal64.exe" 9001
+python main.py "C:\MT5_1\terminal64.exe" 127.0.0.1:9001
 (metaquotes-demo)
 slave
  

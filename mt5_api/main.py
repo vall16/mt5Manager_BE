@@ -5,6 +5,7 @@ import concurrent
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sys
+import uvicorn
 
 app = FastAPI(title="MT5 Local API")
 
@@ -60,22 +61,6 @@ def startup_event():
 
     import sys
     import MetaTrader5 as mt5
-
-    # 🔹 Recupera il path da linea di comando, se non passato None
-    path = sys.argv[1] if len(sys.argv) > 1 else None
-
-    if not path:
-        raise RuntimeError("❌ Nessun percorso MT5 fornito. Usa: python main.py <MT5_PATH> [PORT]")
-
-    print(f"🟢 Avvio terminale MT5 al path: {path}")
-
-    # 🔹 Inizializza MT5
-    initialized = mt5.initialize(path)
-    if not initialized:
-        err = mt5.last_error()  # Recupera dettagli dell'errore
-        raise RuntimeError(f"❌ Fallita inizializzazione MT5 ({path}): {err}")
-
-    print(f"✅ MT5 inizializzato correttamente al path: {path}")
 
 
 @app.on_event("shutdown")
@@ -235,7 +220,31 @@ def send_order(order: dict):
     return {"message": "✅ Order sent", "result": result._asdict()}
 
 
+# -----------------------
+# BLOCCO DI AVVIO
+# -----------------------
 if __name__ == "__main__":
-    import uvicorn
-    port = int(sys.argv[2]) if len(sys.argv) > 2 else 9000
-    uvicorn.run("main:app", host="127.0.0.1", port=port, reload=False)
+    if len(sys.argv) < 3:
+        print("Usage: python mt5_api.py <MT5_PATH> <HOST:PORT>")
+        sys.exit(1)
+    # path di MT5
+    mt5_path = sys.argv[1] 
+    # host+porta
+    host_port = sys.argv[2]
+    host, port_str = host_port.split(":")
+    port = int(port_str)
+
+    if not os.path.exists(mt5_path):
+        print(f"❌ Terminale MT5 non trovato: {mt5_path}")
+        sys.exit(1)
+
+    if not mt5.initialize(mt5_path):
+        err = mt5.last_error()
+        print(f"❌ Fallita inizializzazione MT5: {err}")
+        sys.exit(1)
+
+    print(f"✅ MT5 inizializzato correttamente da {mt5_path}")
+    print(f"🟢 Avvio FastAPI su {host}:{port}")
+
+    uvicorn.run(app, host=host, port=port)
+

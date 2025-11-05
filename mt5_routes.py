@@ -248,28 +248,38 @@ def orders_history(
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
-    Avvia un terminale MetaTrader 5 per il server indicato.
+    Avvia un terminale MetaTrader 5 per il server indicato su host:port.
     """
     print(f"🚀 Avvio server {server.server} ({server.platform})...")
 
     if not os.path.exists(server.path):
         raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
 
+    # host e port definiti nel record server
+    host = server.ip       # es. "192.168.1.208"
+    port = server.port     # es. 8084
+    host_port = f"{host}:{port}"
+
     try:
-        # 🔹 Lancia il terminale MetaTrader come nuovo processo
-        subprocess.Popen([server.path], shell=False)
-        print(f"✅ Terminal avviato da: {server.path}")
+        # Lancia nuova istanza MT5 API su host:port
+        subprocess.Popen(
+            ["python", "mt5_api\main.py", server.path, host_port],
+            shell=False
+        )
+        print(f"✅ Terminal avviato da {server.path} su {host_port}")
 
         return {
             "status": "success",
-            "message": f"Terminal started for {server.server}",
-            "path": server.path
+            "message": f"Terminal started for {server.server} on {host_port}",
+            "path": server.path,
+            "host": host,
+            "port": port
         }
 
     except Exception as e:
         print(f"❌ Errore avvio terminal: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 # --- ORDER MODIFY ---
 @router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
 def order_modify(
