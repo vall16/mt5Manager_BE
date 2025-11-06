@@ -4,6 +4,7 @@ nel main di mt5_api !
 
 
 python main.py "C:\Program Files\MetaTrader 5\terminal64.exe" 127.0.0.1:9000
+python main.py 127.0.0.1:9000
 master
 python main.py "C:\MT5_1\terminal64.exe" 127.0.0.1:9001
 (metaquotes-demo)
@@ -19,6 +20,16 @@ Server   : MetaQuotes-Demo
 Login    : 5041922476
 Password : Zh@1TcKl
 Investor : JoIaT@3x
+
+MASTER (trader)
+Name     : ROBERTO DISCALZO
+Type     : Forex Hedged EUR
+Server   : VTMarkets-Live 2
+
+Login    : 19148641
+Password : Qpnldan1@1
+Investor : JoIaT@3x
+
 
 SLAVE
 
