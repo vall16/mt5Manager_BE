@@ -488,12 +488,26 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
 def copy_orders(trader_id: int):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    print(f"🚀 entrato BE")
+
+    logs = []  # elenco dei messaggi di log
+
+    start_time = datetime.now()  
+
+    def log(message: str):
+        """Aggiunge un messaggio con timestamp relativo."""
+        elapsed = (datetime.now() - start_time).total_seconds()
+        timestamp = f"[+{elapsed:.1f}s]"
+        logs.append(f"{timestamp} {message}")
+        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
+
+
+    # print(f"🚀 entrato BE")
+    log("🚀 Entrato in copy_orders()")
+
 
     # 1️⃣ Recupera info del trader (master e slave)
     cursor.execute("""
         
-
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
        ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
        ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
@@ -505,8 +519,8 @@ def copy_orders(trader_id: int):
     """, (trader_id,))
     trader = cursor.fetchone()
         # 👇 Stampa in console backend
-    print("=== Trader Info ===")
-    print(trader)
+    log("=== Trader Info ===")
+    log(trader)
     print("===================")
     print(trader["master_name"])
     print(trader["master_user"])
@@ -805,7 +819,13 @@ def copy_orders(trader_id: int):
 
 
     # Restituiamo solo i dati del trader come test
-    return {"message": "Trader info retrieved", "trader": trader}
+    # return {"message": "Trader info retrieved", "trader": trader}
+    return {
+        "status": "ok",
+        "message": "Operazione completata",
+        "logs": logs
+    }
+
 
 
 
