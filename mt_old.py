@@ -215,12 +215,12 @@ async def log_cors_debug(request: Request, call_next):
 
 
 # --- ENDPOINTS ---
-@app.get("/healthz")
-def healthz():
-    info = mt5.account_info()
-    if info and "login" in info._asdict():
-        return {"status": "ok"}
-    return {"status": "error", "details": mt5.last_error()}
+# @app.get("/healthz")
+# def healthz():
+#     info = mt5.account_info()
+#     if info and "login" in info._asdict():
+#         return {"status": "ok"}
+#     return {"status": "error", "details": mt5.last_error()}
 
 @app.get("/")
 def read_root():
@@ -495,21 +495,21 @@ def diagnostic(symbol: str):
 
     return info
 
-@app.get("/test_db")
-def test_db():
-    conn = get_connection()
-    if not conn:
-        return {"status": "error", "message": "Connessione fallita"}
+# @app.get("/test_db")
+# def test_db():
+#     conn = get_connection()
+#     if not conn:
+#         return {"status": "error", "message": "Connessione fallita"}
 
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT NOW()")
-        result = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        return {"status": "success", "message": f"Connessione OK! Ora DB: {result[0]}"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute("SELECT NOW()")
+#         result = cursor.fetchone()
+#         cursor.close()
+#         conn.close()
+#         return {"status": "success", "message": f"Connessione OK! Ora DB: {result[0]}"}
+#     except Exception as e:
+#         return {"status": "error", "message": str(e)}
     
 @app.post("/login", response_model=LoginResponse)
 def login(req: LoginRequest):

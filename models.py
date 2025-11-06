@@ -120,3 +120,8 @@ class DealsAllResponse(BaseModel):
 class TraderServersUpdate(BaseModel):
     master_server_id: Optional[int] = None
     slave_server_id: Optional[int] = None
+    sl:Optional[int] = None
+    tp:Optional[int] = None
+    tsl:Optional[int] = None
+    moltiplicatore:Optional[int] = None
+

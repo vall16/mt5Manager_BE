@@ -112,31 +112,31 @@ def create_user(username: str, password: str):
     print(f"User {username} creato con successo. ID: {user_id}")
 
 
-@router.get("/servers", response_model=List[ServerResponse])
-def get_servers():
-    try:
-        conn = get_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Database connection failed")
+# @router.get("/servers", response_model=List[ServerResponse])
+# def get_servers():
+#     try:
+#         conn = get_connection()
+#         if not conn:
+#             raise HTTPException(status_code=500, detail="Database connection failed")
 
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM servers")
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT * FROM servers")
+#         rows = cursor.fetchall()
+#         cursor.close()
+#         conn.close()
 
-        return rows
+#         return rows
 
-    except mysql.connector.Error as db_err:
-        # Errore specifico MySQL
-        detail = f"MySQL error {db_err.errno}: {db_err.msg}"
-        print(f"❌ {detail}")
-        raise HTTPException(status_code=500, detail=detail)
+#     except mysql.connector.Error as db_err:
+#         # Errore specifico MySQL
+#         detail = f"MySQL error {db_err.errno}: {db_err.msg}"
+#         print(f"❌ {detail}")
+#         raise HTTPException(status_code=500, detail=detail)
 
-    except Exception as e:
-        # Qualsiasi altro errore
-        print(f"❌ Errore imprevisto in get_servers: {e}")
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+#     except Exception as e:
+#         # Qualsiasi altro errore
+#         print(f"❌ Errore imprevisto in get_servers: {e}")
+#         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 # @router.post("/servers")
 # def insert_server(server: ServerRequest):
@@ -185,65 +185,65 @@ def get_servers():
 #         print(f"Errore DB: {e}")
 #         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-@router.post("/servers")
-def insert_server(server: ServerRequest):
+# @router.post("/servers")
+# def insert_server(server: ServerRequest):
 
-    conn = get_connection()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Database connection failed")
+#     conn = get_connection()
+#     if not conn:
+#         raise HTTPException(status_code=500, detail="Database connection failed")
 
-    try:
-        cursor = conn.cursor()
+#     try:
+#         cursor = conn.cursor()
 
-        # --- Preparazione ---
-        query = """
-            INSERT INTO servers 
-            (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-        """
+#         # --- Preparazione ---
+#         query = """
+#             INSERT INTO servers 
+#             (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
+#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+#         """
 
-        values = (
-            server.user,
-            server.pwd,
-            server.server,
-            server.platform,
-            server.ip,
-            server.path,
-            server.port,
-            server.is_active
-        )
+#         values = (
+#             server.user,
+#             server.pwd,
+#             server.server,
+#             server.platform,
+#             server.ip,
+#             server.path,
+#             server.port,
+#             server.is_active
+#         )
 
-        print("\n🧩 [DEBUG SQL] Tentativo di INSERT su 'servers' ...")
-        print("Query SQL:", query)
-        print("Valori:", values)
+#         print("\n🧩 [DEBUG SQL] Tentativo di INSERT su 'servers' ...")
+#         print("Query SQL:", query)
+#         print("Valori:", values)
 
-        # --- Esecuzione ---
-        cursor.execute(query, values)
-        conn.commit()
+#         # --- Esecuzione ---
+#         cursor.execute(query, values)
+#         conn.commit()
 
-        new_id = cursor.lastrowid
-        print(f"✅ [OK] Inserito record servers.id={new_id}")
+#         new_id = cursor.lastrowid
+#         print(f"✅ [OK] Inserito record servers.id={new_id}")
 
-        cursor.close()
-        conn.close()
+#         cursor.close()
+#         conn.close()
 
-        return {"message": "Server added successfully", "id": new_id}
+#         return {"message": "Server added successfully", "id": new_id}
 
-    except Exception as e:
-        import traceback
-        print("\n❌ [ERRORE SQL]")
-        print("Tipo errore:", type(e).__name__)
-        print("Dettaglio:", str(e))
-        traceback.print_exc()
-        try:
-            conn.rollback()
-        except:
-            pass
-        raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
+#     except Exception as e:
+#         import traceback
+#         print("\n❌ [ERRORE SQL]")
+#         print("Tipo errore:", type(e).__name__)
+#         print("Dettaglio:", str(e))
+#         traceback.print_exc()
+#         try:
+#             conn.rollback()
+#         except:
+#             pass
+#         raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
 
 
-@router.delete("/servers/{server_id}")
-def delete_server(server_id: int):
+# @router.delete("/servers/{server_id}")
+# def delete_server(server_id: int):
     conn = get_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Database connection failed")

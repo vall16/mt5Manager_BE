@@ -7,8 +7,6 @@ from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
 import requests
 
-# import MetaTrader5 as mt5
-
 # i files a cui punta il main: db.py, mt5_routes.py
 # from db_new import router as db_router
 from db import router as db_router
@@ -97,22 +95,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.get("/")
 def root():
     return {"status": "running", "message": "MT5 Manager API active"}
-
-# @app.get("/healthz")
-# def healthz():
-#     info = mt5.account_info()
-#     if info:
-#         return {"status": "ok", "account": info.login}
-#     return {"status": "error", "details": mt5.last_error()}
-
-# @app.get("/healthz")
-# def healthz():
-#     try:
-#         response = requests.get(f"{MT5_API_URL}/healthz", headers={"x-api-key": MT5_API_KEY})
-#         return response.json()
-#     except Exception as e:
-#         return {"status": "error", "detail": str(e)}
-
 
 # --- RUN SERVER ---
 if __name__ == "__main__":

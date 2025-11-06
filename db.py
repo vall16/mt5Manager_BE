@@ -452,12 +452,43 @@ def delete_trader(trader_id: int):
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+# @router.put("/traders/{trader_id}/servers")
+# def update_trader_servers(trader_id: int, update: TraderServersUpdate):
+#     conn = get_connection()
+#     cursor = conn.cursor(dictionary=True)
+
+#     # Controlla se il trader esiste
+#     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+#     trader = cursor.fetchone()
+#     if not trader:
+#         cursor.close()
+#         conn.close()
+#         raise HTTPException(status_code=404, detail="Trader not found")
+
+#     # Aggiorna i server
+#     cursor.execute("""
+#         UPDATE traders
+#         SET master_server_id = %s,
+#             slave_server_id = %s
+#         WHERE id = %s
+#     """, (update.master_server_id, update.slave_server_id, trader_id))
+    
+#     conn.commit()
+
+#     # Recupera il trader aggiornato
+#     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
+#     updated_trader = cursor.fetchone()
+
+#     cursor.close()
+#     conn.close()
+#     return updated_trader
+
 @router.put("/traders/{trader_id}/servers")
 def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Controlla se il trader esiste
+    # 🔹 Controlla se il trader esiste
     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
     trader = cursor.fetchone()
     if not trader:
@@ -465,23 +496,70 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
         conn.close()
         raise HTTPException(status_code=404, detail="Trader not found")
 
-    # Aggiorna i server
-    cursor.execute("""
-        UPDATE traders
-        SET master_server_id = %s,
-            slave_server_id = %s
-        WHERE id = %s
-    """, (update.master_server_id, update.slave_server_id, trader_id))
+    # 🔹 Prepara i valori aggiornabili dinamicamente
+    fields = []
+    values = []
+
+    if update.master_server_id is not None:
+        fields.append("master_server_id = %s")
+        values.append(update.master_server_id)
+    if update.slave_server_id is not None:
+        fields.append("slave_server_id = %s")
+        values.append(update.slave_server_id)
+    if update.sl is not None:
+        fields.append("sl = %s")
+        values.append(update.sl)
+    if update.tp is not None:
+        fields.append("tp = %s")
+        values.append(update.tp)
+    if update.tsl is not None:
+        fields.append("tsl = %s")
+        values.append(update.tsl)
+    if update.moltiplicatore is not None:
+        fields.append("moltiplicatore = %s")
+        values.append(update.moltiplicatore)
+
+    # 🔹 Se non c’è nulla da aggiornare, ritorna il trader com’è
+    if not fields:
+        cursor.close()
+        conn.close()
+        return trader
+
+    # 🔹 Costruisci dinamicamente la query
+    query = f"UPDATE traders SET {', '.join(fields)} WHERE id = %s"
     
+    values.append(trader_id)
+
+    # 🔹 Log dettagliato per debug
+    # 🔹 Log completo e leggibile
+    print("🛠️ [UPDATE TRADER] Esecuzione aggiornamento trader")
+    print("──────────────────────────────────────────────")
+    print(f"🔹 Trader ID: {trader_id}")
+    print("🔹 Campi aggiornati:")
+    for f, v in zip(fields, values[:-1]):  # salta l'ID alla fine
+        print(f"   • {f.replace(' = %s', '')} → {v}")
+    print("──────────────────────────────────────────────")
+    print(f"🧾 SQL: {query}")
+    print(f"💾 VALUES: {values}")
+    print("──────────────────────────────────────────────")
+
+
+    cursor.execute(query, tuple(values))
     conn.commit()
 
-    # Recupera il trader aggiornato
+    # 🔹 Recupera il trader aggiornato
     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
     updated_trader = cursor.fetchone()
 
     cursor.close()
     conn.close()
-    return updated_trader
+
+    return {
+        "status": "ok",
+        "message": "Trader aggiornato con successo",
+        "trader": updated_trader
+    }
+
 
 # funziona che copia gli ordini del master sullo slave e aggiorna le tabelle relative nel
 @router.post("/traders/{trader_id}/copy_orders")
@@ -521,18 +599,21 @@ def copy_orders(trader_id: int):
         # 👇 Stampa in console backend
     log("=== Trader Info ===")
     log(trader)
-    print("===================")
-    print(trader["master_name"])
-    print(trader["master_user"])
-    print(trader["master_pwd"])
-    print(trader["master_ip"])
-    print(trader["master_port"])
+    log("===================")
+    log(trader["master_name"])
+    log(trader["master_user"])
+    log(trader["master_pwd"])
+    log(trader["master_ip"])
+    log(trader["master_port"])
 
 
     if not trader:
         # conn.close()
 
-        raise HTTPException(status_code=404, detail="Trader non trovato")
+        # raise HTTPException(status_code=404, detail="Trader non trovato")
+        # log(f"❌ Login fallito su master: {resp.text}")
+        return {"status": "ko", "message": "Trader non trovato", "logs": logs}
+
     
     # 2️⃣ Connessione al master MT5
     # if not mt5.initialize(
@@ -560,21 +641,21 @@ def copy_orders(trader_id: int):
     init_body = {"path": trader["master_path"]}
     health_url = f"{base_url}/health"
 
-    print(f"🔍 Verifico stato terminale remoto su {health_url}...")
+    log(f"🔍 Verifico stato terminale remoto su {health_url}...")
     # try:
     health_resp = requests.get(health_url, timeout=5)
     if health_resp.status_code == 200:
         health_data = health_resp.json()
         if health_data.get("status") == "ok":
-            print(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
+            log(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
         else:
             # raise Exception("MT5 non inizializzato, serve init")
-            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            log(f"🔹 Inizializzo terminale remoto {init_url}")
             resp = requests.post(init_url, json=init_body, timeout=10)
             if resp.status_code != 200:
                 raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
 
-            print(f"✅ Init OK su {base_url}")
+            log(f"✅ Init OK su {base_url}")
 
         
     # 2️⃣ Login remoto a master
@@ -585,44 +666,46 @@ def copy_orders(trader_id: int):
         "server": trader["master_name"]
     }
 
-    print(f"🔹 Connessione al master via {login_url}")
+    log(f"🔹 Connessione al master via {login_url}")
     resp = requests.post(login_url, json=login_body, timeout=10)
     if resp.status_code != 200:
         raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
 
     data = resp.json()
-    print(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {data.get('balance')}")
+    log(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {data.get('balance')}")
 
     # URL base del server master
     base_url = f"http://{trader['master_ip']}:{trader['master_port']}"
 
     try:
         positions_url = f"{base_url}/positions"
-        print(f"🔹 Recupero posizioni dal master via {positions_url}")
+        log(f"🔹 Recupero posizioni dal master via {positions_url}")
 
         resp = requests.get(positions_url, timeout=10)
         if resp.status_code != 200:
-            print(f"❌ Errore API master: {resp.text}")
+            log(f"❌ Errore API master: {resp.text}")
             raise HTTPException(status_code=resp.status_code, detail=f"Errore dal master API: {resp.text}")
 
         master_positions = resp.json()
         # master_positions = data.get("positions", [])
 
         if not master_positions:
-            print("⚠️ Nessuna posizione aperta sul master.")
-            raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
+            log("⚠️ Nessuna posizione aperta sul master.")
+            return {"status": "ko", "message": "Errore login master", "logs": logs}
 
-        print(f"✅ Posizioni master ricevute: {len(master_positions)}")
+            # raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
+
+        log(f"✅ Posizioni master ricevute: {len(master_positions)}")
         
     except requests.exceptions.RequestException as e:
-        print(f"❌ Errore di connessione al master API: {e}")
+        log(f"❌ Errore di connessione al master API: {e}")
         raise HTTPException(status_code=500, detail=f"Errore connessione al master: {str(e)}")
 
 
     # Stampa tutte le posizioni trovate
-    print("=== POSIZIONI SUL MASTER ===")
+    log("=== POSIZIONI SUL MASTER ===")
     for pos in master_positions:
-        print(f"[MASTER] {pos}")  # pos è già un dict
+        log(f"[MASTER] {pos}")  # pos è già un dict
 
 
     # # 3️⃣ Connessione allo slave MT5
@@ -637,24 +720,24 @@ def copy_orders(trader_id: int):
     init_body = {"path": trader["slave_path"]}
     health_url = f"{base_url}/health"
 
-    print(f"🔍 Verifico stato terminale remoto su {health_url}...")
+    log(f"🔍 Verifico stato terminale remoto su {health_url}...")
     # try:
     health_resp = requests.get(health_url, timeout=5)
     if health_resp.status_code == 200:
         health_data = health_resp.json()
         if health_data.get("status") == "ok":
-            print(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
+            log(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
             # ---prova altrimenti va in errore !
-            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            log(f"🔹 Inizializzo terminale remoto {init_url}")
             resp = requests.post(init_url, json=init_body, timeout=30)
         else:
             # raise Exception("MT5 non inizializzato, serve init")
-            print(f"🔹 Inizializzo terminale remoto {init_url}")
+            log(f"🔹 Inizializzo terminale remoto {init_url}")
             resp = requests.post(init_url, json=init_body, timeout=30)
             if resp.status_code != 200:
                 raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
 
-            print(f"✅ Init OK su {base_url}")
+            log(f"✅ Init OK su {base_url}")
     
 
     # 2️⃣ Login remoto a slave
@@ -664,30 +747,30 @@ def copy_orders(trader_id: int):
         "password": trader["slave_pwd"],
         "server": trader["slave_name"]
     }
-    print("=" * 80)
-    print("🔹 Tentativo di connessione allo SLAVE")
-    print(f"🌐 URL login: {login_url}")
-    print(f"👤 Login data:")
-    print(f"   - Login ID: {trader['slave_user']}")
-    print(f"   - Password: {trader['slave_pwd']}")
-    print(f"   - Server:   {trader['slave_name']}")
-    print("=" * 80)
+    log("=" * 80)
+    log("🔹 Tentativo di connessione allo SLAVE")
+    log(f"🌐 URL login: {login_url}")
+    log(f"👤 Login data:")
+    log(f"   - Login ID: {trader['slave_user']}")
+    log(f"   - Password: {trader['slave_pwd']}")
+    log(f"   - Server:   {trader['slave_name']}")
+    log("=" * 80)
 
 
-    print(f"🔹 Connessione allo slave via {login_url}")
+    log(f"🔹 Connessione allo slave via {login_url}")
     try:
         resp = requests.post(login_url, json=login_body, timeout=30)
-        print(f"📡 Status code: {resp.status_code}")
-        print(f"📩 Response: {resp.text}")
+        log(f"📡 Status code: {resp.status_code}")
+        log(f"📩 Response: {resp.text}")
     except Exception as e:
-        print(f"❌ Errore chiamata login slave: {e}")
+        log(f"❌ Errore chiamata login slave: {e}")
         raise
 
     if resp.status_code != 200:
         raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
 
     data = resp.json()
-    print(f"✅ Connessione allo slave {trader['slave_user']} riuscita! Bilancio: {data.get('balance')}")
+    log(f"✅ Connessione allo slave {trader['slave_user']} riuscita! Bilancio: {data.get('balance')}")
 
 
     # 4️⃣ Copia ogni ordine master sullo slave
@@ -700,52 +783,52 @@ def copy_orders(trader_id: int):
             symbol = pos["symbol"]
             order_type = "buy" if pos["type"] == 0 else "sell"
             volume = trader["fix_lot"] or round(pos["volume"] * float(trader["moltiplicatore"]), 2)
-            print(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
+            log(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
 
             # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
             info_url = f"{base_url}/symbol_info/{symbol}"
-            print(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+            log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
             
             resp = requests.get(info_url, timeout=10)
 
             sym_info = resp.json()
 
             if resp.status_code != 200:
-                print(f"⚠️ Impossibile ottenere info per {symbol} dallo slave: {resp.text}")
+                log(f"⚠️ Impossibile ottenere info per {symbol} dallo slave: {resp.text}")
                 continue
 
                 
             if not sym_info.get("visible", False):
-                print(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
+                log(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
                 if not mt5.symbol_select(symbol, True):
-                    print(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
+                    log(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
                     continue
                 else:
-                    print(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
+                    log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
             else:
-                print(f"✅ Simbolo {symbol} è già visibile sullo slave.")
+                log(f"✅ Simbolo {symbol} è già visibile sullo slave.")
 
             # tick = mt5.symbol_info_tick(symbol)
             # if not tick:
-            #     print(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
+            #     log(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
             #     continue
 
             # 🔹 2️⃣ Recupero tick dal server slave via API
             tick_url = f"{base_url}/symbol_tick/{symbol}"
-            print(f"📡 Richiedo tick allo slave: {tick_url}")
+            log(f"📡 Richiedo tick allo slave: {tick_url}")
 
             
             resp_tick = requests.get(tick_url, timeout=10)
             if resp_tick.status_code != 200:
-                print(f"⚠️ Nessun tick disponibile per {symbol} dallo slave: {resp_tick.text}")
+                log(f"⚠️ Nessun tick disponibile per {symbol} dallo slave: {resp_tick.text}")
                 continue
 
             tick = resp_tick.json()
             if not tick or "bid" not in tick or "ask" not in tick:
-                print(f"⚠️ Tick incompleto o non valido per {symbol}: {tick}")
+                log(f"⚠️ Tick incompleto o non valido per {symbol}: {tick}")
                 continue
 
-            print(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
+            log(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
         
             # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
@@ -761,21 +844,21 @@ def copy_orders(trader_id: int):
 
             # 🔹 3️⃣ Invio ordine allo slave via API
             order_url = f"{base_url}/order"
-            print(f"🔁 Invio ordine allo slave via API: {order_url}")
-            print(f"🧾 Dati inviati: {json.dumps(request, indent=2)}")
+            log(f"🔁 Invio ordine allo slave via API: {order_url}")
+            log(f"🧾 Dati inviati: {json.dumps(request, indent=2)}")
 
             try:
                 resp_order = requests.post(order_url, json=request, timeout=20)
 
                 if resp_order.status_code != 200:
-                    print(f"❌ Errore invio ordine allo slave: {resp_order.text}")
+                    log(f"❌ Errore invio ordine allo slave: {resp_order.text}")
                     continue
 
                 result = resp_order.json()
-                print(f"✅ Risposta dallo slave: {result}")
+                log(f"✅ Risposta dallo slave: {result}")
 
             except requests.exceptions.RequestException as e:
-                print(f"⚠️ Errore di connessione con lo slave: {e}")
+                log(f"⚠️ Errore di connessione con lo slave: {e}")
                 continue
 
             # if result and result.retcode == mt5.TRADE_RETCODE_DONE:
@@ -803,13 +886,13 @@ def copy_orders(trader_id: int):
                     trader_id, master_order_id, result.get("result", {}).get("order"), symbol, order_type, volume, request["price"], pos.get("sl"), pos.get("tp")
                 ))
                 conn.commit()
-                print(f"✅ Ordine copiato e registrato: {symbol}")
+                log(f"✅ Ordine copiato e registrato: {symbol}")
 
 
 
         except Exception as e:
-            print("❌ Eccezione durante la copia ordine:")
-            print(traceback.format_exc())
+            log("❌ Eccezione durante la copia ordine:")
+            log(traceback.format_exc())
         continue
 
     # ✅ Pulizia finale
