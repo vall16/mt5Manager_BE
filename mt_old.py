@@ -594,40 +594,6 @@ async def check_server(data: ServerCheckRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Connessione remota fallita: {e}")
 
-# @app.post("/check-server")
-# async def check_server(data: ServerCheckRequest):
-#     # Verifica che il path esista
-#     print("Ricevuto dal client:", data.dict())
-
-#     if not os.path.exists(data.path):
-#         return {"status": "error", "message": f"Terminal not found at {data.path}"}
-
-#     # Chiude eventuale sessione precedente
-#     if mt5.initialize():
-#         mt5.shutdown()
-
-#     # Prova a inizializzare MT5
-#     connected = mt5.initialize(
-#         path=data.path,
-#         server=data.server,
-#         login=data.login,
-#         password=data.password,
-#         port=data.port
-#     )
-
-#     if connected:
-#         # Inizializzazione ok
-#         version = mt5.version()
-#         mt5.shutdown()
-#         return {
-#             "status": "success",
-#             "message": "Server reachable and login valid",
-#             "mt5_version": version
-#         }
-#     else:
-#         # Inizializzazione fallita
-#         error = mt5.last_error()
-#         return {"status": "error", "message": f"Cannot connect: {error}"}
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):

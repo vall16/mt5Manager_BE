@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
 import bcrypt
 import os
+import re
 
 # from fastapi_utils.tasks import repeat_every
 
@@ -43,6 +44,25 @@ def get_connection():
         return conn
     except MySQLError as e:
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
+
+
+# funzione di tentativo mappatura/cleaning del simbolo da master a slave
+def normalize_symbol(symbol: str) -> str:
+    """
+    Rimuove suffissi o prefissi comuni dai simboli per permettere la ricerca cross-broker.
+    Esempi:
+      - XAUUSD-STD → XAUUSD
+      - EURUSD.m → EURUSD
+      - EURUSDpro → EURUSD
+      - US30.cash → US30
+    """
+    # Rimuove punti, trattini e suffissi come -STD, .m, .pro, ecc.
+    cleaned = re.sub(r'[-_.](std|stp|pro|ecn|m|mini|micro|cash|r)$', '', symbol, flags=re.IGNORECASE)
+
+    # Rimuove eventuali spazi o caratteri extra
+    cleaned = cleaned.strip().upper()
+
+    return cleaned
 
 
 def insert_order(symbol, lot, sl, tp, magic, comment):
@@ -802,17 +822,33 @@ def copy_orders(trader_id: int):
                 log(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
                 if not mt5.symbol_select(symbol, True):
                     log(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
-                    continue
-                else:
-                    log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
+                    # 🔹 Tentativo con simbolo normalizzato
+                    normalized_symbol = normalize_symbol(symbol)
+                    
+                    if normalized_symbol != symbol:
+                        log(f"🔄 Tentativo 2: provo simbolo normalizzato '{normalized_symbol}'...")
+                        info_url = f"{base_url}/symbol_info/{normalized_symbol}"
+                        try:
+                            resp = requests.get(info_url, timeout=10)
+                            sym_info = resp.json()
+                        except Exception as e:
+                            log(f"⚠️ Errore richiesta info simbolo normalizzato {normalized_symbol}: {e}")
+                            continue
+
+                        if resp.status_code == 200 and sym_info.get("visible", False):
+                            log(f"✅ Simbolo normalizzato '{normalized_symbol}' trovato sullo slave.")
+                            # ** il simbolo dello slave è quello normalizzato
+                            symbol = normalized_symbol
+                        else:
+                            log(f"❌ Anche simbolo normalizzato '{normalized_symbol}' non trovato sullo slave, salto ordine.")
+                            continue
+
+                    else:
+                        log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
             else:
                 log(f"✅ Simbolo {symbol} è già visibile sullo slave.")
 
-            # tick = mt5.symbol_info_tick(symbol)
-            # if not tick:
-            #     log(f"⚠️ Nessun tick disponibile per {symbol} (probabile simbolo non visibile nel Market Watch)")
-            #     continue
-
+            
             # 🔹 2️⃣ Recupero tick dal server slave via API
             tick_url = f"{base_url}/symbol_tick/{symbol}"
             log(f"📡 Richiedo tick allo slave: {tick_url}")
