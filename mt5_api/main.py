@@ -67,17 +67,6 @@ def startup_event():
 def shutdown_event():
     mt5.shutdown()
 
-# @app.post("/login")
-# def login(req: LoginRequest):
-#     if not mt5.login(req.login, req.password, req.server):
-#         err = mt5.last_error()
-#         raise HTTPException(status_code=400, detail=f"Login failed: {err}")
-#     info = mt5.account_info()
-#     return {"message": "✅ Login OK", "balance": info.balance if info else None}
-
-# import concurrent.futures
-# import MetaTrader5 as mt5
-# from fastapi import HTTPException
 
 @app.post("/login")
 def login(req: LoginRequest):

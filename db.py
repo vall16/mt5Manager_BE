@@ -161,110 +161,6 @@ def get_servers():
         print(f"❌ Errore imprevisto in get_servers: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
-# @router.post("/servers")
-# def insert_server(server: ServerRequest):
-
-#     conn = get_connection()
-#     if not conn:
-#         raise HTTPException(status_code=500, detail="Database connection failed")
-
-#     try:
-#         cursor = conn.cursor()
-
-#         print("Dati ricevuti:", server.dict())
-#         # print("Query:", query)
-#         print("Values:", values)
-
-
-#         query = """
-#             INSERT INTO servers 
-#             (user, pwd, server, platform, ip, path, port, is_active, created_at, updated_at)
-#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s,NOW(), NOW())
-#         """
-
-#         values = (
-#             server.user,
-#             server.pwd,
-#             server.server,
-#             server.platform,
-#             server.ip,
-#             server.path,
-#             server.port,
-#             server.is_active
-#         )
-
-
-#         cursor.execute(query, values)
-#         conn.commit()
-
-#         new_id = cursor.lastrowid
-
-#         cursor.close()
-#         conn.close()
-
-#         return {"message": "Server added successfully", "id": new_id}
-
-#     except Error as e:
-#         print(f"Errore DB: {e}")
-#         raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-# @router.post("/servers")
-# def insert_server(server: ServerRequest):
-
-#     conn = get_connection()
-#     if not conn:
-#         raise HTTPException(status_code=500, detail="Database connection failed")
-
-#     try:
-#         cursor = conn.cursor()
-
-#         # --- Preparazione ---
-#         query = """
-#             INSERT INTO servers 
-#             (`user`, `pwd`, `server`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
-#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-#         """
-
-#         values = (
-#             server.user,
-#             server.pwd,
-#             server.server,
-#             server.platform,
-#             server.ip,
-#             server.path,
-#             server.port,
-#             server.is_active
-#         )
-
-#         print("\n🧩 [DEBUG SQL] Tentativo di INSERT su 'servers' ...")
-#         print("Query SQL:", query)
-#         print("Valori:", values)
-
-#         # --- Esecuzione ---
-#         cursor.execute(query, values)
-#         conn.commit()
-
-#         new_id = cursor.lastrowid
-#         print(f"✅ [OK] Inserito record servers.id={new_id}")
-
-#         cursor.close()
-#         conn.close()
-
-#         return {"message": "Server added successfully", "id": new_id}
-
-#     except Exception as e:
-#         import traceback
-#         print("\n❌ [ERRORE SQL]")
-#         print("Tipo errore:", type(e).__name__)
-#         print("Dettaglio:", str(e))
-#         traceback.print_exc()
-#         try:
-#             conn.rollback()
-#         except:
-#             pass
-#         raise HTTPException(status_code=500, detail=f"Errore SQL: {e}")
-
-# from mysql.connector import Error as MySQLError
 
 @router.post("/servers")
 def insert_server(server: ServerRequest):
@@ -635,21 +531,6 @@ def copy_orders(trader_id: int):
         return {"status": "ko", "message": "Trader non trovato", "logs": logs}
 
     
-    # 2️⃣ Connessione al master MT5
-    # if not mt5.initialize(
-    #     path=trader["master_path"],
-    #     login=int(trader["master_user"]),
-    #     password=trader["master_pwd"],
-    #     server=trader["master_name"]
-    # ):
-    #     last_err = mt5.last_error()
-    #     conn.close()
-    #     raise HTTPException(
-    #         status_code=500,
-    #         detail=f"Connessione al master fallita: {last_err}"
-    # )
-    # print(f"Connessione al master {trader['master_user']} riuscita!")
-
     """
     Inizializza e connette il master MT5 remoto tramite API HTTP.
     """
