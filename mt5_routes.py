@@ -4,7 +4,7 @@ import socket
 import subprocess
 import MetaTrader5 as mt5
 import logging
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from models import (
     LoginRequest, LoginResponse, BuyRequest, SellRequest, CloseRequest,
     GetLastCandleRequest, GetLastDealsHistoryRequest, DealsAllResponse,
@@ -244,6 +244,30 @@ async def start_server(server: ServerRequest):
     except Exception as e:
         print(f"❌ Errore avvio terminal: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# sta in ascolto di nuova posizione dal master MT5
+@router.post("/webhook/open_position")
+async def open_position(req: Request):
+    data = await req.json()
+    print("📩 Nuova posizione ricevuta:", data)
+    # Qui puoi inserire nel DB, loggare o avviare il processo di copia
+    return {"status": "ok"}
+    # Esempio: chiama la funzione di copia (definita nel tuo db.py)
+    # try:
+    #     symbol = data.get("symbol")
+    #     volume = data.get("volume")
+    #     price = data.get("price")
+    #     ticket = data.get("ticket")
+    #     order_type = data.get("type")
+
+    #     # Copia l’ordine sullo slave
+    #     result = copy_order_from_master(symbol, volume, price, order_type, master_ticket=ticket)
+    #     return {"status": "ok", "copied": result}
+    # except Exception as e:
+    #     print("❌ Errore nella gestione della notifica:", e)
+    #     return {"status": "error", "message": str(e)}
+
+
     
 # --- ORDER MODIFY ---
 @router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
