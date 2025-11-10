@@ -121,6 +121,7 @@ def health_check():
 
         return {"status": "ok", "mt5_version": version_str}
     except Exception as e:
+        print("Errore INIT:", mt5.last_error())
         return {"status": "error", "message": str(e)}
 
 

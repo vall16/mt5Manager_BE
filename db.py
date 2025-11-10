@@ -23,22 +23,22 @@ router = APIRouter()
 def get_connection():
     try:
         
-        # conn = mysql.connector.connect(
-        #     host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
-        #     user=os.environ.get("MYSQL_USER", "trader"),
-        #     password="vibe2025",
-        #     database=os.environ.get("MYSQL_DB", "trader_db"),
-        #     port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
-        # )
+        conn = mysql.connector.connect(
+            host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
+            user=os.environ.get("MYSQL_USER", "trader"),
+            password="vibe2025",
+            database=os.environ.get("MYSQL_DB", "trader_db"),
+            port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
+        )
 
         # db locale 
-        conn = mysql.connector.connect(
-            host="127.0.0.1",       # o "127.0.0.1"
-            user="trader",            # utente MySQL locale
-            password="vibe2025",            # lascia vuoto se non hai password
-            database="trader_db",   # nome del tuo database
-            port=3306               # porta predefinita MySQL
-        )
+        # conn = mysql.connector.connect(
+        #     host="127.0.0.1",       # o "127.0.0.1"
+        #     user="trader",            # utente MySQL locale
+        #     password="vibe2025",            # lascia vuoto se non hai password
+        #     database="trader_db",   # nome del tuo database
+        #     port=3306               # porta predefinita MySQL
+        # )
 
 
         return conn
