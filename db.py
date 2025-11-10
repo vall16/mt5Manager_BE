@@ -23,7 +23,7 @@ router = APIRouter()
 logs = []  # elenco dei messaggi di log
 
 start_time = datetime.now()  
-# messaggistica di log
+# funz messaggistica di log
 def log(message: str):
         """Aggiunge un messaggio con timestamp relativo."""
         elapsed = (datetime.now() - start_time).total_seconds()
@@ -57,7 +57,7 @@ def get_connection():
     except MySQLError as e:
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
 
-# recupera il trader corrente
+# funz che recupera il trader corrente
 def get_trader(cursor, trader_id, logs, start_time):
     cursor.execute("""
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
@@ -867,6 +867,69 @@ def copy_orders(trader_id: int):
         "logs": logs
     }
 
+def get_master_positions(master_base_url, logs, start_time):
+    url = f"{master_base_url}/positions"
+    log(logs, start_time, f"🔹 Recupero posizioni master: {url}")
+    resp = requests.get(url, timeout=10)
+    if resp.status_code != 200:
+        raise Exception(f"❌ Errore API master: {resp.text}")
+    return resp.json()
+
+def get_slave_positions(slave_base_url, logs, start_time):
+    url = f"{slave_base_url}/positions"
+    log(logs, start_time, f"🔹 Recupero posizioni slave: {url}")
+    resp = requests.get(url, timeout=10)
+    if resp.status_code != 200:
+        raise Exception(f"❌ Errore API slave: {resp.text}")
+    return resp.json()
+
+def close_slave_order(slave_base_url, slave_ticket, logs, start_time):
+    url = f"{slave_base_url}/close_order/{slave_ticket}"
+    log(logs, start_time, f"🔹 Chiudo ordine slave {slave_ticket}: {url}")
+    resp = requests.post(url, timeout=10)
+    if resp.status_code != 200:
+        log(logs, start_time, f"❌ Errore chiusura ordine {slave_ticket}: {resp.text}")
+    else:
+        log(logs, start_time, f"✅ Ordine {slave_ticket} chiuso sullo slave")
+    return resp.json()
+
+# sincronizza l'eventuale chiusura di una posizione sul master con lo slave
+@router.post("/traders/{trader_id}/sync_close")
+def sync_close(trader_id: int):
+    logs = []
+    start_time = datetime.now()
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Recupero trader
+    trader = get_trader(cursor, trader_id, logs, start_time)
+    if not trader:
+        return {"status":"ko","message":"Trader non trovato","logs":logs}
+
+    master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
+    slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+    master_positions = get_master_positions(master_base, logs, start_time)
+    slave_positions  = get_slave_positions(slave_base, logs, start_time)
+
+    # Lista dei ticket aperti sul master
+    master_tickets = [p["ticket"] for p in master_positions]
+
+    # Ciclo sulle posizioni slave
+    for sp in slave_positions:
+        slave_ticket = sp["ticket"]
+        if slave_ticket not in master_tickets:
+            log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
+            close_slave_order(slave_base, slave_ticket, logs, start_time)
+
+            # Aggiorna DB se vuoi tenere traccia della chiusura
+            cursor.execute("UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s", (slave_ticket,))
+            conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {"status": "ok", "message": "Sincronizzazione completata", "logs": logs}
 
 
 
