@@ -20,6 +20,18 @@ import re
 
 router = APIRouter()
 
+logs = []  # elenco dei messaggi di log
+
+start_time = datetime.now()  
+# messaggistica di log
+def log(message: str):
+        """Aggiunge un messaggio con timestamp relativo."""
+        elapsed = (datetime.now() - start_time).total_seconds()
+        timestamp = f"[+{elapsed:.1f}s]"
+        logs.append(f"{timestamp} {message}")
+        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
+
+
 def get_connection():
     try:
         
@@ -44,6 +56,30 @@ def get_connection():
         return conn
     except MySQLError as e:
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
+
+# recupera il trader corrente
+def get_trader(cursor, trader_id, logs, start_time):
+    cursor.execute("""
+        SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
+               ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
+               ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
+        FROM traders t
+        JOIN servers2 ms ON ms.id = t.master_server_id
+        JOIN servers2 ss ON ss.id = t.slave_server_id
+        WHERE t.id = %s
+    """, (trader_id,))
+    trader = cursor.fetchone()
+    # log(logs, start_time, f"Trader info: {trader}")
+    log("=== Trader Info ===")
+    log(trader)
+    log("===================")
+    log(trader["master_name"])
+    log(trader["master_user"])
+    log(trader["master_pwd"])
+    log(trader["master_ip"])
+    log(trader["master_port"])
+
+    return trader
 
 
 # funzione di tentativo mappatura/cleaning del simbolo da master a slave
@@ -495,32 +531,35 @@ def copy_orders(trader_id: int):
         print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 
-    # print(f"🚀 entrato BE")
     log("🚀 Entrato in copy_orders()")
 
+    cursor = conn.cursor(dictionary=True)
 
-    # 1️⃣ Recupera info del trader (master e slave)
-    cursor.execute("""
+    # # 1️⃣ Recupera info del trader (master e slave)
+    trader = get_trader(cursor, trader_id, logs, start_time)
+
+    # # 1Recupera info del trader (master e slave)
+    # cursor.execute("""
         
-        SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
-       ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
-       ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
-            FROM traders t
-            JOIN servers2 ms ON ms.id = t.master_server_id
-            JOIN servers2 ss ON ss.id = t.slave_server_id
-        WHERE t.id = %s;
+    #     SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
+    #    ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
+    #    ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
+    #         FROM traders t
+    #         JOIN servers2 ms ON ms.id = t.master_server_id
+    #         JOIN servers2 ss ON ss.id = t.slave_server_id
+    #     WHERE t.id = %s;
 
-    """, (trader_id,))
-    trader = cursor.fetchone()
-        # 👇 Stampa in console backend
-    log("=== Trader Info ===")
-    log(trader)
-    log("===================")
-    log(trader["master_name"])
-    log(trader["master_user"])
-    log(trader["master_pwd"])
-    log(trader["master_ip"])
-    log(trader["master_port"])
+    # """, (trader_id,))
+    # trader = cursor.fetchone()
+    #     # 👇 Stampa in console backend
+    # log("=== Trader Info ===")
+    # log(trader)
+    # log("===================")
+    # log(trader["master_name"])
+    # log(trader["master_user"])
+    # log(trader["master_pwd"])
+    # log(trader["master_ip"])
+    # log(trader["master_port"])
 
 
     if not trader:
@@ -811,6 +850,8 @@ def copy_orders(trader_id: int):
             log("❌ Eccezione durante la copia ordine:")
             log(traceback.format_exc())
         continue
+
+    
 
     # ✅ Pulizia finale
     mt5.shutdown()
