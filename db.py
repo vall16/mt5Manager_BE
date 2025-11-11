@@ -786,6 +786,21 @@ def copy_orders(trader_id: int):
 
             log(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
+            # --- CALCOLO SL IN PIP ---
+            sl_pips = trader["sl"]  # valore pip inserito dal trader nell'app (es. 10)
+
+            if sl_pips and sl_pips > 0:
+                pip_value = sym_info.get("point")  # valore del singolo punto del simbolo
+                sl_distance = sl_pips * pip_value
+
+                if order_type == "buy":
+                    # SL sotto il prezzo ask
+                    calculated_sl = tick["ask"] - sl_distance
+                else:
+                    # SL sopra il prezzo bid (per SELL)
+                    calculated_sl = tick["bid"] + sl_distance
+            else:
+                calculated_sl = None  # se sl=0 non impostare
         
             # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
             request = {
@@ -793,7 +808,7 @@ def copy_orders(trader_id: int):
                 "volume": volume,
                 "type": "buy" if order_type == "buy" else "sell",
                 "price": tick["ask"] if order_type == "buy" else tick["bid"],
-                "sl": pos["sl"],
+                "sl": calculated_sl,
                 "tp": pos["tp"],
                 "comment": f"Copied from master {trader_id}",
             }
@@ -844,6 +859,8 @@ def copy_orders(trader_id: int):
                 conn.commit()
                 log(f"✅ Ordine copiato e registrato: {symbol}")
 
+                
+
 
 
         except Exception as e:
@@ -851,7 +868,46 @@ def copy_orders(trader_id: int):
             log(traceback.format_exc())
         continue
 
-    
+    # ✅ ✅ ✅ A questo punto IL CICLO È FINITO → ora posso gestire LE CHIUSURE
+    log("🔍 Avvio sincronizzazione chiusure master → slave ...")
+    master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
+    slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    log(logs, start_time, f"🌐 master_base URL → {master_base}")
+    log(logs, start_time, f"🌐 slave_base URL → {slave_base}")
+
+
+    try:
+        # 1️⃣ Recupero posizioni master
+        master_positions = get_master_positions(master_base, logs, start_time)
+        master_tickets = [mp["ticket"] for mp in master_positions]
+        log(f"✅ Ticket master attivi: {master_tickets}")
+
+        # 2️⃣ Recupero posizioni slave
+        slave_positions = get_slave_positions(slave_base, logs, start_time)
+        log(f"✅ Ticket slave attivi: {[sp['ticket'] for sp in slave_positions]}")
+
+        # 3️⃣ Chiudo ordini mancanti
+        for sp in slave_positions:
+            slave_ticket = sp["ticket"]
+
+            if slave_ticket not in master_tickets:
+                log(f"⚠️ Ticket {slave_ticket} sullo slave NON presente sul master → chiudo")
+
+                # Chiudi via API slave
+                resp = close_slave_order(slave_base, slave_ticket, logs, start_time)
+
+                # Aggiorna DB
+                cursor.execute(
+                    "UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s",
+                    (slave_ticket,)
+                )
+                conn.commit()
+
+                log(f"✅ Ticket {slave_ticket} chiuso e DB aggiornato")
+
+    except Exception as e:
+        log(f"❌ Errore sincronizzazione chiusure: {str(e)}")
+        
 
     # ✅ Pulizia finale
     mt5.shutdown()
