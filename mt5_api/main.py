@@ -1,4 +1,6 @@
 # mt5_api.py: sta su ogni SERVER su cui viene istanziato mt5
+# from logging import log
+from datetime import datetime
 import os
 import MetaTrader5 as mt5
 import concurrent
@@ -16,6 +18,17 @@ class LoginRequest(BaseModel):
     
 class InitRequest(BaseModel):
     path: str
+    
+logs = []  # elenco dei messaggi di log
+
+start_time = datetime.now()  
+# funz messaggistica di log
+def log(message: str):
+        """Aggiunge un messaggio con timestamp relativo."""
+        elapsed = (datetime.now() - start_time).total_seconds()
+        timestamp = f"[+{elapsed:.1f}s]"
+        logs.append(f"{timestamp} {message}")
+        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 
 @app.post("/init-mt5")
@@ -173,23 +186,39 @@ def get_terminal_info():
 @app.post("/close_order/{ticket}")
 def close_order(ticket: int):
     """
-    Chiude una posizione aperta sul conto MT5 specificando il ticket.
-    server per la chiusura di una posizione slave che non c'è più su master
+    Chiude una posizione aperta sul conto MT5.
+    Utilizzata dallo slave per chiudere posizioni che non ci sono più sul master.
     """
+    log(f"🔹 Tentativo di chiusura ordine ticket {ticket}")
+
     # Recupera la posizione
-    position = mt5.positions_get(ticket=ticket)
-    if not position:
+    positions = mt5.positions_get(ticket=ticket)
+    if not positions:
+        log(f"❌ Posizione con ticket {ticket} non trovata")
         return {"error": f"❌ Posizione con ticket {ticket} non trovata."}
 
-    pos = position[0]
+    pos = positions[0]
     symbol = pos.symbol
     lot = pos.volume
-    price = mt5.symbol_info_tick(symbol).bid if pos.type == 0 else mt5.symbol_info_tick(symbol).ask
-    action = mt5.TRADE_ACTION_DEAL
-    order_type = mt5.ORDER_SELL if pos.type == 0 else mt5.ORDER_BUY  # chiude BUY → SELL e viceversa
+
+    tick = mt5.symbol_info_tick(symbol)
+    if not tick:
+        log(f"❌ Impossibile leggere tick per {symbol}")
+        return {"error": f"❌ Impossibile leggere tick per {symbol}"}
+
+    # Determina tipo ordine inverso e prezzo per chiusura
+    if pos.type == mt5.ORDER_TYPE_BUY:
+        price = tick.bid
+        order_type = mt5.ORDER_TYPE_SELL
+    elif pos.type == mt5.ORDER_TYPE_SELL:
+        price = tick.ask
+        order_type = mt5.ORDER_TYPE_BUY
+    else:
+        log(f"❌ Tipo ordine non riconosciuto: {pos.type}")
+        return {"error": f"❌ Tipo ordine non riconosciuto: {pos.type}"}
 
     request = {
-        "action": action,
+        "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,
         "volume": lot,
         "type": order_type,
@@ -203,11 +232,14 @@ def close_order(ticket: int):
     result = mt5.order_send(request)
 
     if result is None:
+        log(f"❌ Nessuna risposta da MT5 per ticket {ticket}: {mt5.last_error()}")
         return {"error": "❌ Nessuna risposta da MT5", "details": mt5.last_error()}
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:
+        log(f"❌ Chiusura ordine {ticket} fallita, retcode: {result.retcode}")
         return {"error": f"❌ Chiusura fallita", "retcode": result.retcode, "details": result._asdict()}
 
+    log(f"✅ Ordine {ticket} chiuso correttamente: {symbol}, volume {lot}, prezzo {price}")
     return {
         "status": "✅ Ordine chiuso",
         "ticket_closed": ticket,
