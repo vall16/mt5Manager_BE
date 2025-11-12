@@ -1,0 +1,4 @@
+2025-11-12 12:08:57,618 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Read timed out. (read timeout=10)
+2025-11-12 12:11:52,848 - INFO - Starting API
+2025-11-12 12:11:54,384 - INFO - Starting API
+2025-11-12 12:11:54,573 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

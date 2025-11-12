@@ -253,21 +253,6 @@ async def open_position(req: Request):
     # Qui puoi inserire nel DB, loggare o avviare il processo di copia
     return {"status": "ok"}
     # Esempio: chiama la funzione di copia (definita nel tuo db.py)
-    # try:
-    #     symbol = data.get("symbol")
-    #     volume = data.get("volume")
-    #     price = data.get("price")
-    #     ticket = data.get("ticket")
-    #     order_type = data.get("type")
-
-    #     # Copia l’ordine sullo slave
-    #     result = copy_order_from_master(symbol, volume, price, order_type, master_ticket=ticket)
-    #     return {"status": "ok", "copied": result}
-    # except Exception as e:
-    #     print("❌ Errore nella gestione della notifica:", e)
-    #     return {"status": "error", "message": str(e)}
-
-
     
 # --- ORDER MODIFY ---
 @router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
