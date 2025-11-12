@@ -64,8 +64,8 @@ def get_trader(cursor, trader_id, logs, start_time):
                ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
                ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
         FROM traders t
-        JOIN servers2 ms ON ms.id = t.master_server_id
-        JOIN servers2 ss ON ss.id = t.slave_server_id
+        JOIN servers ms ON ms.id = t.master_server_id
+        JOIN servers ss ON ss.id = t.slave_server_id
         WHERE t.id = %s
     """, (trader_id,))
     trader = cursor.fetchone()
@@ -179,7 +179,7 @@ def get_servers():
 
         cursor = conn.cursor(dictionary=True)
         # cursor.execute("SELECT * FROM servers")
-        cursor.execute("SELECT * FROM servers2")
+        cursor.execute("SELECT * FROM servers")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -210,7 +210,7 @@ def insert_server(server: ServerRequest):
 
         query = """
             # INSERT INTO servers 
-            INSERT INTO servers2 
+            INSERT INTO servers 
             (`user`, `pwd`, `server`,`server_alias`, `platform`, `ip`, `path`, `port`, `is_active`, `created_at`, `updated_at`)
             VALUES (%s, %s, %s, %s,%s, %s, %s, %s, %s, NOW(), NOW())
         """
@@ -277,7 +277,7 @@ def delete_server(server_id: int):
         cursor = conn.cursor()
         # Verifica se il server esiste
         # cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
-        cursor.execute("SELECT id FROM servers2 WHERE id = %s", (server_id,))
+        cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
         row = cursor.fetchone()
         if not row:
             cursor.close()
@@ -538,30 +538,6 @@ def copy_orders(trader_id: int):
     # # 1️⃣ Recupera info del trader (master e slave)
     trader = get_trader(cursor, trader_id, logs, start_time)
 
-    # # 1Recupera info del trader (master e slave)
-    # cursor.execute("""
-        
-    #     SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
-    #    ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
-    #    ss.server AS slave_name, ss.user AS slave_user, ss.pwd AS slave_pwd, ss.path AS slave_path, ss.ip AS slave_ip, ss.port AS slave_port
-    #         FROM traders t
-    #         JOIN servers2 ms ON ms.id = t.master_server_id
-    #         JOIN servers2 ss ON ss.id = t.slave_server_id
-    #     WHERE t.id = %s;
-
-    # """, (trader_id,))
-    # trader = cursor.fetchone()
-    #     # 👇 Stampa in console backend
-    # log("=== Trader Info ===")
-    # log(trader)
-    # log("===================")
-    # log(trader["master_name"])
-    # log(trader["master_user"])
-    # log(trader["master_pwd"])
-    # log(trader["master_ip"])
-    # log(trader["master_port"])
-
-
     if not trader:
         # conn.close()
 
@@ -631,7 +607,7 @@ def copy_orders(trader_id: int):
 
         if not master_positions:
             log("⚠️ Nessuna posizione aperta sul master.")
-            return {"status": "ko", "message": "Errore login master", "logs": logs}
+            # return {"status": "ko", "message": "Errore login master", "logs": logs}
 
             # raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
@@ -872,8 +848,8 @@ def copy_orders(trader_id: int):
     log("🔍 Avvio sincronizzazione chiusure master → slave ...")
     master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
     slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
-    log(logs, start_time, f"🌐 master_base URL → {master_base}")
-    log(logs, start_time, f"🌐 slave_base URL → {slave_base}")
+    log(f"🌐 master_base URL → {master_base}")
+    log(f"🌐 slave_base  URL → {slave_base}")
 
 
     try:
@@ -925,7 +901,7 @@ def copy_orders(trader_id: int):
 
 def get_master_positions(master_base_url, logs, start_time):
     url = f"{master_base_url}/positions"
-    log(logs, start_time, f"🔹 Recupero posizioni master: {url}")
+    log(f"🔹 Recupero posizioni master: {url}")
     resp = requests.get(url, timeout=10)
     if resp.status_code != 200:
         raise Exception(f"❌ Errore API master: {resp.text}")
@@ -933,21 +909,37 @@ def get_master_positions(master_base_url, logs, start_time):
 
 def get_slave_positions(slave_base_url, logs, start_time):
     url = f"{slave_base_url}/positions"
-    log(logs, start_time, f"🔹 Recupero posizioni slave: {url}")
+    log(f"🔹 Recupero posizioni slave: {url}")
+
     resp = requests.get(url, timeout=10)
     if resp.status_code != 200:
         raise Exception(f"❌ Errore API slave: {resp.text}")
     return resp.json()
 
-def close_slave_order(slave_base_url, slave_ticket, logs, start_time):
+def close_slave_order(slave_base_url, slave_ticket):
+    """
+    Chiude un ordine sullo slave server via API REST.
+    """
     url = f"{slave_base_url}/close_order/{slave_ticket}"
-    log(logs, start_time, f"🔹 Chiudo ordine slave {slave_ticket}: {url}")
-    resp = requests.post(url, timeout=10)
+    log(f"🔹 Chiudo ordine slave {slave_ticket}: {url}")
+
+    try:
+        resp = requests.post(url, timeout=10)
+    except requests.exceptions.RequestException as e:
+        log(f"❌ Errore di rete durante la chiusura dell’ordine {slave_ticket}: {e}")
+        return {"error": str(e)}
+
     if resp.status_code != 200:
-        log(logs, start_time, f"❌ Errore chiusura ordine {slave_ticket}: {resp.text}")
+        log(f"❌ Errore chiusura ordine {slave_ticket}: {resp.status_code} - {resp.text}")
     else:
-        log(logs, start_time, f"✅ Ordine {slave_ticket} chiuso sullo slave")
-    return resp.json()
+        log(f"✅ Ordine {slave_ticket} chiuso correttamente sullo slave")
+
+    try:
+        return resp.json()
+    except Exception:
+        log(f"⚠️ Risposta non in JSON valida per ordine {slave_ticket}: {resp.text}")
+        return {"error": "invalid JSON response", "raw": resp.text}
+
 
 # sincronizza l'eventuale chiusura di una posizione sul master con lo slave
 @router.post("/traders/{trader_id}/sync_close")
@@ -975,7 +967,7 @@ def sync_close(trader_id: int):
     for sp in slave_positions:
         slave_ticket = sp["ticket"]
         if slave_ticket not in master_tickets:
-            log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
+            # log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
             close_slave_order(slave_base, slave_ticket, logs, start_time)
 
             # Aggiorna DB se vuoi tenere traccia della chiusura
