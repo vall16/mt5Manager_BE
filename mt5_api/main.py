@@ -169,6 +169,53 @@ def get_terminal_info():
         return info._asdict()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/close_order/{ticket}")
+def close_order(ticket: int):
+    """
+    Chiude una posizione aperta sul conto MT5 specificando il ticket.
+    server per la chiusura di una posizione slave che non c'è più su master
+    """
+    # Recupera la posizione
+    position = mt5.positions_get(ticket=ticket)
+    if not position:
+        return {"error": f"❌ Posizione con ticket {ticket} non trovata."}
+
+    pos = position[0]
+    symbol = pos.symbol
+    lot = pos.volume
+    price = mt5.symbol_info_tick(symbol).bid if pos.type == 0 else mt5.symbol_info_tick(symbol).ask
+    action = mt5.TRADE_ACTION_DEAL
+    order_type = mt5.ORDER_SELL if pos.type == 0 else mt5.ORDER_BUY  # chiude BUY → SELL e viceversa
+
+    request = {
+        "action": action,
+        "symbol": symbol,
+        "volume": lot,
+        "type": order_type,
+        "position": ticket,
+        "price": price,
+        "deviation": 20,
+        "magic": 123456,
+        "comment": "auto-close via API",
+    }
+
+    result = mt5.order_send(request)
+
+    if result is None:
+        return {"error": "❌ Nessuna risposta da MT5", "details": mt5.last_error()}
+
+    if result.retcode != mt5.TRADE_RETCODE_DONE:
+        return {"error": f"❌ Chiusura fallita", "retcode": result.retcode, "details": result._asdict()}
+
+    return {
+        "status": "✅ Ordine chiuso",
+        "ticket_closed": ticket,
+        "symbol": symbol,
+        "volume": lot,
+        "price": price,
+        "retcode": result.retcode
+    }
 
 
 @app.post("/order")

@@ -58,7 +58,7 @@ def get_connection():
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
 
 # funz che recupera il trader corrente
-def get_trader(cursor, trader_id, logs, start_time):
+def get_trader(cursor, trader_id):
     cursor.execute("""
         SELECT t.id, t.name, t.moltiplicatore, t.fix_lot, t.sl, t.tp, t.tsl,
                ms.server AS master_name, ms.user AS master_user, ms.pwd AS master_pwd, ms.path AS master_path, ms.ip AS master_ip, ms.port AS master_port,
@@ -536,13 +536,10 @@ def copy_orders(trader_id: int):
     cursor = conn.cursor(dictionary=True)
 
     # # 1️⃣ Recupera info del trader (master e slave)
-    trader = get_trader(cursor, trader_id, logs, start_time)
+    trader = get_trader(cursor, trader_id)
 
     if not trader:
-        # conn.close()
-
-        # raise HTTPException(status_code=404, detail="Trader non trovato")
-        # log(f"❌ Login fallito su master: {resp.text}")
+        
         return {"status": "ko", "message": "Trader non trovato", "logs": logs}
 
     
@@ -854,12 +851,12 @@ def copy_orders(trader_id: int):
 
     try:
         # 1️⃣ Recupero posizioni master
-        master_positions = get_master_positions(master_base, logs, start_time)
+        master_positions = get_master_positions(master_base)
         master_tickets = [mp["ticket"] for mp in master_positions]
         log(f"✅ Ticket master attivi: {master_tickets}")
 
         # 2️⃣ Recupero posizioni slave
-        slave_positions = get_slave_positions(slave_base, logs, start_time)
+        slave_positions = get_slave_positions(slave_base)
         log(f"✅ Ticket slave attivi: {[sp['ticket'] for sp in slave_positions]}")
 
         # 3️⃣ Chiudo ordini mancanti
@@ -870,7 +867,7 @@ def copy_orders(trader_id: int):
                 log(f"⚠️ Ticket {slave_ticket} sullo slave NON presente sul master → chiudo")
 
                 # Chiudi via API slave
-                resp = close_slave_order(slave_base, slave_ticket, logs, start_time)
+                resp = close_slave_order(slave_base, slave_ticket)
 
                 # Aggiorna DB
                 cursor.execute(
@@ -899,7 +896,7 @@ def copy_orders(trader_id: int):
         "logs": logs
     }
 
-def get_master_positions(master_base_url, logs, start_time):
+def get_master_positions(master_base_url):
     url = f"{master_base_url}/positions"
     log(f"🔹 Recupero posizioni master: {url}")
     resp = requests.get(url, timeout=10)
@@ -907,7 +904,7 @@ def get_master_positions(master_base_url, logs, start_time):
         raise Exception(f"❌ Errore API master: {resp.text}")
     return resp.json()
 
-def get_slave_positions(slave_base_url, logs, start_time):
+def get_slave_positions(slave_base_url):
     url = f"{slave_base_url}/positions"
     log(f"🔹 Recupero posizioni slave: {url}")
 
@@ -950,15 +947,15 @@ def sync_close(trader_id: int):
     cursor = conn.cursor(dictionary=True)
 
     # Recupero trader
-    trader = get_trader(cursor, trader_id, logs, start_time)
+    trader = get_trader(cursor, trader_id)
     if not trader:
         return {"status":"ko","message":"Trader non trovato","logs":logs}
 
     master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
     slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
 
-    master_positions = get_master_positions(master_base, logs, start_time)
-    slave_positions  = get_slave_positions(slave_base, logs, start_time)
+    master_positions = get_master_positions(master_base)
+    slave_positions  = get_slave_positions(slave_base)
 
     # Lista dei ticket aperti sul master
     master_tickets = [p["ticket"] for p in master_positions]
@@ -968,7 +965,7 @@ def sync_close(trader_id: int):
         slave_ticket = sp["ticket"]
         if slave_ticket not in master_tickets:
             # log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
-            close_slave_order(slave_base, slave_ticket, logs, start_time)
+            close_slave_order(slave_base, slave_ticket)
 
             # Aggiorna DB se vuoi tenere traccia della chiusura
             cursor.execute("UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s", (slave_ticket,))

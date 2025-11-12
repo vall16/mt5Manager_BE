@@ -694,3 +694,67 @@
 2025-11-12 10:34:19,780 - INFO - Starting API
 2025-11-12 10:34:20,237 - INFO - Starting API
 2025-11-12 10:34:20,298 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:34:23,756 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE5B6DEC10>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:34:24,053 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE5B5527B0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:34:24,438 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE5B6DF390>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:34:24,972 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE5B6D2C40>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:34:33,730 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DE5B8C9220>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:39:59,968 - INFO - Starting API
+2025-11-12 10:40:00,368 - INFO - Starting API
+2025-11-12 10:40:00,481 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:40:03,905 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002ACCA01E660>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:40:32,135 - INFO - Starting API
+2025-11-12 10:40:32,695 - INFO - Starting API
+2025-11-12 10:40:32,927 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:40:53,588 - INFO - Starting API
+2025-11-12 10:40:54,317 - INFO - Starting API
+2025-11-12 10:40:54,366 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:40:54,638 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:41:22,904 - INFO - Starting API
+2025-11-12 10:41:23,671 - INFO - Starting API
+2025-11-12 10:41:23,763 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:41:34,452 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:42:00,048 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:42:34,671 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:42:44,595 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:42:54,572 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:43:04,871 - ERROR - Unhandled exception: get_trader() takes 2 positional arguments but 4 were given
+2025-11-12 10:43:25,573 - INFO - Starting API
+2025-11-12 10:43:25,895 - INFO - Starting API
+2025-11-12 10:43:26,016 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:43:28,930 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002347FE51810>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:43:29,166 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002347FD5E7B0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:43:49,598 - INFO - Starting API
+2025-11-12 10:43:51,313 - INFO - Starting API
+2025-11-12 10:43:52,366 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:43:56,730 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001B47E8EE660>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:44:17,664 - INFO - Starting API
+2025-11-12 10:44:18,304 - INFO - Starting API
+2025-11-12 10:44:18,331 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:44:24,780 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018E1694E660>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:44:26,785 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018E16A1D810>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:44:36,332 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018E1693FD90>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:45:55,016 - INFO - Starting API
+2025-11-12 10:45:55,783 - INFO - Starting API
+2025-11-12 10:45:55,803 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:45:59,225 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D47B3E660>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:46:00,271 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D47D5D810>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:46:22,651 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D47B2FED0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:46:26,233 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D47D688A0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:46:36,310 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022D47D6A190>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:49:01,607 - INFO - Starting API
+2025-11-12 10:49:01,919 - INFO - Starting API
+2025-11-12 10:49:01,982 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 10:49:21,288 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C025E660>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:49:46,488 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C053E5D0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:50:15,645 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C024EFD0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:50:45,605 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C05C0D60>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:51:15,628 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C05C2650>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 10:51:45,712 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264C028B0B0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 11:13:00,070 - INFO - Starting API
+2025-11-12 11:13:00,745 - INFO - Starting API
+2025-11-12 11:13:00,843 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-12 11:13:04,049 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001DBF266E7B0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-12 11:13:47,996 - INFO - Starting API
+2025-11-12 11:13:48,746 - INFO - Starting API
+2025-11-12 11:13:48,903 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
