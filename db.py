@@ -814,19 +814,45 @@ def copy_orders(trader_id: int):
             if result and result.get("result", {}).get("retcode") == mt5.TRADE_RETCODE_DONE:
 
                 # 🔹 Inserimento nel DB master_orders
+                # cursor.execute("""
+                #     INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+                #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                # """, (
+                #     # trader_id, pos.ticket, symbol, order_type, pos.volume,
+                #     # pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+
+                #     trader_id, pos.get("ticket"), symbol, order_type, pos.get("volume"),
+                #     pos.get("price_open"), pos.get("sl"), pos.get("tp"),
+                #     datetime.fromtimestamp(pos.get("time"))
+                # ))
+
+                # master_order_id = cursor.lastrowid
+                # Controlla se l'ordine master esiste già
                 cursor.execute("""
-                    INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    # trader_id, pos.ticket, symbol, order_type, pos.volume,
-                    # pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
+                    SELECT id
+                    FROM master_orders
+                    WHERE trader_id = %s AND ticket = %s
+                """, (trader_id, pos.get("ticket")))
 
-                    trader_id, pos.get("ticket"), symbol, order_type, pos.get("volume"),
-                    pos.get("price_open"), pos.get("sl"), pos.get("tp"),
-                    datetime.fromtimestamp(pos.get("time"))
-                ))
+                existing = cursor.fetchone()
 
-                master_order_id = cursor.lastrowid
+                if existing:
+                    master_order_id = existing["id"]
+                    log(f"⚠️ Ordine master {pos.get('ticket')} già presente, salto insert")
+                else:
+                    # Inserisce un nuovo ordine master
+                    cursor.execute("""
+                        INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        trader_id, pos.get("ticket"), symbol, order_type, pos.get("volume"),
+                        pos.get("price_open"), pos.get("sl"), pos.get("tp"),
+                        datetime.fromtimestamp(pos.get("time"))
+                    ))
+                    master_order_id = cursor.lastrowid
+                    conn.commit()
+                    log(f"✅ Ordine master {pos.get('ticket')} inserito")
+
 
 
                 # 🔹 Inserimento nel DB slave_orders (aggiunto master_ticket)
