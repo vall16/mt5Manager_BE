@@ -690,10 +690,11 @@ def copy_orders(trader_id: int):
     log(f"✅ Connessione allo slave {trader['slave_user']} riuscita! Bilancio: {data.get('balance')}")
 
 
-    # 4️⃣ Copia ogni ordine master sullo slave
+    # 4️⃣ Copia ogni ordine master sullo slave (SE NON C'è GIA')
     import traceback
 
     base_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    slave_positions  = get_slave_positions(base_url);
     
     for pos in master_positions:
         try:
@@ -701,6 +702,17 @@ def copy_orders(trader_id: int):
             order_type = "buy" if pos["type"] == 0 else "sell"
             volume = trader["fix_lot"] or round(pos["volume"] * float(trader["moltiplicatore"]), 2)
             log(f"Master symbol: {symbol}, tipo: {order_type}, volume calcolato per slave: {volume}")
+
+            # 🔹 NUOVO: Controllo se l’ordine esiste già sullo slave
+            slave_exists = any(
+                sp["symbol"] == symbol and
+                (sp["type"] == order_type or sp["type"] == pos["type"]) and
+                abs(sp["volume"] - volume) < 0.01
+                for sp in slave_positions
+            )
+            if slave_exists:
+                log(f"⚠️ Ordine {symbol} {order_type} già presente sullo slave, salto invio")
+                continue
 
             # 🔹 1️⃣ Controllo se il simbolo è disponibile e visibile sullo slave
             info_url = f"{base_url}/symbol_info/{symbol}"
@@ -814,19 +826,7 @@ def copy_orders(trader_id: int):
             if result and result.get("result", {}).get("retcode") == mt5.TRADE_RETCODE_DONE:
 
                 # 🔹 Inserimento nel DB master_orders
-                # cursor.execute("""
-                #     INSERT INTO master_orders (trader_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                # """, (
-                #     # trader_id, pos.ticket, symbol, order_type, pos.volume,
-                #     # pos.price_open, pos.sl, pos.tp, datetime.fromtimestamp(pos.time)
-
-                #     trader_id, pos.get("ticket"), symbol, order_type, pos.get("volume"),
-                #     pos.get("price_open"), pos.get("sl"), pos.get("tp"),
-                #     datetime.fromtimestamp(pos.get("time"))
-                # ))
-
-                # master_order_id = cursor.lastrowid
+                
                 # Controlla se l'ordine master esiste già
                 cursor.execute("""
                     SELECT id

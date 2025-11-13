@@ -78,3 +78,40 @@
 2025-11-13 11:00:54,608 - INFO - Starting API
 2025-11-13 11:00:54,611 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
 2025-11-13 11:00:54,680 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:01:32,088 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000293B143DD30>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-13 11:09:53,952 - INFO - Starting API
+2025-11-13 11:09:54,027 - INFO - Starting API
+2025-11-13 11:09:56,893 - INFO - Starting API
+2025-11-13 11:09:56,939 - INFO - Starting API
+2025-11-13 11:09:58,259 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:09:59,310 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:18:02,354 - INFO - Starting API
+2025-11-13 11:18:03,037 - INFO - Starting API
+2025-11-13 11:18:03,701 - INFO - Starting API
+2025-11-13 11:18:03,852 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:18:04,065 - INFO - Starting API
+2025-11-13 11:18:05,013 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:18:35,809 - INFO - Starting API
+2025-11-13 11:18:36,052 - INFO - Starting API
+2025-11-13 11:18:36,643 - INFO - Starting API
+2025-11-13 11:18:36,744 - INFO - Starting API
+2025-11-13 11:18:36,800 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:18:36,848 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:21:40,145 - INFO - Starting API
+2025-11-13 11:21:41,838 - INFO - Starting API
+2025-11-13 11:21:42,120 - INFO - Starting API
+2025-11-13 11:21:42,424 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:21:42,888 - INFO - Starting API
+2025-11-13 11:21:43,153 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:21:55,114 - INFO - Starting API
+2025-11-13 11:21:55,433 - INFO - Starting API
+2025-11-13 11:21:56,326 - INFO - Starting API
+2025-11-13 11:21:56,404 - INFO - Starting API
+2025-11-13 11:21:56,684 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:21:56,719 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:26:25,737 - INFO - Starting API
+2025-11-13 11:26:27,219 - INFO - Starting API
+2025-11-13 11:26:27,474 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 11:26:29,955 - INFO - Starting API
+2025-11-13 11:26:30,596 - INFO - Starting API
+2025-11-13 11:26:30,951 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
