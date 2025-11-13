@@ -57,3 +57,12 @@ CREATE TABLE `servers2` (
   KEY `idx_platform` (`platform`),
   KEY `idx_is_active` (`is_active`)
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+Esempio di impatto di SL :
+
+Risultato
+
+Prezzo d’ingresso: 1.2000
+SL a 100 pips: 1.1900
+SL a 1000 pips (BUY): 1.1000

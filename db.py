@@ -754,7 +754,6 @@ def copy_orders(trader_id: int):
             log(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
             # --- CALCOLO SL IN PIP ---
-            # --- CALCOLO SL IN PIP ---
             sl_pips = trader["sl"]  # valore pip inserito dal trader nell'app (es. 10)
 
             if sl_pips and float(sl_pips) > 0:
@@ -770,6 +769,20 @@ def copy_orders(trader_id: int):
             else:
                 calculated_sl = None  # se sl=0 non imposta SL
 
+            # calcolo TP da input
+            tp_pips = trader["tp"]  # pips inseriti dall'app
+            pip_value = float(sym_info.get("point"))
+
+            if tp_pips and float(tp_pips) > 0:
+                tp_distance = float(tp_pips) * pip_value
+                if order_type == "buy":
+                    calculated_tp = tick["ask"] + tp_distance
+                else:
+                    calculated_tp = tick["bid"] - tp_distance
+            else:
+                calculated_tp = None  # se TP=0 non impostare TP
+
+
             # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
             request = {
                 "symbol": symbol,
@@ -777,7 +790,7 @@ def copy_orders(trader_id: int):
                 "type": "buy" if order_type == "buy" else "sell",
                 "price": tick["ask"] if order_type == "buy" else tick["bid"],
                 "sl": calculated_sl,
-                "tp": pos["tp"],
+                "tp": calculated_tp,
                 "comment": f"Copied from master {trader_id}",
             }
 
