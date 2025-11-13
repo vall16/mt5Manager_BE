@@ -4,7 +4,6 @@ from logging import info
 from typing import List
 import uuid
 import mysql.connector
-# from mysql.connector import Error
 from mysql.connector import Error as MySQLError
 import requests
 from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
@@ -15,6 +14,17 @@ import MetaTrader5 as mt5
 import bcrypt
 import os
 import re
+from mysql.connector import pooling
+
+# pool = mysql.connector.pooling.MySQLConnectionPool(
+#     pool_name="trader_pool",
+#     pool_size=10,
+#     host="127.0.0.1",
+#     user="trader",
+#     password="vibe2025",
+#     database="trader_db"
+# )
+
 
 # from fastapi_utils.tasks import repeat_every
 
@@ -280,7 +290,6 @@ def delete_server(server_id: int):
     try:
         cursor = conn.cursor()
         # Verifica se il server esiste
-        # cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
         cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
         row = cursor.fetchone()
         if not row:
@@ -289,8 +298,7 @@ def delete_server(server_id: int):
             raise HTTPException(status_code=404, detail="Server not found")
 
         # Cancella il server
-        # cursor.execute("DELETE FROM servers WHERE id = %s", (server_id,))
-        cursor.execute("DELETE FROM servers2 WHERE id = %s", (server_id,))
+        cursor.execute("DELETE FROM servers WHERE id = %s", (server_id,))
         conn.commit()
 
         cursor.close()
@@ -408,36 +416,6 @@ def delete_trader(trader_id: int):
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-# @router.put("/traders/{trader_id}/servers")
-# def update_trader_servers(trader_id: int, update: TraderServersUpdate):
-#     conn = get_connection()
-#     cursor = conn.cursor(dictionary=True)
-
-#     # Controlla se il trader esiste
-#     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
-#     trader = cursor.fetchone()
-#     if not trader:
-#         cursor.close()
-#         conn.close()
-#         raise HTTPException(status_code=404, detail="Trader not found")
-
-#     # Aggiorna i server
-#     cursor.execute("""
-#         UPDATE traders
-#         SET master_server_id = %s,
-#             slave_server_id = %s
-#         WHERE id = %s
-#     """, (update.master_server_id, update.slave_server_id, trader_id))
-    
-#     conn.commit()
-
-#     # Recupera il trader aggiornato
-#     cursor.execute("SELECT * FROM traders WHERE id = %s", (trader_id,))
-#     updated_trader = cursor.fetchone()
-
-#     cursor.close()
-#     conn.close()
-#     return updated_trader
 
 @router.put("/traders/{trader_id}/servers")
 def update_trader_servers(trader_id: int, update: TraderServersUpdate):
@@ -920,12 +898,28 @@ def copy_orders(trader_id: int):
                 resp = close_slave_order(slave_base, slave_ticket)
 
                 # Aggiorna DB
+            #     cursor.execute(
+            #         "UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s",
+            #         (slave_ticket,)
+            #     )
+            #     conn.commit()
+            #     log(f"✅ Ticket slave {slave_ticket} chiuso e DB aggiornato")
+
+            #     if "error" in resp:
+            # log(f"❌ Errore chiusura ticket {slave_ticket}: {resp['error']}")
+            # continue
+
+            # Recupera il profit dal risultato della chiusura (assumendo resp ritorni 'profit')
+                profit = resp.get("profit", 0)
+
+                # Aggiorna DB con chiusura e profit
                 cursor.execute(
-                    "UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s",
-                    (slave_ticket,)
+                    "UPDATE slave_orders SET closed_at=NOW(), profit=%s WHERE ticket=%s",
+                    (profit, slave_ticket)
                 )
                 conn.commit()
-                log(f"✅ Ticket slave {slave_ticket} chiuso e DB aggiornato")
+                log(f"✅ Ticket slave {slave_ticket} chiuso, profit aggiornato: {profit}")
+
 
 
     except Exception as e:
@@ -989,42 +983,42 @@ def close_slave_order(slave_base_url, slave_ticket):
 
 
 # sincronizza l'eventuale chiusura di una posizione sul master con lo slave
-@router.post("/traders/{trader_id}/sync_close")
-def sync_close(trader_id: int):
-    logs = []
-    start_time = datetime.now()
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+# @router.post("/traders/{trader_id}/sync_close")
+# def sync_close(trader_id: int):
+#     logs = []
+#     start_time = datetime.now()
+#     conn = get_connection()
+#     cursor = conn.cursor(dictionary=True)
 
-    # Recupero trader
-    trader = get_trader(cursor, trader_id)
-    if not trader:
-        return {"status":"ko","message":"Trader non trovato","logs":logs}
+#     # Recupero trader
+#     trader = get_trader(cursor, trader_id)
+#     if not trader:
+#         return {"status":"ko","message":"Trader non trovato","logs":logs}
 
-    master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
-    slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+#     master_base = f"http://{trader['master_ip']}:{trader['master_port']}"
+#     slave_base  = f"http://{trader['slave_ip']}:{trader['slave_port']}"
 
-    master_positions = get_master_positions(master_base)
-    slave_positions  = get_slave_positions(slave_base)
+#     master_positions = get_master_positions(master_base)
+#     slave_positions  = get_slave_positions(slave_base)
 
-    # Lista dei ticket aperti sul master
-    master_tickets = [p["ticket"] for p in master_positions]
+#     # Lista dei ticket aperti sul master
+#     master_tickets = [p["ticket"] for p in master_positions]
 
-    # Ciclo sulle posizioni slave
-    for sp in slave_positions:
-        slave_ticket = sp["ticket"]
-        if slave_ticket not in master_tickets:
-            # log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
-            close_slave_order(slave_base, slave_ticket)
+#     # Ciclo sulle posizioni slave
+#     for sp in slave_positions:
+#         slave_ticket = sp["ticket"]
+#         if slave_ticket not in master_tickets:
+#             # log(logs, start_time, f"⚠️ Posizione {slave_ticket} sullo slave non esiste più sul master, chiudo...")
+#             close_slave_order(slave_base, slave_ticket)
 
-            # Aggiorna DB se vuoi tenere traccia della chiusura
-            cursor.execute("UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s", (slave_ticket,))
-            conn.commit()
+#             # Aggiorna DB se vuoi tenere traccia della chiusura
+#             cursor.execute("UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s", (slave_ticket,))
+#             conn.commit()
 
-    cursor.close()
-    conn.close()
+#     cursor.close()
+#     conn.close()
 
-    return {"status": "ok", "message": "Sincronizzazione completata", "logs": logs}
+#     return {"status": "ok", "message": "Sincronizzazione completata", "logs": logs}
 
 
 

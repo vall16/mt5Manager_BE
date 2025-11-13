@@ -183,6 +183,7 @@ def get_terminal_info():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
 @app.post("/close_order/{ticket}")
 def close_order(ticket: int):
     """
@@ -200,13 +201,15 @@ def close_order(ticket: int):
     pos = positions[0]
     symbol = pos.symbol
     lot = pos.volume
+    profit = pos.profit  # profit corrente prima della chiusura
+
 
     tick = mt5.symbol_info_tick(symbol)
     if not tick:
         log(f"❌ Impossibile leggere tick per {symbol}")
         return {"error": f"❌ Impossibile leggere tick per {symbol}"}
 
-    # Determina tipo ordine inverso e prezzo per chiusura
+    # Determina tipo ordine inverso e prezzo per chiusura: la chiusura implica segno inverso
     if pos.type == mt5.ORDER_TYPE_BUY:
         price = tick.bid
         order_type = mt5.ORDER_TYPE_SELL
@@ -246,6 +249,7 @@ def close_order(ticket: int):
         "symbol": symbol,
         "volume": lot,
         "price": price,
+        "profit": profit,         
         "retcode": result.retcode
     }
 
