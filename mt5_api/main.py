@@ -28,7 +28,7 @@ def log(message: str):
         elapsed = (datetime.now() - start_time).total_seconds()
         timestamp = f"[+{elapsed:.1f}s]"
         logs.append(f"{timestamp} {message}")
-        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
+        print(f"{timestamp} {message}")  # Mantieni anche la stampa in consol
 
 
 @app.post("/init-mt5")
