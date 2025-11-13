@@ -59,3 +59,16 @@
 2025-11-13 10:31:12,964 - INFO - Starting API
 2025-11-13 10:31:13,590 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
 2025-11-13 10:31:13,594 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 10:31:35,160 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C08F9EC050>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-13 10:38:31,151 - INFO - Starting API
+2025-11-13 10:38:31,190 - INFO - Starting API
+2025-11-13 10:38:32,234 - INFO - Starting API
+2025-11-13 10:38:32,577 - INFO - Starting API
+2025-11-13 10:38:33,395 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 10:38:33,501 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 10:44:20,994 - INFO - Starting API
+2025-11-13 10:44:21,138 - INFO - Starting API
+2025-11-13 10:44:21,672 - INFO - Starting API
+2025-11-13 10:44:21,822 - INFO - Starting API
+2025-11-13 10:44:21,852 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-13 10:44:21,972 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

@@ -828,13 +828,6 @@ def copy_orders(trader_id: int):
 
                 master_order_id = cursor.lastrowid
 
-                # 🔹 Inserimento nel DB slave_orders
-                # cursor.execute("""
-                #     INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                # """, (
-                #     trader_id, master_order_id, result.get("result", {}).get("order"), symbol, order_type, volume, request["price"], pos.get("sl"), pos.get("tp")
-                # ))
 
                 # 🔹 Inserimento nel DB slave_orders (aggiunto master_ticket)
                 cursor.execute("""
@@ -861,8 +854,6 @@ def copy_orders(trader_id: int):
 
                 
 
-
-
         except Exception as e:
             log("❌ Eccezione durante la copia ordine:")
             log(traceback.format_exc())
@@ -882,18 +873,24 @@ def copy_orders(trader_id: int):
         master_tickets = [mp["ticket"] for mp in master_positions]
         log(f"✅ Ticket master attivi: {master_tickets}")
 
-        # 2️⃣ Recupero posizioni slave
-        slave_positions = get_slave_positions(slave_base)
-        log(f"✅ Ticket slave attivi: {[sp['ticket'] for sp in slave_positions]}")
+        # 2️⃣ Recupero ticket slave dal DB
+        cursor.execute("""
+            SELECT ticket AS slave_ticket, master_ticket
+            FROM slave_orders
+            WHERE trader_id = %s AND closed_at IS NULL
+        """, (trader_id,))
+        slave_orders = cursor.fetchall()
+        log(f"✅ Ticket slave attivi nel DB: {[s['slave_ticket'] for s in slave_orders]}")
 
-        # 3️⃣ Chiudo ordini mancanti
-        for sp in slave_positions:
-            slave_ticket = sp["ticket"]
+        # 3️⃣ Chiudo gli ordini slave il cui master non esiste più
+        for so in slave_orders:
+            slave_ticket = so["slave_ticket"]
+            master_ticket = so["master_ticket"]
 
-            if slave_ticket not in master_tickets:
-                log(f"⚠️ Ticket {slave_ticket} sullo slave NON presente sul master → chiudo")
+            if master_ticket not in master_tickets:
+                log(f"⚠️ Ticket slave {slave_ticket} (master {master_ticket}) non più attivo → chiudo")
 
-                # Chiudi via API slave
+                # Chiudi tramite API dello slave
                 resp = close_slave_order(slave_base, slave_ticket)
 
                 # Aggiorna DB
@@ -902,8 +899,8 @@ def copy_orders(trader_id: int):
                     (slave_ticket,)
                 )
                 conn.commit()
+                log(f"✅ Ticket slave {slave_ticket} chiuso e DB aggiornato")
 
-                log(f"✅ Ticket {slave_ticket} chiuso e DB aggiornato")
 
     except Exception as e:
         log(f"❌ Errore sincronizzazione chiusure: {str(e)}")
