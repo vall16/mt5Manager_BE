@@ -35,22 +35,26 @@ def log(message: str):
 def get_connection():
     try:
         
-        conn = mysql.connector.connect(
-            host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
-            user=os.environ.get("MYSQL_USER", "trader"),
-            password="vibe2025",
-            database=os.environ.get("MYSQL_DB", "trader_db"),
-            port=int(os.environ.get("MYSQL_PORT", 3306))  # opzionale
-        )
+        # conn = mysql.connector.connect(
+        #     host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
+        #     user=os.environ.get("MYSQL_USER", "trader"),
+        #     password="vibe2025",
+        #     database=os.environ.get("MYSQL_DB", "trader_db"),
+        #     port=int(os.environ.get("MYSQL_PORT", 3306)),
+        #     connection_timeout=5,   # max 5s per connettersi
+        #     read_timeout=60,        # max 10s per leggere
+        #     write_timeout=60        # max 10s per scrivere
+
+        # )
 
         # db locale 
-        # conn = mysql.connector.connect(
-        #     host="127.0.0.1",       # o "127.0.0.1"
-        #     user="trader",            # utente MySQL locale
-        #     password="vibe2025",            # lascia vuoto se non hai password
-        #     database="trader_db",   # nome del tuo database
-        #     port=3306               # porta predefinita MySQL
-        # )
+        conn = mysql.connector.connect(
+            host="127.0.0.1",       # o "127.0.0.1"
+            user="trader",            # utente MySQL locale
+            password="vibe2025",            # lascia vuoto se non hai password
+            database="trader_db",   # nome del tuo database
+            port=3306               # porta predefinita MySQL
+        )
 
 
         return conn
@@ -760,11 +764,12 @@ def copy_orders(trader_id: int):
             log(f"✅ Tick ricevuto per {symbol}: bid={tick['bid']}, ask={tick['ask']}")
 
             # --- CALCOLO SL IN PIP ---
+            # --- CALCOLO SL IN PIP ---
             sl_pips = trader["sl"]  # valore pip inserito dal trader nell'app (es. 10)
 
-            if sl_pips and sl_pips > 0:
-                pip_value = sym_info.get("point")  # valore del singolo punto del simbolo
-                sl_distance = sl_pips * pip_value
+            if sl_pips and float(sl_pips) > 0:
+                pip_value = float(sym_info.get("point"))  # valore del singolo punto del simbolo
+                sl_distance = float(sl_pips) * pip_value
 
                 if order_type == "buy":
                     # SL sotto il prezzo ask
@@ -773,8 +778,8 @@ def copy_orders(trader_id: int):
                     # SL sopra il prezzo bid (per SELL)
                     calculated_sl = tick["bid"] + sl_distance
             else:
-                calculated_sl = None  # se sl=0 non impostare
-        
+                calculated_sl = None  # se sl=0 non imposta SL
+
             # 🔹 3️⃣ Preparo la richiesta da inviare allo slave
             request = {
                 "symbol": symbol,
@@ -820,15 +825,37 @@ def copy_orders(trader_id: int):
                     pos.get("price_open"), pos.get("sl"), pos.get("tp"),
                     datetime.fromtimestamp(pos.get("time"))
                 ))
+
                 master_order_id = cursor.lastrowid
 
                 # 🔹 Inserimento nel DB slave_orders
+                # cursor.execute("""
+                #     INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
+                #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                # """, (
+                #     trader_id, master_order_id, result.get("result", {}).get("order"), symbol, order_type, volume, request["price"], pos.get("sl"), pos.get("tp")
+                # ))
+
+                # 🔹 Inserimento nel DB slave_orders (aggiunto master_ticket)
                 cursor.execute("""
-                    INSERT INTO slave_orders (trader_id, master_order_id, ticket, symbol, type, volume, price_open, sl, tp, opened_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    INSERT INTO slave_orders (
+                        trader_id, master_order_id, master_ticket, ticket,
+                        symbol, type, volume, price_open, sl, tp, opened_at
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
                 """, (
-                    trader_id, master_order_id, result.get("result", {}).get("order"), symbol, order_type, volume, request["price"], pos.get("sl"), pos.get("tp")
+                    trader_id,
+                    master_order_id,
+                    pos.get("ticket"),  # <-- master_ticket
+                    result.get("result", {}).get("order"),  # ticket slave
+                    symbol,
+                    order_type,
+                    volume,
+                    request["price"],
+                    pos.get("sl"),
+                    pos.get("tp")
                 ))
+
                 conn.commit()
                 log(f"✅ Ordine copiato e registrato: {symbol}")
 
