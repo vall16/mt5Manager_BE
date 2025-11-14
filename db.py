@@ -15,6 +15,10 @@ import bcrypt
 import os
 import re
 from mysql.connector import pooling
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # pool = mysql.connector.pooling.MySQLConnectionPool(
 #     pool_name="trader_pool",
@@ -57,14 +61,26 @@ def get_connection():
 
         # )
 
-        # db locale 
         conn = mysql.connector.connect(
-            host="127.0.0.1",       # o "127.0.0.1"
-            user="trader",            # utente MySQL locale
-            password="vibe2025",            # lascia vuoto se non hai password
-            database="trader_db",   # nome del tuo database
-            port=3306               # porta predefinita MySQL
+            host=os.environ.get("MYSQL_HOST"),
+            user=os.environ.get("MYSQL_USER"),
+            password=os.environ.get("MYSQL_PASSWORD"),
+            database=os.environ.get("MYSQL_DB"),
+            port=int(os.environ.get("MYSQL_PORT")),
+            connection_timeout=int(os.environ.get("MYSQL_CONNECT_TIMEOUT", 5)),
+            read_timeout=int(os.environ.get("MYSQL_READ_TIMEOUT", 60)),
+            write_timeout=int(os.environ.get("MYSQL_WRITE_TIMEOUT", 60)),
         )
+
+
+        # db locale 
+        # conn = mysql.connector.connect(
+        #     host="127.0.0.1",       # o "127.0.0.1"
+        #     user="trader",            # utente MySQL locale
+        #     password="vibe2025",            # lascia vuoto se non hai password
+        #     database="trader_db",   # nome del tuo database
+        #     port=3306               # porta predefinita MySQL
+        # )
 
 
         return conn
