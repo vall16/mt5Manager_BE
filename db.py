@@ -613,7 +613,7 @@ def copy_orders(trader_id: int):
     log(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {master_data.get('balance')}")
 
 
-    # URL base del server master
+    # recupera posizioni  del server master
     base_url_master = f"http://{trader['master_ip']}:{trader['master_port']}"
 
     try:
@@ -649,35 +649,12 @@ def copy_orders(trader_id: int):
     Inizializza e connette il slave MT5 remoto tramite API HTTP.
     """
 
-    base_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    ensure_mt5_initialized(base_url_slave, trader["slave_path"], log)
 
-    # 1️⃣ Inizializza terminale remoto
-    init_url = f"{base_url}/init-mt5"
-    init_body = {"path": trader["slave_path"]}
-    health_url = f"{base_url}/health"
-
-    log(f"🔍 Verifico stato terminale remoto su {health_url}...")
-    # try:
-    health_resp = requests.get(health_url, timeout=5)
-    if health_resp.status_code == 200:
-        health_data = health_resp.json()
-        if health_data.get("status") == "ok":
-            log(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
-            # ---prova altrimenti va in errore !
-            log(f"🔹 Inizializzo terminale remoto {init_url}")
-            resp = requests.post(init_url, json=init_body, timeout=30)
-        else:
-            # raise Exception("MT5 non inizializzato, serve init")
-            log(f"🔹 Inizializzo terminale remoto {init_url}")
-            resp = requests.post(init_url, json=init_body, timeout=30)
-            if resp.status_code != 200:
-                raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
-
-            log(f"✅ Init OK su {base_url}")
-    
 
     # 2️⃣ Login remoto a slave
-    login_url = f"{base_url}/login"
+    login_url = f"{base_url_slave}/login"
     login_body = {
         "login": int(trader["slave_user"]),
         "password": trader["slave_pwd"],
@@ -703,7 +680,7 @@ def copy_orders(trader_id: int):
         raise
 
     if resp.status_code != 200:
-        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+        raise Exception(f"❌ Login fallito su {base_url_slave}: {resp.text}")
 
     data = resp.json()
     log(f"✅ Connessione allo slave {trader['slave_user']} riuscita! Bilancio: {data.get('balance')}")
