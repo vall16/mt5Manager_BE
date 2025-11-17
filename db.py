@@ -21,14 +21,14 @@ load_dotenv()
 
 
 # pool = mysql.connector.pooling.MySQLConnectionPool(
-#     pool_name="trader_pool",
-#     pool_size=10,
-#     host="127.0.0.1",
-#     user="trader",
-#     password="vibe2025",
-#     database="trader_db"
+#     pool_name=os.environ.get("MYSQL_POOL_NAME"),
+#     pool_size=int(os.environ.get("MYSQL_POOL_SIZE")),
+#     host=os.environ.get("MYSQL_HOST"),
+#     user=os.environ.get("MYSQL_USER"),
+#     password=os.environ.get("MYSQL_PASSWORD"),
+#     database=os.environ.get("MYSQL_DB"),
+#     port=int(os.environ.get("MYSQL_PORT")),
 # )
-
 
 # from fastapi_utils.tasks import repeat_every
 
@@ -45,21 +45,48 @@ def log(message: str):
         logs.append(f"{timestamp} {message}")
         print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
+import requests
+
+def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
+    """
+    Verifica la salute del terminale remoto MT5 e lo inizializza se necessario.
+    Riutilizzabile in qualsiasi logica master/slave.
+    """
+    health_url = f"{base_url}/health"
+    init_url   = f"{base_url}/init-mt5"
+
+    log(f"🔍 Controllo MT5 remoto su {health_url}...")
+
+    try:
+        resp = requests.get(health_url, timeout=5)
+    except Exception as e:
+        raise Exception(f"❌ Terminale non raggiungibile ({base_url}): {e}")
+
+    # Se MT5 è già attivo
+    if resp.status_code == 200:
+        data = resp.json()
+        if data.get("status") == "ok":
+            log(f"✅ MT5 attivo (versione {data.get('mt5_version')})")
+            return True
+
+    # Se non è attivo → inizializza
+    log(f"🔹 Inizializzo terminale MT5 su {init_url}...")
+    init_body = {"path": mt5_path}
+
+    try:
+        init_resp = requests.post(init_url, json=init_body, timeout=10)
+    except Exception as e:
+        raise Exception(f"❌ Errore durante init su {base_url}: {e}")
+
+    if init_resp.status_code != 200:
+        raise Exception(f"❌ Init MT5 fallita ({base_url}): {init_resp.text}")
+
+    log(f"✅ MT5 inizializzato correttamente su {base_url}")
+    return True
+
 
 def get_connection():
     try:
-        
-        # conn = mysql.connector.connect(
-        #     host=os.environ.get("MYSQL_HOST", "192.168.1.208"),
-        #     user=os.environ.get("MYSQL_USER", "trader"),
-        #     password="vibe2025",
-        #     database=os.environ.get("MYSQL_DB", "trader_db"),
-        #     port=int(os.environ.get("MYSQL_PORT", 3306)),
-        #     connection_timeout=5,   # max 5s per connettersi
-        #     read_timeout=60,        # max 10s per leggere
-        #     write_timeout=60        # max 10s per scrivere
-
-        # )
 
         conn = mysql.connector.connect(
             host=os.environ.get("MYSQL_HOST"),
@@ -71,6 +98,11 @@ def get_connection():
             read_timeout=int(os.environ.get("MYSQL_READ_TIMEOUT", 60)),
             write_timeout=int(os.environ.get("MYSQL_WRITE_TIMEOUT", 60)),
         )
+
+        print(os.environ.get("MYSQL_HOST"))
+        print(os.environ.get("MYSQL_DB"))
+        print(os.environ.get("MYSQL_PORT"))
+        
 
 
         # db locale 
@@ -540,37 +572,18 @@ def copy_orders(trader_id: int):
         
         return {"status": "ko", "message": "Trader non trovato", "logs": logs}
 
-    
     """
     Inizializza e connette il master MT5 remoto tramite API HTTP.
     """
 
-    base_url = f"http://{trader['master_ip']}:{trader['master_port']}"
+    # # 1️⃣ Inizializza terminale remoto
 
-    # 1️⃣ Inizializza terminale remoto
-    init_url = f"{base_url}/init-mt5"
-    init_body = {"path": trader["master_path"]}
-    health_url = f"{base_url}/health"
-
-    log(f"🔍 Verifico stato terminale remoto su {health_url}...")
-    # try:
-    health_resp = requests.get(health_url, timeout=5)
-    if health_resp.status_code == 200:
-        health_data = health_resp.json()
-        if health_data.get("status") == "ok":
-            log(f"✅ MT5 già inizializzato (versione {health_data.get('mt5_version')})")
-        else:
-            # raise Exception("MT5 non inizializzato, serve init")
-            log(f"🔹 Inizializzo terminale remoto {init_url}")
-            resp = requests.post(init_url, json=init_body, timeout=10)
-            if resp.status_code != 200:
-                raise Exception(f"❌ Init fallita su {base_url}: {resp.text}")
-
-            log(f"✅ Init OK su {base_url}")
+    base_url_master = f"http://{trader['master_ip']}:{trader['master_port']}"
+    ensure_mt5_initialized(base_url_master, trader["master_path"], log)
 
         
     # 2️⃣ Login remoto a master
-    login_url = f"{base_url}/login"
+    login_url = f"{base_url_master}/login"
     login_body = {
         "login": int(trader["master_user"]),
         "password": trader["master_pwd"],
@@ -580,16 +593,16 @@ def copy_orders(trader_id: int):
     log(f"🔹 Connessione al master via {login_url}")
     resp = requests.post(login_url, json=login_body, timeout=10)
     if resp.status_code != 200:
-        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+        raise Exception(f"❌ Login fallito su {base_url_master}: {resp.text}")
 
     data = resp.json()
     log(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {data.get('balance')}")
 
     # URL base del server master
-    base_url = f"http://{trader['master_ip']}:{trader['master_port']}"
+    base_url_master = f"http://{trader['master_ip']}:{trader['master_port']}"
 
     try:
-        positions_url = f"{base_url}/positions"
+        positions_url = f"{base_url_master}/positions"
         log(f"🔹 Recupero posizioni dal master via {positions_url}")
 
         resp = requests.get(positions_url, timeout=10)
@@ -602,9 +615,6 @@ def copy_orders(trader_id: int):
 
         if not master_positions:
             log("⚠️ Nessuna posizione aperta sul master.")
-            # return {"status": "ko", "message": "Errore login master", "logs": logs}
-
-            # raise HTTPException(status_code=404, detail="Nessuna posizione sul master")
 
         log(f"✅ Posizioni master ricevute: {len(master_positions)}")
         
@@ -926,17 +936,6 @@ def copy_orders(trader_id: int):
                 # Chiudi tramite API dello slave
                 resp = close_slave_order(slave_base, slave_ticket)
 
-                # Aggiorna DB
-            #     cursor.execute(
-            #         "UPDATE slave_orders SET closed_at=NOW() WHERE ticket=%s",
-            #         (slave_ticket,)
-            #     )
-            #     conn.commit()
-            #     log(f"✅ Ticket slave {slave_ticket} chiuso e DB aggiornato")
-
-            #     if "error" in resp:
-            # log(f"❌ Errore chiusura ticket {slave_ticket}: {resp['error']}")
-            # continue
 
             # Recupera il profit dal risultato della chiusura (assumendo resp ritorni 'profit')
                 profit = resp.get("profit", 0)
