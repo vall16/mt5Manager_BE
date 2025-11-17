@@ -84,6 +84,26 @@ def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
     log(f"✅ MT5 inizializzato correttamente su {base_url}")
     return True
 
+# funzione di login a mster5
+def mt5_login(base_url, login, password, server, log):
+    login_url = f"{base_url}/login"
+    login_body = {
+        "login": int(login),
+        "password": password,
+        "server": server
+    }
+
+    log(f"🔹 Connessione MT5 a {login_url}")
+    resp = requests.post(login_url, json=login_body, timeout=10)
+
+    if resp.status_code != 200:
+        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+
+    data = resp.json()
+    log(f"✅ Login MT5 OK! Bilancio: {data.get('balance')}")
+
+    return data
+
 
 def get_connection():
     try:
@@ -576,27 +596,22 @@ def copy_orders(trader_id: int):
     Inizializza e connette il master MT5 remoto tramite API HTTP.
     """
 
-    # # 1️⃣ Inizializza terminale remoto
+    # # 1️⃣ Inizializza terminale remoto master
 
     base_url_master = f"http://{trader['master_ip']}:{trader['master_port']}"
     ensure_mt5_initialized(base_url_master, trader["master_path"], log)
 
         
     # 2️⃣ Login remoto a master
-    login_url = f"{base_url_master}/login"
-    login_body = {
-        "login": int(trader["master_user"]),
-        "password": trader["master_pwd"],
-        "server": trader["master_name"]
-    }
+    master_data = mt5_login(
+        base_url_master,
+        trader["master_user"],
+        trader["master_pwd"],
+        trader["master_name"],
+        log
+    )
+    log(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {master_data.get('balance')}")
 
-    log(f"🔹 Connessione al master via {login_url}")
-    resp = requests.post(login_url, json=login_body, timeout=10)
-    if resp.status_code != 200:
-        raise Exception(f"❌ Login fallito su {base_url_master}: {resp.text}")
-
-    data = resp.json()
-    log(f"✅ Connessione al master {trader['master_user']} riuscita! Bilancio: {data.get('balance')}")
 
     # URL base del server master
     base_url_master = f"http://{trader['master_ip']}:{trader['master_port']}"
