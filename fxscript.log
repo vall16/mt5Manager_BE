@@ -11,3 +11,7 @@
 2025-11-18 11:10:05,985 - INFO - Starting API
 2025-11-18 11:10:06,362 - INFO - Starting API
 2025-11-18 11:10:06,615 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-18 11:37:55,797 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://192.168.1.102:443): HTTPConnectionPool(host='192.168.1.102', port=443): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000017EE8131400>, 'Connection to 192.168.1.102 timed out. (connect timeout=5)'))
+2025-11-18 11:41:49,324 - INFO - Starting API
+2025-11-18 11:41:50,206 - INFO - Starting API
+2025-11-18 11:41:50,509 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

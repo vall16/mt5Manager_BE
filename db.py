@@ -183,20 +183,7 @@ def normalize_symbol(symbol: str) -> str:
     return cleaned
 
 
-# def insert_order(symbol, lot, sl, tp, magic, comment):
-#     conn = get_connection()
-#     if not conn:
-#         return False
-#     cursor = conn.cursor()
-#     query = """
-#         INSERT INTO orders (symbol, lot, sl, tp, magic, comment)
-#         VALUES (%s, %s, %s, %s, %s, %s)
-#     """
-#     cursor.execute(query, (symbol, lot, sl, tp, magic, comment))
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
-#     return True
+
 
 @router.post("/login", response_model=LoginResponse)
 def login(req: LoginRequest):
