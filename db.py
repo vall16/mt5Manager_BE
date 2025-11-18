@@ -183,20 +183,20 @@ def normalize_symbol(symbol: str) -> str:
     return cleaned
 
 
-def insert_order(symbol, lot, sl, tp, magic, comment):
-    conn = get_connection()
-    if not conn:
-        return False
-    cursor = conn.cursor()
-    query = """
-        INSERT INTO orders (symbol, lot, sl, tp, magic, comment)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """
-    cursor.execute(query, (symbol, lot, sl, tp, magic, comment))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return True
+# def insert_order(symbol, lot, sl, tp, magic, comment):
+#     conn = get_connection()
+#     if not conn:
+#         return False
+#     cursor = conn.cursor()
+#     query = """
+#         INSERT INTO orders (symbol, lot, sl, tp, magic, comment)
+#         VALUES (%s, %s, %s, %s, %s, %s)
+#     """
+#     cursor.execute(query, (symbol, lot, sl, tp, magic, comment))
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+#     return True
 
 @router.post("/login", response_model=LoginResponse)
 def login(req: LoginRequest):
@@ -454,6 +454,7 @@ def insert_trader(trader: Newtrader):
 
 
     # --- DELETE trader ---
+
 @router.delete("/traders/{trader_id}")
 def delete_trader(trader_id: int):
     conn = get_connection()
@@ -1001,6 +1002,52 @@ def close_slave_order(slave_base_url, slave_ticket):
         log(f"⚠️ Risposta non in JSON valida per ordine {slave_ticket}: {resp.text}")
         return {"error": "invalid JSON response", "raw": resp.text}
 
+@router.get("/history")
+def get_history(
+    trader_id: int,
+    symbol: str | None = None,
+    profit_min: float | None = None,
+    profit_max: float | None = None,
+):
+    return get_history_db(trader_id, symbol, profit_min, profit_max)
+
+def get_history_db(trader_id, symbol=None, profit_min=None, profit_max=None):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT 
+            id, trader_id, master_order_id, master_ticket,
+            ticket, symbol, type, volume,
+            price_open, price_close, profit, comment,
+            opened_at, closed_at
+        FROM slave_orders
+        WHERE trader_id = %s
+          AND closed_at IS NOT NULL
+    """
+    params = [trader_id]
+
+    if symbol:
+        query += " AND symbol = %s"
+        params.append(symbol)
+
+    if profit_min is not None:
+        query += " AND profit >= %s"
+        params.append(profit_min)
+
+    if profit_max is not None:
+        query += " AND profit <= %s"
+        params.append(profit_max)
+
+    query += " ORDER BY closed_at DESC"
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return rows
 
 # sincronizza l'eventuale chiusura di una posizione sul master con lo slave
 # @router.post("/traders/{trader_id}/sync_close")
