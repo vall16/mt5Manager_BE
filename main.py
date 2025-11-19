@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 import requests
 
 # i files a cui punta il main: db.py, mt5_routes.py
-# from db_new import router as db_router
 from db import router as db_router
 from mt5_routes import router as mt5_router
+from app import router as app_router
 
 # MT5_API_URL = "http://127.0.0.1:8081"
 # MT5_API_KEY = "superkey123"
@@ -37,9 +37,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- ROUTERS /db e /mt5 sono i prefissi da aggiungere alle chiamate FE---
+# --- ROUTERS /db e /mt5 e /app sono i prefissi da aggiungere alle chiamate FE---
 app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
+app.include_router(app_router, prefix="/app", tags=["AppTrader5"])
 
 # --- STARTUP ---
 # @app.on_event("startup")
