@@ -1,4 +1,5 @@
 # backend/app.py
+from datetime import datetime
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
@@ -20,11 +21,22 @@ current_signal = "HOLD"
 # =========================
 # Funzioni indicatori
 # =========================
-def get_data(symbol, timeframe, n):
-    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n)
+def get_data(symbol, timeframe, n_candles):
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
+
+    if rates is None or len(rates) == 0:
+        print("❌ Nessun dato ricevuto da MT5 per", symbol)
+        return None
+
     df = pd.DataFrame(rates)
+
+    if "time" not in df.columns:
+        print("❌ La colonna time non esiste nel DataFrame:", df.columns)
+        return None
+
     df['time'] = pd.to_datetime(df['time'], unit='s')
     return df
+
 
 def compute_ema(df, period):
     return df['close'].ewm(span=period, adjust=False).mean()
@@ -52,9 +64,12 @@ def check_signal():
     if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
         current_signal = "BUY"
         # Qui puoi inserire il codice per aprire la posizione su MT5
-        print("🚀 Segnale BUY!")
+        # print("🚀 Segnale BUY!")
+        print(f"🚀 Segnale BUY!  ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
+
     else:
-        current_signal = "HOLD"
+        # print("🚀 Segnale HOLD!")
+        print(f"🚀 Segnale HOLD!  ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
 
 # Polling in background
 def start_polling():

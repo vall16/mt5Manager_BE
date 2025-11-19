@@ -10,7 +10,7 @@ import requests
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
-from app import router as app_router
+from trading_signals import router as app_router
 
 # MT5_API_URL = "http://127.0.0.1:8081"
 # MT5_API_KEY = "superkey123"
