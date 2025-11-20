@@ -7,12 +7,14 @@ import pandas as pd
 import threading
 import time
 
+import requests
+
 router = APIRouter()
 
 SYMBOL = "XAUUSD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
-CHECK_INTERVAL = 10  # secondi
+CHECK_INTERVAL = 30  # secondi
 PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
@@ -64,12 +66,17 @@ def check_signal():
     if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
         current_signal = "BUY"
         # Qui puoi inserire il codice per aprire la posizione su MT5
-        # print("🚀 Segnale BUY!")
+        # 🔥 QUI invia l’ordine allo SLAVE
         print(f"🚀 Segnale BUY!  ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
+        send_buy_to_slave()
+
+        # print("🚀 Segnale BUY!")
+        
 
     else:
         # print("🚀 Segnale HOLD!")
         print(f"🚀 Segnale HOLD!  ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
+        send_buy_to_slave()
 
 # Polling in background
 def start_polling():
@@ -83,3 +90,22 @@ threading.Thread(target=start_polling, daemon=True).start()
 @router.get("/signal")
 def get_signal():
     return {"signal": current_signal}
+
+TRADER_ID = 1  # <-- cambia questo col tuo trader reale
+BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
+
+def send_buy_to_slave():
+    url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
+    payload = {
+        "order_type": "buy",
+        "volume": 0.10
+    }
+
+    print(f"📤 Invio BUY allo SLAVE → {url}")
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        print("📥 Risposta SLAVE:", resp.text)
+    except Exception as e:
+        print("❌ Errore invio ordine:", e)
+
