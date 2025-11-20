@@ -11,6 +11,7 @@ import requests
 from db import router as db_router
 from mt5_routes import router as mt5_router
 from trading_signals import router as app_router
+# from trading_signals import start_polling
 
 # MT5_API_URL = "http://127.0.0.1:8081"
 # MT5_API_KEY = "superkey123"
@@ -77,6 +78,7 @@ def startup_event():
     - NON inizializza MetaTrader
     """
     logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
+    # start_polling()
 
 
 

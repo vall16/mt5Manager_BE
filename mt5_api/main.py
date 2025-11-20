@@ -282,8 +282,18 @@ def send_order(order: dict):
     print(f"🚀 Inviando ordine a MetaTrader5: {order}")
     result = mt5.order_send(order)
 
+    
+
     if result is None:
-        raise HTTPException(status_code=500, detail=f"MT5 order_send() returned None")
+        err = mt5.last_error()
+        print("❌ MT5 order_send() failed:", err)
+        raise HTTPException(
+        status_code=500,
+        detail=f"MT5 order_send() returned None, error: {err}"
+    )
+    else:
+        print("✅ Ordine inviato:", result)
+
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:
         print(f"❌ Errore invio ordine: {result}")

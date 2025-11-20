@@ -1096,12 +1096,13 @@ def open_order_on_slave(trader_id: int, order_type: str = "buy", volume: float =
     # 5️⃣ Prepara ordine
     order_request = {
         "symbol": symbol,
-        "volume": volume,
+        "volume": volume * 5,
         "type": order_type.lower(),
         "price": price,
+        # "price": 0.0,
         "sl": None,
-        "tp": None,
-        "comment": f"Manual order from API (trader {trader_id})"
+        "tp": None
+        # "comment": f"Manual order from API (trader {trader_id})"
     }
 
     order_url = f"{base_url_slave}/order"
@@ -1118,17 +1119,17 @@ def open_order_on_slave(trader_id: int, order_type: str = "buy", volume: float =
     ticket = result.get("result", {}).get("order")
 
     # 6️⃣ Scrive nel DB solo slave_orders
-    if ticket:
-        cursor.execute("""
-            INSERT INTO slave_orders
-                (trader_id, master_order_id, master_ticket, ticket,
-                 symbol, type, volume, price_open, opened_at)
-            VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
-        """,
-        (trader_id, ticket, symbol, order_type, volume, price))
+    # if ticket:
+    #     cursor.execute("""
+    #         INSERT INTO slave_orders
+    #             (trader_id, master_order_id, master_ticket, ticket,
+    #              symbol, type, volume, price_open, opened_at)
+    #         VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
+    #     """,
+    #     (trader_id, ticket, symbol, order_type, volume, price))
 
-        conn.commit()
-        log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
+    #     conn.commit()
+    #     log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
 
     # 7️⃣ Fine
     cursor.close()
