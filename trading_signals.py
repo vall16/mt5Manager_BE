@@ -116,7 +116,7 @@ def check_signal():
     else:
         current_signal = "HOLD"
 
-    print(f"👉 Segnale corrente: **{current_signal}**")
+    # print(f"👉 Segnale corrente: **{current_signal}**")
     print("=============================\n")
 
     # # 1️⃣ Recupera le posizioni correnti sullo SLAVE
@@ -154,22 +154,19 @@ def check_signal():
     # print(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
     # print(f"🔍 Debug condizione current_signal={current_signal}")
 
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Se il segnale cambia da HOLD → BUY
     if current_signal == "BUY":
         
-            print("🔥 Invio BUY allo slave")
+            print(f"🔥 [{now}] Invio BUY allo slave")
 
             send_buy_to_slave()
             
     # Se il segnale diventa HOLD dopo un BUY, resettiamo il flag
     if current_signal == "HOLD":
         
-        print("⚠️ Segnale HOLD, reset buy_executed")
-        # send_buy_to_slave()
-
-        # Qui puoi inviare eventualmente close_buy allo SLAVE
-        # send_close_buy_to_slave()
+        print(f"⚠️ [{now}] Segnale HOLD, reset buy_executed")
     
 
 
