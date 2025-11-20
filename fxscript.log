@@ -246,3 +246,45 @@
 2025-11-20 16:53:43,240 - INFO - Starting API
 2025-11-20 16:53:43,740 - INFO - Starting API
 2025-11-20 16:53:43,807 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 16:53:47,432 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647A93EC10>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 16:54:49,787 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647A979BA0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 16:55:51,947 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647AC7CB90>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 16:56:54,621 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647ABE5AE0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 16:57:57,363 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002647A8F3F00>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 17:00:59,765 - INFO - Starting API
+2025-11-20 17:01:01,309 - INFO - Starting API
+2025-11-20 17:01:01,510 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:01:25,580 - INFO - Starting API
+2025-11-20 17:01:26,197 - INFO - Starting API
+2025-11-20 17:01:26,382 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:04:18,422 - INFO - Starting API
+2025-11-20 17:04:19,521 - INFO - Starting API
+2025-11-20 17:04:19,624 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:05:56,672 - INFO - Starting API
+2025-11-20 17:05:57,383 - INFO - Starting API
+2025-11-20 17:05:57,616 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:06:04,342 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002B6801CE350>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 17:07:26,394 - INFO - Starting API
+2025-11-20 17:07:27,212 - INFO - Starting API
+2025-11-20 17:07:27,427 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:07:34,135 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000018578234CD0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 17:09:25,875 - INFO - Starting API
+2025-11-20 17:09:26,601 - INFO - Starting API
+2025-11-20 17:09:26,675 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:09:30,697 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001B93C105D10>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 17:15:02,776 - INFO - Starting API
+2025-11-20 17:15:03,502 - INFO - Starting API
+2025-11-20 17:15:03,659 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:15:07,838 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001C580D74190>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-20 17:19:48,546 - INFO - Starting API
+2025-11-20 17:19:49,341 - INFO - Starting API
+2025-11-20 17:19:49,394 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:22:42,108 - INFO - Starting API
+2025-11-20 17:22:43,401 - INFO - Starting API
+2025-11-20 17:22:43,472 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:24:10,302 - INFO - Starting API
+2025-11-20 17:24:11,800 - INFO - Starting API
+2025-11-20 17:24:12,509 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-20 17:24:28,830 - INFO - Starting API
+2025-11-20 17:24:30,079 - INFO - Starting API
+2025-11-20 17:24:30,270 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

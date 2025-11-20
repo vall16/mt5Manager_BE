@@ -14,7 +14,7 @@ router = APIRouter()
 SYMBOL = "XAUUSD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
-CHECK_INTERVAL = 60  # secondi
+CHECK_INTERVAL = 20  # secondi
 PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
@@ -62,9 +62,12 @@ def compute_rsi(df, period):
 def check_signal():
     global current_signal
 
+    positions = []   # ← SEMPRE nella prima riga
+
     if not mt5.initialize():
         print("Errore MT5:", mt5.last_error())
         return
+    
     df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
     ema_short = compute_ema(df, PARAMETERS["EMA_short"])
     ema_long = compute_ema(df, PARAMETERS["EMA_long"])
@@ -73,12 +76,51 @@ def check_signal():
     #  Determina segnale attuale
     if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
         current_signal = "BUY"
+
+        # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
+                
+        base_url_slave = "http://127.0.0.1:9001"
+
+        try:
+                positions_url = f"{base_url_slave}/positions"
+                print(f"🔹 Recupero posizioni dallo slave via {positions_url}")
+
+                resp = requests.get(positions_url, timeout=10)
+                resp.raise_for_status()
+                positions = resp.json()
+
+                if positions:
+                    print("📌 Posizioni aperte sullo SLAVE:")
+                    for p in positions:
+                        print(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+                    
+                    # Se c'è già il simbolo XAUUSD non inviare nuovo ordine
+                    if any(p["symbol"] == SYMBOL for p in positions):
+                        print(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
+                        return
+
+        except requests.exceptions.RequestException as e:
+                print(f"❌ Errore di connessione al slave API: {e}")
+                # raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
+
+
+        # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
+        if any(p.get("symbol") == "XAUUSD" for p in positions):
+            print("⚠️ Posizione su XAUUSD già aperta sullo SLAVE, skip invio BUY")
+            return
+        
+        print(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
+        print(f"🔍 Debug condizione current_signal={current_signal}")
+
+        
     else:
         current_signal = "HOLD"
 
-    # 1️⃣ Recupera le posizioni correnti sullo SLAVE
+    print(f"👉 Segnale corrente: **{current_signal}**")
+    print("=============================\n")
+
+    # # 1️⃣ Recupera le posizioni correnti sullo SLAVE
         
-    # base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
     # base_url_slave = "http://127.0.0.1:9001"
 
     # try:
@@ -92,7 +134,7 @@ def check_signal():
     #     if positions:
     #         print("📌 Posizioni aperte sullo SLAVE:")
     #         for p in positions:
-    #             print(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}, Price: {p['price']}, Ticket: {p['ticket']}")
+    #             print(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
             
     #         # Se c'è già il simbolo XAUUSD non inviare nuovo ordine
     #         if any(p["symbol"] == SYMBOL for p in positions):
@@ -101,7 +143,7 @@ def check_signal():
 
     # except requests.exceptions.RequestException as e:
     #     print(f"❌ Errore di connessione al slave API: {e}")
-    #     raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
+    #     # raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
 
 
     # # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
@@ -124,6 +166,7 @@ def check_signal():
     if current_signal == "HOLD":
         
         print("⚠️ Segnale HOLD, reset buy_executed")
+        # send_buy_to_slave()
 
         # Qui puoi inviare eventualmente close_buy allo SLAVE
         # send_close_buy_to_slave()
