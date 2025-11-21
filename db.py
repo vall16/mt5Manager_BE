@@ -1155,6 +1155,77 @@ def open_order_on_slave(payload: OrderPayload):
     }
 
 
+# chiusura ordine determinato
+class CloseOrderPayload(BaseModel):
+    trader_id: int
+    symbol: str
+
+
+@router.post("/traders/{trader_id}/close_order_on_slave")
+def close_order_on_slave(payload: CloseOrderPayload):
+    trader_id = payload.trader_id
+    symbol = payload.symbol
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    log("🚀 Entrato in close_order_on_slave()")
+
+    # 1️⃣ Recupero trader
+    trader = get_trader(cursor, trader_id)
+    if not trader:
+        return {"status": "ko", "message": "Trader non trovato", "logs": logs}
+
+    # 2️⃣ Inizializza server SLAVE
+    base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    log(f"🌐 Init MT5 slave: {base_url_slave}")
+    ensure_mt5_initialized(base_url_slave, trader["slave_path"], log)
+
+    # 3️⃣ Login SLAVE
+    login_url = f"{base_url_slave}/login"
+    login_body = {
+        "login": int(trader["slave_user"]),
+        "password": trader["slave_pwd"],
+        "server": trader["slave_name"]
+    }
+
+    log("🔐 Login allo SLAVE...")
+    resp = requests.post(login_url, json=login_body, timeout=20)
+    if resp.status_code != 200:
+        return {"status": "ko", "message": f"Errore login slave: {resp.text}", "logs": logs}
+
+    log("✅ Login SLAVE riuscito")
+    log(f"Simbolo da chiudere: {symbol}")
+
+    # 4️⃣ Prepara richiesta chiusura ordine
+    close_order_url = f"{base_url_slave}/close_order"
+    payload_order = {"symbol": symbol}
+
+    log(f"📤 Invio richiesta chiusura ordine → {close_order_url}")
+    log(json.dumps(payload_order, indent=2))
+
+    try:
+        resp_order = requests.post(close_order_url, json=payload_order, timeout=20)
+        if resp_order.status_code != 200:
+            return {"status": "ko", "message": f"Errore chiusura ordine: {resp_order.text}", "logs": logs}
+
+        result = resp_order.json()
+        log(f"✅ Risposta SLAVE chiusura: {result}")
+
+    except requests.RequestException as e:
+        log(f"❌ Errore invio richiesta chiusura ordine: {e}")
+        return {"status": "ko", "message": str(e), "logs": logs}
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "status": "ok",
+        "message": f"Ordine {symbol} chiuso sullo SLAVE",
+        "result": result,
+        "logs": logs
+    }
+
 if __name__ == "__main__":
     create_user("roberto", "roberto123")
 

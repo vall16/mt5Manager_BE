@@ -16,7 +16,7 @@ router = APIRouter()
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 TRADER_ID = 1
 SYMBOL = "USDCAD"
-# SYMBOL = "USDCAD"
+# SYMBOL = "XAUUSD"
 # SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
@@ -25,6 +25,8 @@ PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
 current_signal = "HOLD"
+previous_signal = "HOLD"
+
 
 # def normalize(d):
 #     return {k.lower(): v for k, v in d.items()}
@@ -66,7 +68,7 @@ def compute_rsi(df, period):
     return rsi
 
 def check_signal():
-    global current_signal
+    global current_signal,previous_signal
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -113,31 +115,28 @@ def check_signal():
 
         except requests.exceptions.RequestException as e:
                 log(f"❌ Errore di connessione al slave API: {e}")
-                # raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
-
+                
 
         # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
         if any(p.get("symbol") == SYMBOL for p in positions):
-            log("⚠️ Posizione su XAUUSD già aperta sullo SLAVE, skip invio BUY")
+            log("⚠️ Posizione già aperta sullo SLAVE, skip invio BUY")
             return
-        
-        log(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
-        log(f"🔍 Debug condizione current_signal={current_signal}")
+        else:
+            log(f"🚀 Invio BUY allo SLAVE")
+            send_buy_to_slave()
 
-        
     else:
         current_signal = "HOLD"
-        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} !")
-    
+        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
 
-    # Se il segnale cambia da HOLD → BUY
-    if current_signal == "BUY":
-        
-            log(f"🔥 [{now}] Invio BUY allo slave")
+        # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
+        if previous_signal == "BUY":
+            log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
+            close_slave_position()
+     
+        # Aggiorna lo stato precedente
+        previous_signal = current_signal
 
-            send_buy_to_slave()
-            
-        
     
 
 # Polling in background
@@ -153,9 +152,6 @@ threading.Thread(target=start_polling, daemon=True).start()
 def get_signal():
     return {"signal": current_signal}
 
-# TRADER_ID = 1  # <-- cambia questo col tuo trader reale
-BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
-
 def send_buy_to_slave():
     url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
     payload = {
@@ -169,7 +165,18 @@ def send_buy_to_slave():
 
     try:
         resp = requests.post(url, json=payload, timeout=10)
-        print("📥 Risposta SLAVE:", resp.text)
-    except Exception as e:
-        print("❌ Errore invio ordine:", e)
+        log(f"📥 Risposta SLAVE: {resp.text}")
+    except requests.RequestException as e:
+        log(f"❌ Errore invio ordine: {e}")
+
+def close_slave_position():
+    url = f"{BASE_URL}/db/traders/{TRADER_ID}/close_order_on_slave"
+    payload = {"symbol": SYMBOL}
+    log(f"📤 Invio richiesta chiusura posizione [symbol={SYMBOL}] allo SLAVE → {url}")
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Risposta chiusura SLAVE: {resp.text}")
+    except requests.RequestException as e:
+        log(f"❌ Errore chiusura posizione: {e}")
 

@@ -1,5 +1,4 @@
 # mt5_api.py: sta su ogni SERVER su cui viene istanziato mt5
-# from logging import log
 from datetime import datetime
 import os
 import MetaTrader5 as mt5
@@ -49,7 +48,7 @@ def init_mt5(req: InitRequest):
 
     CURRENT_PATH = req.path
     version = ".".join(map(str, mt5.version()))
-    print(f"✅ MT5 inizializzato da API al path {req.path} (versione {version})")
+    log(f"✅ MT5 inizializzato da API al path {req.path} (versione {version})")
 
     return {"status": "ok", "message": f"MT5 inizializzato", "version": version, "path": req.path}
 
@@ -77,7 +76,7 @@ def login(req: LoginRequest):
     Esegue il login MT5 con timeout protetto.
     Evita che il server resti bloccato se il terminale non risponde.
     """
-    print(f"🟢 Tentativo login MT5: login={req.login}, server={req.server}")
+    log(f"🟢 Tentativo login MT5: login={req.login}, server={req.server}")
 
     # 1️⃣ Verifica inizializzazione
     info = mt5.terminal_info()
@@ -102,7 +101,7 @@ def login(req: LoginRequest):
 
     info = mt5.account_info()
     balance = info.balance if info else None
-    print(f"✅ Login MT5 riuscito: {req.login} - Balance: {balance}")
+    log(f"✅ Login MT5 riuscito: {req.login} - Balance: {balance}")
 
     return {"message": "✅ Login OK", "balance": balance}
 
@@ -124,7 +123,7 @@ def health_check():
 
         return {"status": "ok", "mt5_version": version_str}
     except Exception as e:
-        print("Errore INIT:", mt5.last_error())
+        log("Errore INIT:", mt5.last_error())
         return {"status": "error", "message": str(e)}
 
 
@@ -246,7 +245,7 @@ def close_order(ticket: int):
 
 @app.post("/order")
 def send_order(order: dict):
-    print(f"📩 Ricevuto ordine dallo slave: {order}")
+    log(f"📩 Ricevuto ordine dallo slave: {order}")
 
     # 🔹 Conversione dei tipi numerici
     order["volume"] = float(order.get("volume", 0))
@@ -269,27 +268,27 @@ def send_order(order: dict):
     order.setdefault("type_time", mt5.ORDER_TIME_GTC)
     order.setdefault("magic", 123456)
 
-    print(f"🚀 Inviando ordine a MetaTrader5: {order}")
+    log(f"🚀 Inviando ordine a MetaTrader5: {order}")
     result = mt5.order_send(order)
 
     
 
     if result is None:
         err = mt5.last_error()
-        print("❌ MT5 order_send() failed:", err)
+        log("❌ MT5 order_send() failed:", err)
         raise HTTPException(
         status_code=500,
         detail=f"MT5 order_send() returned None, error: {err}"
     )
     else:
-        print("✅ Ordine inviato:", result)
+        log("✅ Ordine inviato:", result)
 
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:
-        print(f"❌ Errore invio ordine: {result}")
+        log(f"❌ Errore invio ordine: {result}")
         raise HTTPException(status_code=400, detail=f"Trade failed: {result.comment}")
 
-    print(f"✅ Ordine eseguito correttamente: {result}")
+    log(f"✅ Ordine eseguito correttamente: {result}")
     return {"message": "✅ Order sent", "result": result._asdict()}
 
 
@@ -298,7 +297,7 @@ def send_order(order: dict):
 # -----------------------
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python mt5_api.py <MT5_PATH> <HOST:PORT>")
+        log("Usage: python mt5_api.py <MT5_PATH> <HOST:PORT>")
         sys.exit(1)
     # path di MT5
     mt5_path = sys.argv[1] 
@@ -308,16 +307,16 @@ if __name__ == "__main__":
     port = int(port_str)
 
     if not os.path.exists(mt5_path):
-        print(f"❌ Terminale MT5 non trovato: {mt5_path}")
+        log(f"❌ Terminale MT5 non trovato: {mt5_path}")
         sys.exit(1)
 
     if not mt5.initialize(mt5_path):
         err = mt5.last_error()
-        print(f"❌ Fallita inizializzazione MT5: {err}")
+        log(f"❌ Fallita inizializzazione MT5: {err}")
         sys.exit(1)
 
-    print(f"✅ MT5 inizializzato correttamente da {mt5_path}")
-    print(f"🟢 Avvio FastAPI su {host}:{port}")
+    log(f"✅ MT5 inizializzato correttamente da {mt5_path}")
+    log(f"🟢 Avvio FastAPI su {host}:{port}")
 
     uvicorn.run(app, host=host, port=port)
 
