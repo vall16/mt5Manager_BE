@@ -559,14 +559,14 @@ def copy_orders(trader_id: int):
 
     logs = []  # elenco dei messaggi di log
 
-    start_time = datetime.now()  
+    # start_time = datetime.now()  
 
-    def log(message: str):
-        """Aggiunge un messaggio con timestamp relativo."""
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timestamp = f"[+{elapsed:.1f}s]"
-        logs.append(f"{timestamp} {message}")
-        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
+    # def log(message: str):
+    #     """Aggiunge un messaggio con timestamp relativo."""
+    #     elapsed = (datetime.now() - start_time).total_seconds()
+    #     timestamp = f"[+{elapsed:.1f}s]"
+    #     logs.append(f"{timestamp} {message}")
+    #     print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 
     log("🚀 Entrato in copy_orders()")
@@ -1038,18 +1038,17 @@ def get_history_db(trader_id, symbol=None, profit_min=None, profit_max=None):
 
 # manda ordine allo slave, no copytrading
 @router.post("/traders/{trader_id}/open_order_on_slave")
-def open_order_on_slave(trader_id: int, order_type: str = "buy", volume: float = 0.10):
+def open_order_on_slave(trader_id: int, 
+                        order_type: str = "buy", 
+                        volume: float = 0.10,
+                        symbol: str = ""):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     logs = []
     start_time = datetime.now()
 
-    def log(msg):
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timestamp = f"[+{elapsed:.1f}s]"
-        logs.append(f"{timestamp} {msg}")
-        print(f"{timestamp} {msg}")
+    
 
     log("🚀 Entrato in open_order_on_slave()")
 
@@ -1079,7 +1078,7 @@ def open_order_on_slave(trader_id: int, order_type: str = "buy", volume: float =
     log("✅ Login SLAVE riuscito")
 
     # 4️⃣ Recupero tick SLAVE
-    symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
+    # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
     tick_url = f"{base_url_slave}/symbol_tick/{symbol}"
 
     log(f"📡 Richiedo tick dello SLAVE: {tick_url}")
@@ -1102,7 +1101,7 @@ def open_order_on_slave(trader_id: int, order_type: str = "buy", volume: float =
         # "price": 0.0,
         "sl": None,
         "tp": None
-        # "comment": f"Manual order from API (trader {trader_id})"
+        
     }
 
     order_url = f"{base_url_slave}/order"
