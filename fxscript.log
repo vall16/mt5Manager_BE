@@ -814,3 +814,125 @@
 2025-11-21 14:51:44,943 - INFO - Starting API
 2025-11-21 14:51:46,477 - INFO - Starting API
 2025-11-21 14:51:46,539 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 14:54:30,164 - INFO - Starting API
+2025-11-21 14:54:30,679 - INFO - Starting API
+2025-11-21 14:54:31,139 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 14:55:13,088 - INFO - Starting API
+2025-11-21 14:55:13,612 - INFO - Starting API
+2025-11-21 14:55:13,790 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 14:55:14,647 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 14:56:14,700 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 14:57:14,742 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 14:58:14,793 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 14:59:14,823 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:00:14,857 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:01:14,908 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:02:14,948 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:03:15,342 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:04:15,383 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:05:15,441 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:06:15,508 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:07:15,538 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:08:15,574 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:09:15,610 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:10:15,637 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:11:15,696 - ERROR - Validation error: [{'type': 'missing', 'loc': ('body', 'trader_id'), 'msg': 'Field required', 'input': {'symbol': 'USDCAD'}}] for body {"symbol": "USDCAD"}
+2025-11-21 15:12:17,903 - INFO - Starting API
+2025-11-21 15:12:18,725 - INFO - Starting API
+2025-11-21 15:12:18,766 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:21:01,255 - INFO - Starting API
+2025-11-21 15:21:05,019 - INFO - Starting API
+2025-11-21 15:21:05,589 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:25:21,687 - INFO - Starting API
+2025-11-21 15:25:22,233 - INFO - Starting API
+2025-11-21 15:25:22,323 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:29:01,560 - INFO - Starting API
+2025-11-21 15:29:02,623 - INFO - Starting API
+2025-11-21 15:29:02,691 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:31:29,437 - INFO - Starting API
+2025-11-21 15:31:30,244 - INFO - Starting API
+2025-11-21 15:31:30,405 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:36:08,851 - INFO - Starting API
+2025-11-21 15:36:09,505 - INFO - Starting API
+2025-11-21 15:36:10,480 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:47:33,985 - INFO - Starting API
+2025-11-21 15:47:35,644 - INFO - Starting API
+2025-11-21 15:47:35,694 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:49:45,420 - INFO - Starting API
+2025-11-21 15:50:11,657 - INFO - Starting API
+2025-11-21 15:50:13,898 - INFO - Starting API
+2025-11-21 15:50:14,511 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:51:45,413 - INFO - Starting API
+2025-11-21 15:51:53,851 - INFO - Starting API
+2025-11-21 15:51:54,468 - INFO - Starting API
+2025-11-21 15:51:54,667 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:54:53,175 - INFO - Starting API
+2025-11-21 15:54:53,727 - INFO - Starting API
+2025-11-21 15:54:54,527 - INFO - Starting API
+2025-11-21 15:54:55,055 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:54:55,788 - INFO - Starting API
+2025-11-21 15:54:55,980 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:54:58,904 - ERROR - Unhandled exception: \u274c Init MT5 fallita (http://127.0.0.1:9001): Internal Server Error
+2025-11-21 15:55:01,606 - ERROR - Unhandled exception: \u274c Init MT5 fallita (http://127.0.0.1:9001): Internal Server Error
+2025-11-21 15:55:58,597 - INFO - Starting API
+2025-11-21 15:55:58,651 - INFO - Starting API
+2025-11-21 15:55:59,344 - INFO - Starting API
+2025-11-21 15:55:59,559 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 15:55:59,713 - INFO - Starting API
+2025-11-21 15:55:59,994 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:13:04,870 - INFO - Starting API
+2025-11-21 16:13:05,073 - INFO - Starting API
+2025-11-21 16:13:05,850 - INFO - Starting API
+2025-11-21 16:13:06,084 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:13:06,478 - INFO - Starting API
+2025-11-21 16:13:09,001 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:15:23,321 - INFO - Starting API
+2025-11-21 16:15:23,782 - INFO - Starting API
+2025-11-21 16:15:24,254 - INFO - Starting API
+2025-11-21 16:15:25,711 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:15:26,202 - INFO - Starting API
+2025-11-21 16:15:27,032 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:16:36,497 - INFO - Starting API
+2025-11-21 16:16:43,892 - INFO - Starting API
+2025-11-21 16:16:44,618 - INFO - Starting API
+2025-11-21 16:16:44,964 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 16:48:52,699 - ERROR - Unhandled exception: \u274c Init MT5 fallita (http://127.0.0.1:9001): Internal Server Error
+2025-11-21 17:12:20,046 - INFO - Starting API
+2025-11-21 17:12:27,479 - INFO - Starting API
+2025-11-21 17:12:28,591 - INFO - Starting API
+2025-11-21 17:12:43,314 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 17:12:52,537 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019EDB6384D0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:12:53,640 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019EDB5ED0F0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:13:59,846 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019EDB5FE030>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:14:01,346 - ERROR - Unhandled exception: \u274c Terminale non raggiungibile (http://127.0.0.1:9001): HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019EDB5FE140>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:14:50,753 - INFO - Starting API
+2025-11-21 17:14:51,242 - INFO - Starting API
+2025-11-21 17:14:51,861 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 17:14:56,749 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:14:57,097 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:16:01,065 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:16:01,552 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:17:07,653 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:17:08,583 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:17:54,061 - INFO - Starting API
+2025-11-21 17:17:54,908 - INFO - Starting API
+2025-11-21 17:17:55,564 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 17:18:00,974 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:18:01,366 - ERROR - Unhandled exception: cannot access local variable 'resp' where it is not associated with a value
+2025-11-21 17:18:29,026 - INFO - Starting API
+2025-11-21 17:18:29,417 - INFO - Starting API
+2025-11-21 17:18:29,666 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 17:18:37,363 - ERROR - Unhandled exception: \u274c Errore durante init su http://127.0.0.1:9001: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /init-mt5 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020C377FECF0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:18:37,982 - ERROR - Unhandled exception: \u274c Errore durante init su http://127.0.0.1:9001: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /init-mt5 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020C378B47C0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:19:44,805 - ERROR - Unhandled exception: \u274c Errore durante init su http://127.0.0.1:9001: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /init-mt5 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020C378B6580>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:19:45,204 - ERROR - Unhandled exception: \u274c Errore durante init su http://127.0.0.1:9001: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /init-mt5 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020C378B67A0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-21 17:20:33,442 - INFO - Starting API
+2025-11-21 17:20:34,057 - INFO - Starting API
+2025-11-21 17:20:34,454 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-21 17:20:41,282 - ERROR - Unhandled exception: cannot access local variable 'init_resp' where it is not associated with a value
+2025-11-21 17:20:41,579 - ERROR - Unhandled exception: cannot access local variable 'init_resp' where it is not associated with a value
+2025-11-21 17:21:48,081 - ERROR - Unhandled exception: cannot access local variable 'init_resp' where it is not associated with a value
+2025-11-21 17:21:49,213 - ERROR - Unhandled exception: cannot access local variable 'init_resp' where it is not associated with a value
+2025-11-21 17:21:53,352 - INFO - Starting API
+2025-11-21 17:21:53,605 - INFO - Starting API
+2025-11-21 17:21:53,697 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.

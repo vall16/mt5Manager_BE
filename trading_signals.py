@@ -15,8 +15,8 @@ router = APIRouter()
 
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 TRADER_ID = 1
-SYMBOL = "USDCAD"
-# SYMBOL = "XAUUSD"
+# SYMBOL = "USDCAD"
+SYMBOL = "XAUUSD"
 # SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
@@ -79,6 +79,10 @@ def check_signal():
         return
     
     df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+    if df is None:
+        log(f"⚠️ get_data() ha restituito None per {SYMBOL}. Salto il ciclo.")
+        return  # esce da check_signal() senza fare danni
+
     ema_short = compute_ema(df, PARAMETERS["EMA_short"])
     ema_long = compute_ema(df, PARAMETERS["EMA_long"])
     rsi = compute_rsi(df, PARAMETERS["RSI_period"])
@@ -130,6 +134,7 @@ def check_signal():
         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
 
         # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
+        # close_slave_position()close_slave_position()
         if previous_signal == "BUY":
             log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
             close_slave_position()
@@ -145,7 +150,13 @@ def start_polling():
         check_signal()
         time.sleep(CHECK_INTERVAL)
 
-threading.Thread(target=start_polling, daemon=True).start()
+# threading.Thread(target=start_polling, daemon=True).start()
+@router.on_event("startup")
+def on_startup():
+    # Lancia il polling in un thread separato solo all'avvio del server
+    threading.Thread(target=start_polling, daemon=True).start()
+    print("✅ Polling thread avviato all'avvio del server")
+
 
 # Endpoint per il frontend
 @router.get("/signal")
@@ -171,7 +182,7 @@ def send_buy_to_slave():
 
 def close_slave_position():
     url = f"{BASE_URL}/db/traders/{TRADER_ID}/close_order_on_slave"
-    payload = {"symbol": SYMBOL}
+    payload = {"symbol": SYMBOL,"trader_id": TRADER_ID}
     log(f"📤 Invio richiesta chiusura posizione [symbol={SYMBOL}] allo SLAVE → {url}")
 
     try:

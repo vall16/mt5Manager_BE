@@ -243,6 +243,7 @@ def close_order(ticket: int):
     }
 
 
+# crea un ordine
 @app.post("/order")
 def send_order(order: dict):
     log(f"📩 Ricevuto ordine dallo slave: {order}")

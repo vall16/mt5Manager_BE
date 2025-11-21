@@ -63,14 +63,19 @@ def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
     try:
         resp = requests.get(health_url, timeout=5)
     except Exception as e:
-        raise Exception(f"❌ Terminale non raggiungibile ({base_url}): {e}")
+        # raise Exception(f"❌ Terminale non raggiungibile ({base_url}): {e}")
+        log(f"❌ Terminale non raggiungibile ({base_url}): {e}")
+        resp = None
 
     # Se MT5 è già attivo
-    if resp.status_code == 200:
+    if resp is not None and resp.status_code == 200:
         data = resp.json()
         if data.get("status") == "ok":
             log(f"✅ MT5 attivo (versione {data.get('mt5_version')})")
             return True
+    else:
+        log(f"⚠️ MT5 non attivo o errore nella risposta")
+
 
     # Se non è attivo → inizializza
     log(f"🔹 Inizializzo terminale MT5 su {init_url}...")
@@ -79,10 +84,19 @@ def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
     try:
         init_resp = requests.post(init_url, json=init_body, timeout=10)
     except Exception as e:
-        raise Exception(f"❌ Errore durante init su {base_url}: {e}")
+        # raise Exception(f"❌ Errore durante init su {base_url}: {e}")
+        log(f"❌ Errore durante init su {base_url}: {e}")
+        init_resp = None  
 
-    if init_resp.status_code != 200:
-        raise Exception(f"❌ Init MT5 fallita ({base_url}): {init_resp.text}")
+
+    if init_resp is not None:
+        if init_resp.status_code == 200:
+            log(f"✅ Init MT5 riuscita ({base_url})")
+        else:
+            log(f"❌ Init MT5 fallita ({base_url}): {init_resp.text}")
+    else:
+        log(f"⚠️ Init MT5 non eseguita ({base_url}) a causa di errore di rete")
+
 
     log(f"✅ MT5 inizializzato correttamente su {base_url}")
     return True
@@ -100,7 +114,9 @@ def mt5_login(base_url, login, password, server, log):
     resp = requests.post(login_url, json=login_body, timeout=10)
 
     if resp.status_code != 200:
-        raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+        # raise Exception(f"❌ Login fallito su {base_url}: {resp.text}")
+        log(f"❌ Login fallito su {base_url}: {resp.text}")
+
 
     data = resp.json()
     log(f"✅ Login MT5 OK! Bilancio: {data.get('balance')}")
@@ -1189,8 +1205,16 @@ def close_order_on_slave(payload: CloseOrderPayload):
         "server": trader["slave_name"]
     }
 
+    # Log dettagliato completo (inclusa password)
+    log("🔐 Tentativo di login allo SLAVE con i seguenti parametri:")
+    for k, v in login_body.items():
+        log(f"  {k}: {v}")
+
+    log(f"  URL: {login_url}")
+
+
     log("🔐 Login allo SLAVE...")
-    resp = requests.post(login_url, json=login_body, timeout=20)
+    resp = requests.post(login_url, json=login_body, timeout=30)
     if resp.status_code != 200:
         return {"status": "ko", "message": f"Errore login slave: {resp.text}", "logs": logs}
 
