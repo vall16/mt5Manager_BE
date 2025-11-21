@@ -11,8 +11,8 @@ import requests
 
 router = APIRouter()
 
-# SYMBOL = "XAUUSD"
-SYMBOL = "GBPUSD"
+SYMBOL = "XAUUSD"
+# SYMBOL = "GBPUSD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
 CHECK_INTERVAL = 60  # secondi
@@ -33,8 +33,8 @@ def log(message: str):
         logs.append(f"{timestamp} {message}")
         print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
-def normalize(d):
-    return {k.lower(): v for k, v in d.items()}
+# def normalize(d):
+#     return {k.lower(): v for k, v in d.items()}
 
 
 # =========================

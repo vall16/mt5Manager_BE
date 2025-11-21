@@ -1077,14 +1077,19 @@ def open_order_on_slave(trader_id: int,
 
     log("✅ Login SLAVE riuscito")
 
+    log("simbolo {symbol}")
+
     # 4️⃣ Recupero tick SLAVE
     # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
     tick_url = f"{base_url_slave}/symbol_tick/{symbol}"
+
 
     log(f"📡 Richiedo tick dello SLAVE: {tick_url}")
     resp_tick = requests.get(tick_url, timeout=10)
 
     if resp_tick.status_code != 200:
+        log(f"🔎 Verifica simbolo sullo SLAVE: {symbol}")
+
         return {"status": "ko", "message": f"Errore tick {resp_tick.text}", "logs": logs}
 
     tick = resp_tick.json()
