@@ -16,11 +16,12 @@ router = APIRouter()
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 TRADER_ID = 1
 # SYMBOL = "USDCAD"
+# SYMBOL = "EURUSD"
 SYMBOL = "XAUUSD"
 # SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
-CHECK_INTERVAL = 60  # secondi
+CHECK_INTERVAL = 20  # secondi
 PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
@@ -39,7 +40,7 @@ def get_data(symbol, timeframe, n_candles):
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
 
     if rates is None or len(rates) == 0:
-        log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
+        # log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
 
         return None
 
@@ -80,7 +81,7 @@ def check_signal():
     
     df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
     if df is None:
-        log(f"⚠️ get_data() ha restituito None per {SYMBOL}. Salto il ciclo.")
+        # log(f"⚠️ get_data() ha restituito None per {SYMBOL}. Salto il ciclo.")
         return  # esce da check_signal() senza fare danni
 
     ema_short = compute_ema(df, PARAMETERS["EMA_short"])
@@ -92,6 +93,7 @@ def check_signal():
 
         current_signal = "BUY"
 
+        log("───────S-I-G-N-A-L──────────")
         log(f"🔥 [{now}] BUY signal per {SYMBOL} !")
 
         # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
@@ -131,6 +133,7 @@ def check_signal():
 
     else:
         current_signal = "HOLD"
+        log("───────S-I-G-N-A-L──────────")
         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
 
         # Se il segnale passa da BUY a HOLD, chiudiamo la posizione

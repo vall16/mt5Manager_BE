@@ -40,13 +40,6 @@ router = APIRouter()
 # logs = []  # elenco dei messaggi di log
 
 start_time = datetime.now()  
-# funz messaggistica di log
-# def log(message: str):
-#         """Aggiunge un messaggio con timestamp relativo."""
-#         elapsed = (datetime.now() - start_time).total_seconds()
-#         timestamp = f"[+{elapsed:.1f}s]"
-#         logs.append(f"{timestamp} {message}")
-#         print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 import requests
 
@@ -96,7 +89,7 @@ def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
             log(f"❌ Init MT5 fallita ({base_url}): {init_resp.text}")
     else:
         log(f"⚠️ Init MT5 non eseguita ({base_url}) a causa di errore di rete")
-
+        return False
 
     log(f"✅ MT5 inizializzato correttamente su {base_url}")
     return True
