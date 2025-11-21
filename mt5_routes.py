@@ -4,6 +4,8 @@ import socket
 import subprocess
 import MetaTrader5 as mt5
 import logging
+from logger import log, logs
+
 from fastapi import APIRouter, HTTPException, Query, Request
 from models import (
     LoginRequest, LoginResponse, BuyRequest, SellRequest, CloseRequest,

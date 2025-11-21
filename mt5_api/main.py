@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sys
 import uvicorn
+from logger import log, logs
 
 app = FastAPI(title="MT5 Local API")
 
@@ -19,17 +20,6 @@ class LoginRequest(BaseModel):
 class InitRequest(BaseModel):
     path: str
     
-logs = []  # elenco dei messaggi di log
-
-start_time = datetime.now()  
-# funz messaggistica di log
-def log(message: str):
-        """Aggiunge un messaggio con timestamp relativo."""
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timestamp = f"[+{elapsed:.1f}s]"
-        logs.append(f"{timestamp} {message}")
-        print(f"{timestamp} {message}")  # Mantieni anche la stampa in consol
-
 
 @app.post("/init-mt5")
 def init_mt5(req: InitRequest):

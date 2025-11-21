@@ -3,6 +3,8 @@ from datetime import datetime
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
+from logger import log, logs
+
 import pandas as pd
 import threading
 import time
@@ -11,8 +13,11 @@ import requests
 
 router = APIRouter()
 
-SYMBOL = "XAUUSD"
-# SYMBOL = "GBPUSD"
+BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
+TRADER_ID = 1
+SYMBOL = "USDCAD"
+# SYMBOL = "USDCAD"
+# SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
 CHECK_INTERVAL = 60  # secondi
@@ -20,18 +25,6 @@ PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
 current_signal = "HOLD"
-
-
-logs = []  # elenco dei messaggi di log
-
-start_time = datetime.now()  
-# funz messaggistica di log
-def log(message: str):
-        """Aggiunge un messaggio con timestamp relativo."""
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timestamp = f"[+{elapsed:.1f}s]"
-        logs.append(f"{timestamp} {message}")
-        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 # def normalize(d):
 #     return {k.lower(): v for k, v in d.items()}
@@ -44,13 +37,15 @@ def get_data(symbol, timeframe, n_candles):
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
 
     if rates is None or len(rates) == 0:
-        print("❌ Nessun dato ricevuto da MT5 per", symbol)
+        log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
+
         return None
 
     df = pd.DataFrame(rates)
 
     if "time" not in df.columns:
-        print("❌ La colonna time non esiste nel DataFrame:", df.columns)
+        log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
+
         return None
 
     df['time'] = pd.to_datetime(df['time'], unit='s')
@@ -158,12 +153,13 @@ threading.Thread(target=start_polling, daemon=True).start()
 def get_signal():
     return {"signal": current_signal}
 
-TRADER_ID = 1  # <-- cambia questo col tuo trader reale
+# TRADER_ID = 1  # <-- cambia questo col tuo trader reale
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 
 def send_buy_to_slave():
     url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
     payload = {
+         "trader_id": TRADER_ID,
         "order_type": "buy",
         "volume": 0.10,
         "symbol": SYMBOL        

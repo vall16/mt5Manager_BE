@@ -1,6 +1,9 @@
 from datetime import datetime
 import json
 from logging import info
+
+from pydantic import BaseModel
+from logger import log, logs
 from typing import List
 import uuid
 import mysql.connector
@@ -34,16 +37,16 @@ load_dotenv()
 
 router = APIRouter()
 
-logs = []  # elenco dei messaggi di log
+# logs = []  # elenco dei messaggi di log
 
 start_time = datetime.now()  
 # funz messaggistica di log
-def log(message: str):
-        """Aggiunge un messaggio con timestamp relativo."""
-        elapsed = (datetime.now() - start_time).total_seconds()
-        timestamp = f"[+{elapsed:.1f}s]"
-        logs.append(f"{timestamp} {message}")
-        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
+# def log(message: str):
+#         """Aggiunge un messaggio con timestamp relativo."""
+#         elapsed = (datetime.now() - start_time).total_seconds()
+#         timestamp = f"[+{elapsed:.1f}s]"
+#         logs.append(f"{timestamp} {message}")
+#         print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 import requests
 
@@ -1037,18 +1040,23 @@ def get_history_db(trader_id, symbol=None, profit_min=None, profit_max=None):
     return rows
 
 # manda ordine allo slave, no copytrading
+class OrderPayload(BaseModel):
+    trader_id: int
+    order_type: str = "buy"
+    volume: float = 0.10
+    symbol: str
+
 @router.post("/traders/{trader_id}/open_order_on_slave")
-def open_order_on_slave(trader_id: int, 
-                        order_type: str = "buy", 
-                        volume: float = 0.10,
-                        symbol: str = ""):
+def open_order_on_slave(payload: OrderPayload):
+
+    order_type = payload.order_type
+    volume = payload.volume
+    symbol = payload.symbol
+    trader_id = payload.trader_id
+
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    logs = []
-    start_time = datetime.now()
-
-    
 
     log("🚀 Entrato in open_order_on_slave()")
 
@@ -1077,7 +1085,7 @@ def open_order_on_slave(trader_id: int,
 
     log("✅ Login SLAVE riuscito")
 
-    log("simbolo {symbol}")
+    log(f"Simbolo dal payload è: {symbol}")
 
     # 4️⃣ Recupero tick SLAVE
     # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"

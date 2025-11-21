@@ -43,30 +43,6 @@ app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
 app.include_router(app_router, prefix="/app", tags=["AppTrader5"])
 
-# --- STARTUP ---
-# @app.on_event("startup")
-# def startup_event():
-#     login_data = {
-#         "login": 959911,
-#         "password": "Qpnldan1@1",
-#         "server": "VTMarkets-Demo"
-#     }
-
-#     try:
-#         response = requests.post(
-#             f"{MT5_API_URL}/login",
-#             json=login_data,
-#             headers={"x-api-key": MT5_API_KEY},
-#             timeout=5
-#         )
-#         if response.status_code != 200:
-#             logging.error(f"MT5 API login failed: {response.text}")
-#             raise RuntimeError(f"MT5 API login failed: {response.text}")
-
-#         logging.info(f"✅ MT5 API connected: {response.json()}")
-#     except Exception as e:
-#         logging.error(f"❌ Error contacting MT5 API: {e}")
-#         raise
 
 # --- STARTUP ---
 @app.on_event("startup")
