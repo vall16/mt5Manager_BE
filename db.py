@@ -108,31 +108,31 @@ def mt5_login(base_url, login, password, server, log):
 def get_connection():
     try:
 
-        conn = mysql.connector.connect(
-            host=os.environ.get("MYSQL_HOST"),
-            user=os.environ.get("MYSQL_USER"),
-            password=os.environ.get("MYSQL_PASSWORD"),
-            database=os.environ.get("MYSQL_DB"),
-            port=int(os.environ.get("MYSQL_PORT")),
-            connection_timeout=int(os.environ.get("MYSQL_CONNECT_TIMEOUT", 5)),
-            read_timeout=int(os.environ.get("MYSQL_READ_TIMEOUT", 60)),
-            write_timeout=int(os.environ.get("MYSQL_WRITE_TIMEOUT", 60)),
-        )
+        # conn = mysql.connector.connect(
+        #     host=os.environ.get("MYSQL_HOST"),
+        #     user=os.environ.get("MYSQL_USER"),
+        #     password=os.environ.get("MYSQL_PASSWORD"),
+        #     database=os.environ.get("MYSQL_DB"),
+        #     port=int(os.environ.get("MYSQL_PORT")),
+        #     connection_timeout=int(os.environ.get("MYSQL_CONNECT_TIMEOUT", 5)),
+        #     read_timeout=int(os.environ.get("MYSQL_READ_TIMEOUT", 60)),
+        #     write_timeout=int(os.environ.get("MYSQL_WRITE_TIMEOUT", 60)),
+        # )
 
-        print(os.environ.get("MYSQL_HOST"))
-        print(os.environ.get("MYSQL_DB"))
-        print(os.environ.get("MYSQL_PORT"))
+        # print(os.environ.get("MYSQL_HOST"))
+        # print(os.environ.get("MYSQL_DB"))
+        # print(os.environ.get("MYSQL_PORT"))
         
 
 
         # db locale 
-        # conn = mysql.connector.connect(
-        #     host="127.0.0.1",       # o "127.0.0.1"
-        #     user="trader",            # utente MySQL locale
-        #     password="vibe2025",            # lascia vuoto se non hai password
-        #     database="trader_db",   # nome del tuo database
-        #     port=3306               # porta predefinita MySQL
-        # )
+        conn = mysql.connector.connect(
+            host="127.0.0.1",       # o "127.0.0.1"
+            user="trader",            # utente MySQL locale
+            password="vibe2025",            # lascia vuoto se non hai password
+            database="trader_db",   # nome del tuo database
+            port=3306               # porta predefinita MySQL
+        )
 
 
         return conn

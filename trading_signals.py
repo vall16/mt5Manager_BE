@@ -14,16 +14,23 @@ router = APIRouter()
 SYMBOL = "XAUUSD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
-CHECK_INTERVAL = 20  # secondi
+CHECK_INTERVAL = 60  # secondi
 PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
 current_signal = "HOLD"
-# buy_executed=False
-# Stato globale del segnale
-# current_signal = "HOLD"
-# last_signal = "HOLD"   # <- aggiunto
-# buy_executed = False
+
+
+logs = []  # elenco dei messaggi di log
+
+start_time = datetime.now()  
+# funz messaggistica di log
+def log(message: str):
+        """Aggiunge un messaggio con timestamp relativo."""
+        elapsed = (datetime.now() - start_time).total_seconds()
+        timestamp = f"[+{elapsed:.1f}s]"
+        logs.append(f"{timestamp} {message}")
+        print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
 
 
 # =========================
@@ -62,6 +69,8 @@ def compute_rsi(df, period):
 def check_signal():
     global current_signal
 
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     positions = []   # ← SEMPRE nella prima riga
 
     if not mt5.initialize():
@@ -76,6 +85,7 @@ def check_signal():
     #  Determina segnale attuale
     if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
         current_signal = "BUY"
+        log(f"🔥 [{now}] Segnale BUY !")
 
         # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
                 
@@ -83,90 +93,52 @@ def check_signal():
 
         try:
                 positions_url = f"{base_url_slave}/positions"
-                print(f"🔹 Recupero posizioni dallo slave via {positions_url}")
+                log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
 
                 resp = requests.get(positions_url, timeout=10)
                 resp.raise_for_status()
                 positions = resp.json()
 
                 if positions:
-                    print("📌 Posizioni aperte sullo SLAVE:")
+                    log("📌 Posizioni aperte sullo SLAVE:")
                     for p in positions:
-                        print(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+                        log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
                     
                     # Se c'è già il simbolo XAUUSD non inviare nuovo ordine
                     if any(p["symbol"] == SYMBOL for p in positions):
-                        print(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
+                        log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
                         return
 
         except requests.exceptions.RequestException as e:
-                print(f"❌ Errore di connessione al slave API: {e}")
+                log(f"❌ Errore di connessione al slave API: {e}")
                 # raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
 
 
         # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
         if any(p.get("symbol") == "XAUUSD" for p in positions):
-            print("⚠️ Posizione su XAUUSD già aperta sullo SLAVE, skip invio BUY")
+            log("⚠️ Posizione su XAUUSD già aperta sullo SLAVE, skip invio BUY")
             return
         
-        print(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
-        print(f"🔍 Debug condizione current_signal={current_signal}")
+        log(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
+        log(f"🔍 Debug condizione current_signal={current_signal}")
 
         
     else:
         current_signal = "HOLD"
 
-    # print(f"👉 Segnale corrente: **{current_signal}**")
-    print("=============================\n")
-
-    # # 1️⃣ Recupera le posizioni correnti sullo SLAVE
-        
-    # base_url_slave = "http://127.0.0.1:9001"
-
-    # try:
-    #     positions_url = f"{base_url_slave}/positions"
-    #     print(f"🔹 Recupero posizioni dallo slave via {positions_url}")
-
-    #     resp = requests.get(positions_url, timeout=10)
-    #     resp.raise_for_status()
-    #     positions = resp.json()
-
-    #     if positions:
-    #         print("📌 Posizioni aperte sullo SLAVE:")
-    #         for p in positions:
-    #             print(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
-            
-    #         # Se c'è già il simbolo XAUUSD non inviare nuovo ordine
-    #         if any(p["symbol"] == SYMBOL for p in positions):
-    #             print(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
-    #             return
-
-    # except requests.exceptions.RequestException as e:
-    #     print(f"❌ Errore di connessione al slave API: {e}")
-    #     # raise HTTPException(status_code=500, detail=f"Errore connessione al slave: {str(e)}")
-
-
-    # # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
-    # if any(p.get("symbol") == "XAUUSD" for p in positions):
-    #     print("⚠️ Posizione su XAUUSD già aperta sullo SLAVE, skip invio BUY")
-    #     return
-    
-    # print(f"🚀 Segnale {current_signal}! ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
-    # print(f"🔍 Debug condizione current_signal={current_signal}")
-
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Se il segnale cambia da HOLD → BUY
     if current_signal == "BUY":
         
-            print(f"🔥 [{now}] Invio BUY allo slave")
+            log(f"🔥 [{now}] Invio BUY allo slave")
 
             send_buy_to_slave()
             
     # Se il segnale diventa HOLD dopo un BUY, resettiamo il flag
     if current_signal == "HOLD":
         
-        print(f"⚠️ [{now}] Segnale HOLD, reset buy_executed")
+        log(f"⚠️ [{now}] Segnale HOLD, reset buy_executed")
     
 
 
@@ -193,11 +165,11 @@ def send_buy_to_slave():
         "volume": 0.10
     }
 
-    print(f"📤 Invio BUY allo SLAVE → {url}")
+    log(f"📤 Invio BUY allo SLAVE → {url}")
 
     try:
         resp = requests.post(url, json=payload, timeout=10)
-        print("📥 Risposta SLAVE:", resp.text)
+        log("📥 Risposta SLAVE:", resp.text)
     except Exception as e:
-        print("❌ Errore invio ordine:", e)
+        log("❌ Errore invio ordine:", e)
 
