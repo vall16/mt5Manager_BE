@@ -243,6 +243,71 @@ def close_order(ticket: int):
     }
 
 
+
+@app.post("/close_order_by_symbol")
+def close_order_by_symbol(payload: dict):
+    """
+    Chiude tutte le posizioni aperte per un dato simbolo.
+    Payload: {"symbol": "XAUUSD"}
+    """
+    symbol = payload.get("symbol")
+    if not symbol:
+        raise HTTPException(status_code=400, detail="Missing symbol in payload")
+
+    # Recupera tutte le posizioni aperte per il simbolo
+    positions = mt5.positions_get(symbol=symbol)
+    if not positions:
+        log(f"❌ Nessuna posizione aperta per {symbol}")
+        return {"status": "none", "message": f"Nessuna posizione aperta per {symbol}"}
+
+    closed = []
+    errors = []
+
+    for pos in positions:
+        tick = mt5.symbol_info_tick(pos.symbol)
+        if not tick:
+            errors.append({"ticket": pos.ticket, "error": "No tick available"})
+            continue
+
+        # Determina tipo ordine inverso per chiusura
+        if pos.type == mt5.ORDER_TYPE_BUY:
+            price = tick.bid
+            order_type = mt5.ORDER_TYPE_SELL
+        elif pos.type == mt5.ORDER_TYPE_SELL:
+            price = tick.ask
+            order_type = mt5.ORDER_TYPE_BUY
+        else:
+            errors.append({"ticket": pos.ticket, "error": f"Unknown type {pos.type}"})
+            continue
+
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": pos.symbol,
+            "volume": pos.volume,
+            "type": order_type,
+            "position": pos.ticket,
+            "price": price,
+            "deviation": 20,
+            "magic": 123456,
+            "comment": "auto-close by symbol"
+        }
+
+        result = mt5.order_send(request)
+        if result is None or result.retcode != mt5.TRADE_RETCODE_DONE:
+            errors.append({"ticket": pos.ticket, "result": result._asdict() if result else None})
+        else:
+            closed.append({
+                "ticket": pos.ticket,
+                "symbol": pos.symbol,
+                "volume": pos.volume,
+                "price": price,
+                "retcode": result.retcode
+            })
+            log(f"✅ Ordine chiuso: ticket={pos.ticket}, symbol={pos.symbol}, volume={pos.volume}")
+
+    return {"closed": closed, "errors": errors}
+
+
 # crea un ordine
 @app.post("/order")
 def send_order(order: dict):

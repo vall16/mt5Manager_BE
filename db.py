@@ -1215,7 +1215,7 @@ def close_order_on_slave(payload: CloseOrderPayload):
     log(f"Simbolo da chiudere: {symbol}")
 
     # 4️⃣ Prepara richiesta chiusura ordine
-    close_order_url = f"{base_url_slave}/close_order"
+    close_order_url = f"{base_url_slave}/close_order_by_symbol"  # <- cambiato solo questo
     payload_order = {"symbol": symbol}
 
     log(f"📤 Invio richiesta chiusura ordine → {close_order_url}")
@@ -1233,15 +1233,6 @@ def close_order_on_slave(payload: CloseOrderPayload):
         log(f"❌ Errore invio richiesta chiusura ordine: {e}")
         return {"status": "ko", "message": str(e), "logs": logs}
 
-    cursor.close()
-    conn.close()
-
-    return {
-        "status": "ok",
-        "message": f"Ordine {symbol} chiuso sullo SLAVE",
-        "result": result,
-        "logs": logs
-    }
 
 if __name__ == "__main__":
     create_user("roberto", "roberto123")
