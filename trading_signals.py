@@ -16,8 +16,8 @@ router = APIRouter()
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 TRADER_ID = 1
 # SYMBOL = "USDCAD"
-# SYMBOL = "EURUSD"
-SYMBOL = "XAUUSD"
+SYMBOL = "EURUSD"
+# SYMBOL = "XAUUSD"
 # SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
@@ -111,6 +111,8 @@ def check_signal():
     if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
 
         current_signal = "BUY"
+        previous_signal = current_signal  # aggiorna prima di uscire
+
 
         log("───────S-I-G-N-A-L──────────")
         log(f"🔥 [{now}] BUY signal per {SYMBOL} !")
@@ -136,6 +138,7 @@ def check_signal():
                     # Se c'è già il simbolo  non inviare nuovo ordine
                     if any(p["symbol"] == SYMBOL for p in positions):
                         log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
+                        
                         return
 
         except requests.exceptions.RequestException as e:
@@ -156,7 +159,9 @@ def check_signal():
         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
 
         # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
-        # close_slave_position()close_slave_position()
+        # Log dello stato precedente e attuale
+        log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
+
         if previous_signal == "BUY":
             log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
             close_slave_position()
