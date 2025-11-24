@@ -28,8 +28,11 @@ PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 current_signal = "HOLD"
 previous_signal = "HOLD"
 
-polling_thread = None
+# polling_thread = None
 polling_running = False
+
+polling_timer = None  # riferimento al Timer
+
 
 
 # def normalize(d):
@@ -39,6 +42,18 @@ polling_running = False
 # =========================
 # Funzioni indicatori
 # =========================
+def polling_loop_timer():
+    global polling_timer, polling_running
+    if not polling_running:
+        return  # stop se il polling è stato fermato
+
+    check_signal()
+    
+    # richiama se stesso dopo CHECK_INTERVAL secondi
+    polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
+    polling_timer.daemon = True
+    polling_timer.start()
+
 def get_data(symbol, timeframe, n_candles):
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
 
@@ -78,6 +93,7 @@ def check_signal():
 
     positions = []   # ← SEMPRE nella prima riga
 
+    # blocco inizialize che sembra rallentare ...
     if not mt5.initialize():
         print("Errore MT5:", mt5.last_error())
         return
@@ -152,25 +168,40 @@ def check_signal():
 
 # Polling in background
 def polling_loop():
+    log("▶️ Polling loop partito")
+
     while True:
         check_signal()
         time.sleep(CHECK_INTERVAL)
 
 # chiamata da FE
+# @router.post("/start_polling")
+# def start_polling():
+#     global polling_thread, polling_running
+
+#     if polling_running:
+#         return {"status": "already_running", "message": "Polling già attivo"}
+
+#     polling_running = True
+#     polling_thread = threading.Thread(target=polling_loop, daemon=True)
+#     polling_thread.start()
+
+#     log("▶️ Polling avviato manualmente dal frontend!")
+#     return {"status": "started"}
+
+
 @router.post("/start_polling")
 def start_polling():
-    global polling_thread, polling_running
+    global polling_running, polling_timer
 
     if polling_running:
         return {"status": "already_running", "message": "Polling già attivo"}
 
     polling_running = True
-    polling_thread = threading.Thread(target=polling_loop, daemon=True)
-    polling_thread.start()
+    polling_loop_timer()  # avvia subito il ciclo
 
     log("▶️ Polling avviato manualmente dal frontend!")
     return {"status": "started"}
-
 
 # threading.Thread(target=start_polling, daemon=True).start()
 # @router.on_event("startup")

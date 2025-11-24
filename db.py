@@ -1117,7 +1117,7 @@ def open_order_on_slave(payload: OrderPayload):
     # 5️⃣ Prepara ordine
     order_request = {
         "symbol": symbol,
-        "volume": volume * 5,
+        "volume": volume,
         "type": order_type.lower(),
         "price": price,
         # "price": 0.0,
