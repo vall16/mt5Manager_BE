@@ -208,6 +208,22 @@ def start_polling():
     log("▶️ Polling avviato manualmente dal frontend!")
     return {"status": "started"}
 
+@router.post("/stop_polling")
+def stop_polling():
+    global polling_running, polling_timer
+
+    if not polling_running:
+        return {"status": "not_running", "message": "Polling non è attivo"}
+
+    polling_running = False
+
+    if polling_timer:
+        polling_timer.cancel()
+        polling_timer = None
+
+    log("⏹️ Polling fermato manualmente dal frontend!")
+    return {"status": "stopped"}
+
 # threading.Thread(target=start_polling, daemon=True).start()
 # @router.on_event("startup")
 # def on_startup():
