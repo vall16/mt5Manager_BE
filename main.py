@@ -10,7 +10,7 @@ import requests
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
-from trading_signals import router as app_router
+from trading_signals import router as trade_router
 # from trading_signals import start_polling
 
 # MT5_API_URL = "http://127.0.0.1:8081"
@@ -41,7 +41,7 @@ app.add_middleware(
 # --- ROUTERS /db e /mt5 e /app sono i prefissi da aggiungere alle chiamate FE---
 app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
-app.include_router(app_router, prefix="/app", tags=["AppTrader5"])
+app.include_router(trade_router, prefix="/trade", tags=["AppTrader5"])
 
 
 # --- STARTUP ---

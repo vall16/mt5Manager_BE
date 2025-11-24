@@ -21,12 +21,15 @@ SYMBOL = "XAUUSD"
 # SYMBOL = "USDCAD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
-CHECK_INTERVAL = 20  # secondi
+CHECK_INTERVAL = 10  # secondi
 PARAMETERS = {"EMA_short": 10, "EMA_long": 30, "RSI_period": 14}
 
 # Stato globale del segnale
 current_signal = "HOLD"
 previous_signal = "HOLD"
+
+polling_thread = None
+polling_running = False
 
 
 # def normalize(d):
@@ -142,23 +145,39 @@ def check_signal():
             log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
             close_slave_position()
      
-        # Aggiorna lo stato precedente
-        previous_signal = current_signal
+    # Aggiorna lo stato precedente
+    previous_signal = current_signal
 
     
 
 # Polling in background
-def start_polling():
+def polling_loop():
     while True:
         check_signal()
         time.sleep(CHECK_INTERVAL)
 
+# chiamata da FE
+@router.post("/start_polling")
+def start_polling():
+    global polling_thread, polling_running
+
+    if polling_running:
+        return {"status": "already_running", "message": "Polling già attivo"}
+
+    polling_running = True
+    polling_thread = threading.Thread(target=polling_loop, daemon=True)
+    polling_thread.start()
+
+    log("▶️ Polling avviato manualmente dal frontend!")
+    return {"status": "started"}
+
+
 # threading.Thread(target=start_polling, daemon=True).start()
-@router.on_event("startup")
-def on_startup():
-    # Lancia il polling in un thread separato solo all'avvio del server
-    threading.Thread(target=start_polling, daemon=True).start()
-    print("✅ Polling thread avviato all'avvio del server")
+# @router.on_event("startup")
+# def on_startup():
+#     # Lancia il polling in un thread separato solo all'avvio del server
+#     threading.Thread(target=start_polling, daemon=True).start()
+#     print("✅ Polling thread avviato all'avvio del server")
 
 
 # Endpoint per il frontend
