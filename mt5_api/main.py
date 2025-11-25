@@ -134,6 +134,44 @@ def get_positions():
         raise HTTPException(status_code=400, detail="Cannot get positions")
     return [p._asdict() for p in positions]
 
+
+@app.get("/symbols/active")
+def get_active_symbols():
+    """
+    Restituisce tutti i simboli attivi (trade_mode = FULL).
+    Li abilita nel Market Watch.
+    Perfetto per dropdown lato frontend.
+    """
+    info = mt5.terminal_info()
+    if info is None:
+        raise HTTPException(status_code=500, detail="MT5 non inizializzato. Prima usa /init-mt5.")
+
+    symbols = mt5.symbols_get()
+    if symbols is None:
+        raise HTTPException(status_code=500, detail=f"symbols_get() failed: {mt5.last_error()}")
+
+    active_symbols = []
+
+    for s in symbols:
+        if s.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL:
+            # assicura visibilità nel Market Watch
+            mt5.symbol_select(s.name, True)
+
+            active_symbols.append({
+                "symbol": s.name,
+                "spread": s.spread,
+                "digits": s.digits,
+                "point": s.point
+            })
+
+    active_symbols.sort(key=lambda x: x["symbol"])  # ordinati alfabeticamente
+
+    return {
+        "count": len(active_symbols),
+        "symbols": active_symbols
+    }
+
+
 @app.get("/symbol_info/{symbol}")
 def get_symbol_info(symbol: str):
     info = mt5.symbol_info(symbol)
