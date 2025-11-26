@@ -4,7 +4,10 @@ from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
 from logger import log, logs
-
+from db import get_trader, get_connection
+from models import (
+    Trader
+)
 import pandas as pd
 import threading
 import time
@@ -15,10 +18,11 @@ router = APIRouter()
 
 BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
 TRADER_ID = 1
+CURRENT_TRADER: Trader | None = None
 # SYMBOL = "USDCAD"
-SYMBOL = "EURUSD"
-# SYMBOL = "XAUUSD"
-# SYMBOL = "USDCAD"
+# SYMBOL = "EURUSD"
+# SYMBOL = "MSFT"
+SYMBOL = "XAUUSD"
 TIMEFRAME = mt5.TIMEFRAME_M5
 N_CANDLES = 50
 CHECK_INTERVAL = 10  # secondi
@@ -33,6 +37,7 @@ polling_running = False
 
 polling_timer = None  # riferimento al Timer
 
+base_url_slave = "http://127.0.0.1:9001"
 
 
 # def normalize(d):
@@ -53,6 +58,8 @@ def polling_loop_timer():
     polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
     polling_timer.daemon = True
     polling_timer.start()
+
+
 
 def get_data(symbol, timeframe, n_candles):
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
@@ -119,7 +126,7 @@ def check_signal():
 
         # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
                 
-        base_url_slave = "http://127.0.0.1:9001"
+        # base_url_slave = "http://127.0.0.1:9001"
 
         try:
                 positions_url = f"{base_url_slave}/positions"
@@ -154,6 +161,7 @@ def check_signal():
             send_buy_to_slave()
 
     else:
+        # send_buy_to_slave()
         current_signal = "HOLD"
         log("───────S-I-G-N-A-L──────────")
         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
@@ -179,25 +187,14 @@ def polling_loop():
         check_signal()
         time.sleep(CHECK_INTERVAL)
 
-# chiamata da FE
-# @router.post("/start_polling")
-# def start_polling():
-#     global polling_thread, polling_running
-
-#     if polling_running:
-#         return {"status": "already_running", "message": "Polling già attivo"}
-
-#     polling_running = True
-#     polling_thread = threading.Thread(target=polling_loop, daemon=True)
-#     polling_thread.start()
-
-#     log("▶️ Polling avviato manualmente dal frontend!")
-#     return {"status": "started"}
-
 
 @router.post("/start_polling")
-def start_polling():
-    global polling_running, polling_timer
+def start_polling(trader:Trader):
+    
+    global polling_running, polling_timer,CURRENT_TRADER
+
+    # Salva il trader globale
+    CURRENT_TRADER = trader
 
     if polling_running:
         return {"status": "already_running", "message": "Polling già attivo"}
@@ -238,12 +235,76 @@ def get_signal():
     return {"signal": current_signal}
 
 def send_buy_to_slave():
-    url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
+
+    # conn = get_connection()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Database connection failed")
+
+    # cursor = conn.cursor(dictionary=True)
+    # # Recupera il trader dal DB
+    # trader = get_trader(cursor,TRADER_ID)
+    # if not trader:
+    #     log(f"❌ Trader {TRADER_ID} non trovato")
+    #     return
+    
+    # sl_raw = trader.get("sl")
+    # stop_loss = float(sl_raw) if sl_raw is not None else None
+    info_url = f"{base_url_slave}/symbol_info/{SYMBOL}"
+    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+    
+    resp = requests.get(info_url, timeout=10)
+
+    sym_info = resp.json()
+
+    # Prendi lo stop loss dal trader, se presente
+     # 🔹 2️⃣ Recupero tick dal server slave via API
+    tick_url = f"{base_url_slave}/symbol_tick/{SYMBOL}"
+    log(f"📡 Richiedo tick allo slave: {tick_url}")
+
+            
+    resp_tick = requests.get(tick_url, timeout=10)
+    if resp_tick.status_code != 200:
+        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave: {resp_tick.text}")
+        # continue
+
+    tick = resp_tick.json()
+    if not tick or "bid" not in tick or "ask" not in tick:
+        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
+        # continue
+
+    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
+
+            # --- CALCOLO SL IN PIP ---
+    sl_pips =  CURRENT_TRADER.sl
+    # valore pip inserito dal trader nell'app (es. 10)
+
+    if sl_pips and float(sl_pips) > 0:
+        pip_value = float(sym_info.get("point"))  # valore del singolo punto del simbolo
+        sl_distance = float(sl_pips) * pip_value
+
+        # if order_type == "buy":
+            # SL sotto il prezzo ask
+        calculated_sl = tick["ask"] - sl_distance
+        # else:
+        #     # SL sopra il prezzo bid (per SELL)
+        #     calculated_sl = tick["bid"] + sl_distance
+    else:
+        calculated_sl = None  # se sl=0 non imposta SL
+
+    sl_value = calculated_sl
+    tp_value = CURRENT_TRADER.tp
+    trader_id = CURRENT_TRADER.id
+
+    # url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
-         "trader_id": TRADER_ID,
+         "trader_id": trader_id,
         "order_type": "buy",
         "volume": 0.10,
-        "symbol": SYMBOL        
+        "symbol": SYMBOL,
+        "sl":sl_value,
+        "tp": tp_value,
+
     }
 
     log(f"📤 Invio BUY [symbol={SYMBOL}] allo SLAVE → {url} ")

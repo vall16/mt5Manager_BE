@@ -134,8 +134,45 @@ def get_positions():
         raise HTTPException(status_code=400, detail="Cannot get positions")
     return [p._asdict() for p in positions]
 
-
 @app.get("/symbols/active")
+def get_active_symbols():
+    """
+    Restituisce SOLO i simboli:
+    - già presenti nel Market Watch (selected=True)
+    - tradabili (trade_mode = FULL)
+    NON modifica la visibilità dei simboli.
+    """
+    info = mt5.terminal_info()
+    if info is None:
+        raise HTTPException(status_code=500, detail="MT5 non inizializzato. Prima usa /init-mt5.")
+
+    symbols = mt5.symbols_get()
+    if symbols is None:
+        raise HTTPException(status_code=500, detail=f"symbols_get() failed: {mt5.last_error()}")
+
+    active_symbols = []
+
+    for s in symbols:
+        if s.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL and s.select:  # ← GIÀ visibile
+            active_symbols.append({
+                "symbol": s.name,
+                "base": s.currency_base,
+                "profit": s.currency_profit,
+                "spread": s.spread,
+                "digits": s.digits,
+                "point": s.point
+            })
+
+    active_symbols.sort(key=lambda x: x["symbol"])
+
+    return {
+        "count": len(active_symbols),
+        "symbols": active_symbols
+    }
+
+
+
+@app.get("/symbols/MWactive")
 def get_active_symbols():
     """
     Restituisce tutti i simboli attivi (trade_mode = FULL).

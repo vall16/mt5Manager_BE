@@ -1160,3 +1160,187 @@
 2025-11-25 10:31:17,504 - INFO - Starting API
 2025-11-25 10:31:18,518 - INFO - Starting API
 2025-11-25 10:31:18,653 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 10:59:59,216 - INFO - Starting API
+2025-11-25 10:59:59,624 - INFO - Starting API
+2025-11-25 10:59:59,710 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 11:05:49,101 - INFO - Starting API
+2025-11-25 11:05:49,435 - INFO - Starting API
+2025-11-25 11:05:49,462 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 11:21:04,728 - INFO - Starting API
+2025-11-25 11:21:05,043 - INFO - Starting API
+2025-11-25 11:21:05,093 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 11:21:21,875 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /login (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001FE0B74DF30>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 11:23:59,683 - INFO - Starting API
+2025-11-25 11:24:00,021 - INFO - Starting API
+2025-11-25 11:24:00,063 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 11:24:32,922 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /login (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000023609F29350>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 14:39:08,786 - INFO - Starting API
+2025-11-25 14:39:09,292 - INFO - Starting API
+2025-11-25 14:39:09,320 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 14:39:50,514 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /login (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000023A05D15A70>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 14:56:45,827 - INFO - Starting API
+2025-11-25 14:56:47,406 - INFO - Starting API
+2025-11-25 14:56:47,577 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:23:04,392 - INFO - Starting API
+2025-11-25 15:23:05,076 - INFO - Starting API
+2025-11-25 15:23:05,105 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:23:36,990 - ERROR - Unhandled exception: get_trader() missing 1 required positional argument: 'trader_id'
+2025-11-25 15:29:18,780 - INFO - Starting API
+2025-11-25 15:29:19,471 - INFO - Starting API
+2025-11-25 15:29:19,509 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:29:42,639 - ERROR - Unhandled exception: Object of type Decimal is not JSON serializable
+2025-11-25 15:32:17,198 - INFO - Starting API
+2025-11-25 15:32:18,430 - INFO - Starting API
+2025-11-25 15:32:18,460 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:33:37,267 - INFO - Starting API
+2025-11-25 15:33:37,929 - INFO - Starting API
+2025-11-25 15:33:38,030 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:34:59,859 - INFO - Starting API
+2025-11-25 15:35:00,501 - INFO - Starting API
+2025-11-25 15:35:00,580 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:38:28,383 - INFO - Starting API
+2025-11-25 15:38:29,064 - INFO - Starting API
+2025-11-25 15:38:29,197 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 15:39:13,141 - INFO - Starting API
+2025-11-25 15:39:13,548 - INFO - Starting API
+2025-11-25 15:39:13,594 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:02:23,113 - INFO - Starting API
+2025-11-25 16:02:23,852 - INFO - Starting API
+2025-11-25 16:02:24,006 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:05:52,932 - INFO - Starting API
+2025-11-25 16:05:53,464 - INFO - Starting API
+2025-11-25 16:05:53,496 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:07:56,825 - INFO - Starting API
+2025-11-25 16:07:57,388 - INFO - Starting API
+2025-11-25 16:07:57,417 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:17:38,765 - INFO - Starting API
+2025-11-25 16:17:39,424 - INFO - Starting API
+2025-11-25 16:17:39,469 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:22:57,054 - INFO - Starting API
+2025-11-25 16:22:57,755 - INFO - Starting API
+2025-11-25 16:22:57,786 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:30:45,713 - INFO - Starting API
+2025-11-25 16:30:46,218 - INFO - Starting API
+2025-11-25 16:30:46,262 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:36:26,366 - INFO - Starting API
+2025-11-25 16:36:26,952 - INFO - Starting API
+2025-11-25 16:36:26,988 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:39:53,646 - INFO - Starting API
+2025-11-25 16:39:54,344 - INFO - Starting API
+2025-11-25 16:39:54,415 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:51:09,913 - INFO - Starting API
+2025-11-25 16:51:10,542 - INFO - Starting API
+2025-11-25 16:51:10,573 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 16:58:41,548 - INFO - Starting API
+2025-11-25 16:58:42,264 - INFO - Starting API
+2025-11-25 16:58:42,488 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 17:02:31,473 - INFO - Starting API
+2025-11-25 17:02:32,122 - INFO - Starting API
+2025-11-25 17:02:32,157 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 17:02:47,110 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000027080555E80>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 17:20:07,252 - INFO - Starting API
+2025-11-25 17:20:07,647 - INFO - Starting API
+2025-11-25 17:20:07,689 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 17:20:22,640 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000219BB19C2D0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 17:40:17,625 - INFO - Starting API
+2025-11-25 17:40:18,114 - INFO - Starting API
+2025-11-25 17:40:18,155 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 17:40:38,194 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001833DA6C2D0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 17:48:04,403 - INFO - Starting API
+2025-11-25 17:48:05,077 - INFO - Starting API
+2025-11-25 17:48:05,127 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 17:50:08,409 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000026A40213D90>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 17:52:00,327 - INFO - Starting API
+2025-11-25 17:52:00,756 - INFO - Starting API
+2025-11-25 17:52:00,797 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 21:20:51,233 - INFO - Starting API
+2025-11-25 21:20:52,712 - INFO - Starting API
+2025-11-25 21:20:52,786 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 21:42:46,212 - INFO - Starting API
+2025-11-25 21:42:46,921 - INFO - Starting API
+2025-11-25 21:42:46,982 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 21:59:05,383 - INFO - Starting API
+2025-11-25 21:59:05,993 - INFO - Starting API
+2025-11-25 21:59:06,041 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 22:11:59,424 - INFO - Starting API
+2025-11-25 22:12:00,198 - INFO - Starting API
+2025-11-25 22:12:00,266 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-25 22:12:19,432 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/MSFT (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000285EDF7C410>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-25 22:20:37,995 - INFO - Starting API
+2025-11-25 22:20:38,688 - INFO - Starting API
+2025-11-25 22:20:38,724 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 10:17:49,907 - INFO - Starting API
+2025-11-26 10:17:50,298 - INFO - Starting API
+2025-11-26 10:17:50,336 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 10:18:09,649 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002A2D500C550>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-26 10:34:43,264 - INFO - Starting API
+2025-11-26 10:34:43,879 - INFO - Starting API
+2025-11-26 10:34:43,908 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 10:54:54,020 - INFO - Starting API
+2025-11-26 10:54:55,254 - INFO - Starting API
+2025-11-26 10:54:55,288 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:12:59,926 - INFO - Starting API
+2025-11-26 11:13:01,806 - INFO - Starting API
+2025-11-26 11:13:01,845 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:13:33,694 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002B1BF928550>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-26 11:23:59,815 - INFO - Starting API
+2025-11-26 11:24:01,827 - INFO - Starting API
+2025-11-26 11:24:01,906 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:30:37,238 - INFO - Starting API
+2025-11-26 11:30:37,569 - INFO - Starting API
+2025-11-26 11:30:37,600 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:30:57,685 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:07,785 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:17,892 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:28,096 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:38,272 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:48,385 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:31:59,587 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:32:10,400 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:32:21,049 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:33:31,872 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:33:42,488 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:33:52,590 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:02,933 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:13,078 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:23,195 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:33,410 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:43,541 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:34:53,614 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:03,688 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:13,809 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:23,923 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:34,026 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:44,131 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:35:54,246 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:04,383 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:14,491 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:24,592 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:34,736 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:45,054 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:36:55,260 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:05,386 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:15,495 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:25,671 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:35,745 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:46,411 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:37:56,844 - ERROR - Validation error: [{'type': 'float_type', 'loc': ('body', 'sl'), 'msg': 'Input should be a valid number', 'input': None}] for body {"trader_id": 1, "order_type": "buy", "volume": 0.1, "symbol": "XAUUSD", "sl": null, "tp": 200.0}
+2025-11-26 11:43:48,433 - INFO - Starting API
+2025-11-26 11:43:48,832 - INFO - Starting API
+2025-11-26 11:43:49,004 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:44:38,842 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020266FF87D0>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-26 11:49:51,478 - INFO - Starting API
+2025-11-26 11:49:51,900 - INFO - Starting API
+2025-11-26 11:49:51,929 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 11:55:51,374 - INFO - Starting API
+2025-11-26 11:55:51,734 - INFO - Starting API
+2025-11-26 11:55:51,768 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 12:01:04,196 - INFO - Starting API
+2025-11-26 12:01:04,551 - INFO - Starting API
+2025-11-26 12:01:04,583 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 12:13:45,194 - INFO - Starting API
+2025-11-26 12:13:45,646 - INFO - Starting API
+2025-11-26 12:13:45,674 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-26 12:28:21,677 - INFO - Starting API
+2025-11-26 12:28:22,547 - INFO - Starting API
+2025-11-26 12:28:22,590 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
