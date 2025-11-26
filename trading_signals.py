@@ -291,11 +291,25 @@ def send_buy_to_slave():
     else:
         calculated_sl = None  # se sl=0 non imposta SL
 
+    tp_pips = CURRENT_TRADER.tp  # pips inseriti dall'app
+    pip_value = float(sym_info.get("point"))
+
+    if tp_pips and float(tp_pips) > 0:
+        tp_distance = float(tp_pips) * pip_value
+        # if order_type == "buy":
+        calculated_tp = tick["ask"] + tp_distance
+        # else:
+        #     calculated_tp = tick["bid"] - tp_distance
+    else:
+        calculated_tp = None  # se TP=0 non impostare TP
+
+
     sl_value = calculated_sl
-    tp_value = CURRENT_TRADER.tp
+    tp_value = calculated_tp
     trader_id = CURRENT_TRADER.id
 
-    # url = f"{BASE_URL}/db/traders/{TRADER_ID}/open_order_on_slave"
+    log(f"SL = {sl_value}, TP = {tp_value}")
+
     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
          "trader_id": trader_id,
