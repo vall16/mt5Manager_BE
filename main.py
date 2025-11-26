@@ -78,5 +78,11 @@ def root():
 # --- RUN SERVER ---
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8080)
+
+    load_dotenv()  # legge il file .env
+
+    HOST = os.getenv("API_HOST")  # default localhost
+    PORT = int(os.getenv("API_PORT"))    # default 8080
+
+    uvicorn.run("main:app", host=HOST, port=PORT)
     # uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True)
