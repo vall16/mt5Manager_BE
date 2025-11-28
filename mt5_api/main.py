@@ -62,7 +62,7 @@ def startup_event():
     """
 
     import sys
-    import MetaTrader5 as mt5
+    # import MetaTrader5 as mt5
 
 
 @app.on_event("shutdown")
@@ -422,7 +422,7 @@ def send_order(order: dict):
         detail=f"MT5 order_send() returned None, error: {err}"
     )
     else:
-        log("✅ Ordine inviato:", result)
+        log(f"✅ Ordine inviato:{result}")
 
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:

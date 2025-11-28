@@ -290,10 +290,20 @@ def polling_loop():
 @router.post("/start_polling")
 def start_polling(trader:Trader):
     
-    global polling_running, polling_timer,CURRENT_TRADER
+    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL
+
+    print(">>> start_polling CHIAMATO, trader =", trader)
 
     # Salva il trader globale
     CURRENT_TRADER = trader
+
+    try:
+        CHECK_INTERVAL = int(trader.customSignalInterval)
+    except:
+        CHECK_INTERVAL = 2
+
+
+    print(CHECK_INTERVAL)
 
     if polling_running:
         return {"status": "already_running", "message": "Polling già attivo"}
@@ -427,6 +437,8 @@ def send_buy_to_slave():
         log(f"📥 Risposta SLAVE: {resp.text}")
     except requests.RequestException as e:
         log(f"❌ Errore invio ordine: {e}")
+
+
 
 def close_slave_position():
     url = f"{BASE_URL}/db/traders/{TRADER_ID}/close_order_on_slave"

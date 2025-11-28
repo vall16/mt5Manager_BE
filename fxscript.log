@@ -1,36 +1,40 @@
-2025-11-26 14:54:03,238 - INFO - Starting API
-2025-11-26 14:54:03,936 - INFO - Starting API
-2025-11-26 14:54:04,090 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 14:59:53,425 - INFO - Starting API
-2025-11-26 14:59:54,280 - INFO - Starting API
-2025-11-26 14:59:54,396 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 15:00:40,956 - INFO - Starting API
-2025-11-26 15:00:41,714 - INFO - Starting API
-2025-11-26 15:00:41,755 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 15:09:42,606 - INFO - Starting API
-2025-11-26 15:09:43,487 - INFO - Starting API
-2025-11-26 15:09:43,628 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 15:44:56,686 - INFO - Starting API
-2025-11-26 15:44:57,563 - INFO - Starting API
-2025-11-26 15:44:57,803 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 16:10:37,339 - INFO - Starting API
-2025-11-26 16:10:38,073 - INFO - Starting API
-2025-11-26 16:10:38,175 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 16:13:46,221 - INFO - Starting API
-2025-11-26 16:13:46,615 - INFO - Starting API
-2025-11-26 16:13:46,693 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 16:15:17,107 - INFO - Starting API
-2025-11-26 16:15:17,530 - INFO - Starting API
-2025-11-26 16:15:17,591 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 16:17:43,096 - INFO - Starting API
-2025-11-26 16:17:43,614 - INFO - Starting API
-2025-11-26 16:17:43,679 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 17:01:58,775 - INFO - Starting API
-2025-11-26 17:01:59,363 - INFO - Starting API
-2025-11-26 17:01:59,408 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 17:19:42,301 - INFO - Starting API
-2025-11-26 17:19:42,712 - INFO - Starting API
-2025-11-26 17:19:42,780 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
-2025-11-26 17:21:34,349 - INFO - Starting API
-2025-11-26 17:21:35,545 - INFO - Starting API
-2025-11-26 17:21:35,684 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-27 14:39:00,131 - INFO - Starting API
+2025-11-27 14:39:00,872 - INFO - Starting API
+2025-11-27 14:39:01,017 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-27 15:54:09,459 - INFO - Starting API
+2025-11-27 15:54:10,571 - INFO - Starting API
+2025-11-27 15:54:10,613 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-27 16:12:02,199 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=9001): Max retries exceeded with url: /symbol_info/XAUUSD (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000110A34A8410>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-11-27 17:12:28,572 - INFO - Starting API
+2025-11-27 17:12:29,172 - INFO - Starting API
+2025-11-27 17:12:29,295 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-27 17:16:49,822 - INFO - Starting API
+2025-11-27 17:16:50,342 - INFO - Starting API
+2025-11-27 17:16:50,428 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-27 22:44:15,307 - ERROR - Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\crist\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\crist\AppData\Local\Programs\Python\Python313\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] Connessione in corso interrotta forzatamente dall'host remoto
+2025-11-27 22:44:15,449 - ERROR - Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\crist\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\crist\AppData\Local\Programs\Python\Python313\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] Connessione in corso interrotta forzatamente dall'host remoto
+2025-11-28 10:11:17,162 - INFO - Starting API
+2025-11-28 10:11:17,806 - INFO - Starting API
+2025-11-28 10:11:17,853 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:16:03,656 - INFO - Starting API
+2025-11-28 10:16:14,595 - INFO - Starting API
+2025-11-28 10:16:16,165 - INFO - Starting API
+2025-11-28 10:16:16,410 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
