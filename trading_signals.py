@@ -149,7 +149,7 @@ def check_signal_new():
         previous_signal = current_signal
 
         log("───────S-I-G-N-A-L──────────")
-        log(f"\n🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
+        log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
 
         # Recupera posizioni SLAVE
         try:

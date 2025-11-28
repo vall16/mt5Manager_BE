@@ -1151,7 +1151,7 @@ def open_order_on_slave(payload: OrderPayload):
     log(f"📤 Invio ordine allo SLAVE → {order_url}")
     # log(json.dumps(order_request, indent=2))
     # log(pformat(order_request))
-    log("🧾 Dati inviati:\n" + pformat(order_request))
+    log("🧾 Dati inviati:" + pformat(order_request))
 
 
     
