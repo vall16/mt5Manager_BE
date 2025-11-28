@@ -3,7 +3,7 @@ import json
 from logging import info
 
 from pydantic import BaseModel
-from logger import log, logs
+from logger import log, logs, safe_get,safe_post
 from typing import List, Optional
 import uuid
 import mysql.connector
@@ -55,7 +55,7 @@ def ensure_mt5_initialized(base_url: str, mt5_path: str, log=print):
     log(f"🔍 Controllo MT5 remoto su {health_url}...")
 
     try:
-        resp = requests.get(health_url, timeout=5)
+        resp = safe_get(health_url, timeout=5)
     except Exception as e:
         # raise Exception(f"❌ Terminale non raggiungibile ({base_url}): {e}")
         log(f"❌ Terminale non raggiungibile ({base_url}): {e}")
@@ -625,7 +625,7 @@ def copy_orders(trader_id: int):
         positions_url = f"{base_url_master}/positions"
         log(f"🔹 Recupero posizioni dal master via {positions_url}")
 
-        resp = requests.get(positions_url, timeout=10)
+        resp = safe_get(positions_url, timeout=10)
         if resp.status_code != 200:
             log(f"❌ Errore API master: {resp.text}")
             raise HTTPException(status_code=resp.status_code, detail=f"Errore dal master API: {resp.text}")
@@ -719,7 +719,7 @@ def copy_orders(trader_id: int):
             info_url = f"{base_url}/symbol_info/{symbol}"
             log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
             
-            resp = requests.get(info_url, timeout=10)
+            resp = safe_get(info_url, timeout=10)
 
             sym_info = resp.json()
 
@@ -739,7 +739,7 @@ def copy_orders(trader_id: int):
                         log(f"🔄 Tentativo 2: provo simbolo normalizzato '{normalized_symbol}'...")
                         info_url = f"{base_url}/symbol_info/{normalized_symbol}"
                         try:
-                            resp = requests.get(info_url, timeout=10)
+                            resp = safe_get(info_url, timeout=10)
                             sym_info = resp.json()
                         except Exception as e:
                             log(f"⚠️ Errore richiesta info simbolo normalizzato {normalized_symbol}: {e}")
@@ -764,7 +764,7 @@ def copy_orders(trader_id: int):
             log(f"📡 Richiedo tick allo slave: {tick_url}")
 
             
-            resp_tick = requests.get(tick_url, timeout=10)
+            resp_tick = safe_get(tick_url, timeout=10)
             if resp_tick.status_code != 200:
                 log(f"⚠️ Nessun tick disponibile per {symbol} dallo slave: {resp_tick.text}")
                 continue
@@ -972,7 +972,7 @@ def copy_orders(trader_id: int):
 def get_master_positions(master_base_url):
     url = f"{master_base_url}/positions"
     log(f"🔹 Recupero posizioni master: {url}")
-    resp = requests.get(url, timeout=10)
+    resp = safe_get(url, timeout=10)
     if resp.status_code != 200:
         raise Exception(f"❌ Errore API master: {resp.text}")
     return resp.json()
@@ -981,7 +981,7 @@ def get_slave_positions(slave_base_url):
     url = f"{slave_base_url}/positions"
     log(f"🔹 Recupero posizioni slave: {url}")
 
-    resp = requests.get(url, timeout=10)
+    resp = safe_get(url, timeout=10)
     if resp.status_code != 200:
         raise Exception(f"❌ Errore API slave: {resp.text}")
     return resp.json()
@@ -1120,7 +1120,7 @@ def open_order_on_slave(payload: OrderPayload):
 
 
     log(f"📡 Richiedo tick dello SLAVE: {tick_url}")
-    resp_tick = requests.get(tick_url, timeout=10)
+    resp_tick = safe_get(tick_url, timeout=10)
 
     if resp_tick.status_code != 200:
         log(f"🔎 Verifica simbolo sullo SLAVE: {symbol}")

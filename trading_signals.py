@@ -4,6 +4,7 @@ from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
 from logger import log, logs
+from logger import safe_get
 from db import get_trader, get_connection
 from models import (
     Trader
@@ -154,7 +155,8 @@ def check_signal_new():
         try:
             positions_url = f"{base_url_slave}/positions"
             log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
-            resp = requests.get(positions_url, timeout=10)
+            # resp = (positions_url, timeout=10)
+            resp = safe_get(positions_url, timeout=10)
             resp.raise_for_status()
             positions = resp.json()
 
@@ -229,7 +231,15 @@ def check_signal():
                 positions_url = f"{base_url_slave}/positions"
                 log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
 
-                resp = requests.get(positions_url, timeout=10)
+                resp = safe_get(positions_url, timeout=10)
+
+                # ⛔ SE SAFE_GET FALLISCE → resp è None → esci subito
+                if resp is None:
+                    log("❌ Slave offline → esco da check_signal()")
+                    return
+
+
+
                 resp.raise_for_status()
                 positions = resp.json()
 
@@ -262,7 +272,7 @@ def check_signal():
         current_signal = "HOLD"
         log("───────S-I-G-N-A-L──────────")
         # log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
-        log(f"\n⚠️  [{now}] HOLD signal per {SYMBOL} ...")
+        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
 
 
         # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
@@ -361,7 +371,7 @@ def send_buy_to_slave():
     info_url = f"{base_url_slave}/symbol_info/{SYMBOL}"
     log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
     
-    resp = requests.get(info_url, timeout=10)
+    resp = safe_get(info_url, timeout=10)
 
     sym_info = resp.json()
 
@@ -371,7 +381,7 @@ def send_buy_to_slave():
     log(f"📡 Richiedo tick allo slave: {tick_url}")
 
             
-    resp_tick = requests.get(tick_url, timeout=10)
+    resp_tick = safe_get(tick_url, timeout=10)
     if resp_tick.status_code != 200:
         log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave: {resp_tick.text}")
         # continue

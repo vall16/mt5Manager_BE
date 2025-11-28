@@ -1,4 +1,5 @@
 # mt5_api.py: sta su ogni SERVER su cui viene istanziato mt5
+from contextlib import asynccontextmanager
 from datetime import datetime
 import os
 import MetaTrader5 as mt5
@@ -52,22 +53,56 @@ def init_mt5(req: InitRequest):
 
     return {"status": "ok", "message": f"MT5 inizializzato", "version": version, "path": req.path}
 
-@app.on_event("startup")
-def startup_event():
+# @app.on_event("startup")
+# def startup_event():
+#     """
+#     Evento di startup di FastAPI:
+#     - Recupera il percorso del terminale MT5 dai parametri da linea di comando (sys.argv)
+#     - Inizializza MetaTrader 5 con il path fornito
+#     - Solleva un errore se l'inizializzazione fallisce
+#     """
+
+#     import sys
+#     # import MetaTrader5 as mt5
+
+
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     mt5.shutdown()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
-    Evento di startup di FastAPI:
-    - Recupera il percorso del terminale MT5 dai parametri da linea di comando (sys.argv)
-    - Inizializza MetaTrader 5 con il path fornito
-    - Solleva un errore se l'inizializzazione fallisce
+    Lifespan event handler:
+    - Startup: inizializza MT5 se specificato nei parametri CLI
+    - Shutdown: chiude MT5
     """
+    log("🟢 API avviata, inizio lifespan")
 
-    import sys
-    # import MetaTrader5 as mt5
+    # Startup
+    if len(sys.argv) >= 2:
+        mt5_path = sys.argv[1]
+        if os.path.exists(mt5_path):
+            if not mt5.initialize(mt5_path):
+                err = mt5.last_error()
+                log(f"❌ Fallita inizializzazione MT5: {err}")
+            else:
+                CURRENT_PATH = mt5_path
+                version = ".".join(map(str, mt5.version()))
+                log(f"✅ MT5 inizializzato da lifespan al path {mt5_path} (versione {version})")
+        else:
+            log(f"❌ MT5 path non trovato: {mt5_path}")
+    else:
+        log("⚠️ Nessun MT5 path fornito come parametro, skip inizializzazione MT5")
 
+    yield  # qui FastAPI serve le richieste
 
-@app.on_event("shutdown")
-def shutdown_event():
-    mt5.shutdown()
+    # Shutdown
+    try:
+        mt5.shutdown()
+        log("🛑 MT5 chiuso correttamente al shutdown")
+    except Exception as e:
+        log(f"⚠️ Errore durante shutdown MT5: {e}")
+
 
 
 @app.post("/login")
