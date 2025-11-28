@@ -326,7 +326,7 @@ def insert_server(server: ServerRequest):
 
     except MySQLError as e:
         import traceback
-        print("\n❌ [ERRORE SQL MySQL]")
+        print("❌ [ERRORE SQL MySQL]")
         print("Codice errore:", e.errno)
         print("Dettaglio:", e.msg)
         traceback.print_exc()

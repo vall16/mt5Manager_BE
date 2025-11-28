@@ -3,29 +3,55 @@ from datetime import datetime
 # logger.py
 from pprint import pformat
 import time
+import sys
+import io
+
+# Forza stdout e stderr su UTF-8 (Windows)
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 
-
-start_time = datetime.now()
+# start_time = datetime.now()
 logs = []  # lista globale dei log
 
 
+# def log(message):
+#     global logs
+#     # converte in stringa leggibile
+#     if isinstance(message, dict):
+#         message = pformat(message)
+#     elif not isinstance(message, str):
+#         message = str(message)
+
+#     # timestamp relativo
+#     elapsed = (datetime.now() - start_time).total_seconds()
+#     timestamp = f"[+{elapsed:.1f}s]"
+
+#     for line in message.splitlines():
+#         line_to_print = f"{timestamp} {line}"
+#         logs.append(line_to_print)   # <-- mantiene lo storico
+#         print(line_to_print)
+
+start_time = time.time()
+
 def log(message):
-    global logs
-    # converte in stringa leggibile
-    if isinstance(message, dict):
+    global start_time
+    if isinstance(message, (dict, list)):
         message = pformat(message)
     elif not isinstance(message, str):
         message = str(message)
 
-    # timestamp relativo
-    elapsed = (datetime.now() - start_time).total_seconds()
+    # interpreta \n
+    # message = message.encode('utf-8').decode('unicode_escape')
+
+    elapsed = time.time() - start_time  # float - float
     timestamp = f"[+{elapsed:.1f}s]"
 
     for line in message.splitlines():
         line_to_print = f"{timestamp} {line}"
-        logs.append(line_to_print)   # <-- mantiene lo storico
+        logs.append(line_to_print)
         print(line_to_print)
+
 
 import requests
 
