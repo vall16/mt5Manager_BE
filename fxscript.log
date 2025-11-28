@@ -38,3 +38,45 @@ ConnectionResetError: [WinError 10054] Connessione in corso interrotta forzatame
 2025-11-28 10:16:14,595 - INFO - Starting API
 2025-11-28 10:16:16,165 - INFO - Starting API
 2025-11-28 10:16:16,410 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:22:01,193 - ERROR - Unhandled exception: 1 validation errors:
+  {'type': 'missing', 'loc': ('response', 0, 'customSignalInterval'), 'msg': 'Field required', 'input': {'id': 1, 'name': 'Trader_Alphaa', 'status': 'active', 'master_server_id': 37, 'slave_server_id': 42, 'sl': Decimal('150.00'), 'tp': Decimal('200.00'), 'tsl': Decimal('23.00'), 'moltiplicatore': Decimal('5.0000'), 'fix_lot': None, 'created_at': '2025-10-17T17:52:31', 'updated_at': '2025-11-27T14:39:11'}}
+
+2025-11-28 10:22:42,606 - INFO - Starting API
+2025-11-28 10:22:55,147 - INFO - Starting API
+2025-11-28 10:22:55,730 - INFO - Starting API
+2025-11-28 10:22:55,992 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:24:15,963 - INFO - Starting API
+2025-11-28 10:24:16,502 - INFO - Starting API
+2025-11-28 10:24:16,574 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:24:25,807 - ERROR - Unhandled exception: 1 validation errors:
+  {'type': 'missing', 'loc': ('response', 0, 'customSignalInterval'), 'msg': 'Field required', 'input': {'id': 1, 'name': 'Trader_Alphaa', 'status': 'active', 'master_server_id': 37, 'slave_server_id': 42, 'sl': Decimal('150.00'), 'tp': Decimal('200.00'), 'tsl': Decimal('23.00'), 'moltiplicatore': Decimal('5.0000'), 'fix_lot': None, 'created_at': '2025-10-17T17:52:31', 'updated_at': '2025-11-27T14:39:11'}}
+
+2025-11-28 10:24:31,386 - ERROR - Unhandled exception: 1 validation errors:
+  {'type': 'missing', 'loc': ('response', 0, 'customSignalInterval'), 'msg': 'Field required', 'input': {'id': 1, 'name': 'Trader_Alphaa', 'status': 'active', 'master_server_id': 37, 'slave_server_id': 42, 'sl': Decimal('150.00'), 'tp': Decimal('200.00'), 'tsl': Decimal('23.00'), 'moltiplicatore': Decimal('5.0000'), 'fix_lot': None, 'created_at': '2025-10-17T17:52:31', 'updated_at': '2025-11-27T14:39:11'}}
+
+2025-11-28 10:27:58,443 - INFO - Starting API
+2025-11-28 10:27:59,325 - INFO - Starting API
+2025-11-28 10:27:59,403 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:28:42,458 - INFO - Starting API
+2025-11-28 10:28:43,451 - INFO - Starting API
+2025-11-28 10:28:43,534 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 10:30:13,280 - INFO - Starting API
+2025-11-28 10:30:13,824 - INFO - Starting API
+2025-11-28 10:30:13,877 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:17:33,886 - INFO - Starting API
+2025-11-28 11:17:35,038 - INFO - Starting API
+2025-11-28 11:17:35,094 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:23:05,673 - INFO - Starting API
+2025-11-28 11:23:06,891 - INFO - Starting API
+2025-11-28 11:23:07,079 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:23:34,501 - INFO - Starting API
+2025-11-28 11:23:35,225 - INFO - Starting API
+2025-11-28 11:23:35,273 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:24:02,681 - INFO - Starting API
+2025-11-28 11:24:03,266 - INFO - Starting API
+2025-11-28 11:24:03,338 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:26:06,391 - INFO - Starting API
+2025-11-28 11:26:06,977 - INFO - Starting API
+2025-11-28 11:26:07,032 - INFO - \u2705 Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.
+2025-11-28 11:30:59,265 - INFO - Starting API
+2025-11-28 11:30:59,868 - INFO - Starting API

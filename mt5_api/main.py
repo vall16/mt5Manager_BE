@@ -127,12 +127,22 @@ def health_check():
         return {"status": "error", "message": str(e)}
 
 
+# @app.get("/positions")
+# def get_positions():
+#     positions = mt5.positions_get()
+#     if positions is None:
+#         raise HTTPException(status_code=400, detail="Cannot get positions")
+#     return [p._asdict() for p in positions]
+
 @app.get("/positions")
 def get_positions():
     positions = mt5.positions_get()
     if positions is None:
-        raise HTTPException(status_code=400, detail="Cannot get positions")
+        # Logga ma ritorna lista vuota
+        log("⚠️ Impossibile ottenere posizioni da MT5. Probabile mancanza di connessione")
+        return []  # invece di sollevare HTTPException
     return [p._asdict() for p in positions]
+
 
 @app.get("/symbols/active")
 def get_active_symbols():

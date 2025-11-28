@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import logging
 import os
 from fastapi import FastAPI, Request
@@ -25,6 +26,22 @@ logging.basicConfig(
 )
 logging.info("Starting API")
 
+# --- LIFESPAN HANDLER ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Gestisce startup e shutdown dell'app.
+    Qui puoi aggiungere inizializzazioni e cleanup.
+    """
+    # --- STARTUP ---
+    logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
+    # start_polling()  # se vuoi avviare polling automatico
+
+    yield  # qui l'app è in esecuzione
+
+    # --- SHUTDOWN ---
+    logging.info("🛑 Manager API in chiusura. Cleanup eseguito se necessario.")
+
 # --- APP ---
 app = FastAPI(title="MT5 Manager API")
 
@@ -45,16 +62,16 @@ app.include_router(trade_router, prefix="/trade", tags=["AppTrader5"])
 
 
 # --- STARTUP ---
-@app.on_event("startup")
-def startup_event():
-    """
-    Evento di avvio dell'API Manager:
-    - verifica connessione al DB
-    - crea file di log
-    - NON inizializza MetaTrader
-    """
-    logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
-    # start_polling()
+# @app.on_event("startup")
+# def startup_event():
+#     """
+#     Evento di avvio dell'API Manager:
+#     - verifica connessione al DB
+#     - crea file di log
+#     - NON inizializza MetaTrader
+#     """
+#     logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
+#     # start_polling()
 
 
 
@@ -84,5 +101,6 @@ if __name__ == "__main__":
     HOST = os.getenv("API_HOST")  # default localhost
     PORT = int(os.getenv("API_PORT"))    # default 8080
 
-    uvicorn.run("main:app", host=HOST, port=PORT,reload=True  )
+    uvicorn.run("main:app", host=HOST, port=PORT)
+    # uvicorn.run("main:app", host=HOST, port=PORT,reload=True  )
     

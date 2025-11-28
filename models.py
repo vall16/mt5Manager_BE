@@ -69,7 +69,7 @@ class Trader(BaseModel):
     fix_lot: Optional[float] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
-    customSignalInterval:Optional[int]
+    customSignalInterval:Optional[int] =None
 
 class Newtrader(BaseModel):
     

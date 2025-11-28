@@ -177,7 +177,7 @@ def check_signal_new():
     else:
         current_signal = "HOLD"
         log("───────S-I-G-N-A-L──────────")
-        log(f"\n⚠️  [{now}] HOLD signal per {SYMBOL} ...")
+        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
 
         # Se il segnale passa da BUY a HOLD, chiudi posizione
         log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
@@ -218,7 +218,7 @@ def check_signal():
 
         log("───────S-I-G-N-A-L──────────")
         
-        log(f"\n🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
+        log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
 
 
         # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
