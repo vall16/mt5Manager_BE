@@ -1,5 +1,7 @@
 # backend/app.py
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import MetaTrader5 as mt5
@@ -17,7 +19,12 @@ import requests
 
 router = APIRouter()
 
-BASE_URL = "http://127.0.0.1:8080"   # API del tuo FastAPI
+load_dotenv()  # legge il file .env
+
+HOST = os.getenv("API_HOST")  # default localhost
+PORT = int(os.getenv("API_PORT"))    # default 8080
+
+BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
 # SYMBOL = "USDCAD"
@@ -340,12 +347,6 @@ def stop_polling():
     log("⏹️ Polling fermato manualmente dal frontend!")
     return {"status": "stopped"}
 
-# threading.Thread(target=start_polling, daemon=True).start()
-# @router.on_event("startup")
-# def on_startup():
-#     # Lancia il polling in un thread separato solo all'avvio del server
-#     threading.Thread(target=start_polling, daemon=True).start()
-#     print("✅ Polling thread avviato all'avvio del server")
 
 
 # Endpoint per il frontend
@@ -355,19 +356,6 @@ def get_signal():
 
 def send_buy_to_slave():
 
-    # conn = get_connection()
-    # if not conn:
-    #     raise HTTPException(status_code=500, detail="Database connection failed")
-
-    # cursor = conn.cursor(dictionary=True)
-    # # Recupera il trader dal DB
-    # trader = get_trader(cursor,TRADER_ID)
-    # if not trader:
-    #     log(f"❌ Trader {TRADER_ID} non trovato")
-    #     return
-    
-    # sl_raw = trader.get("sl")
-    # stop_loss = float(sl_raw) if sl_raw is not None else None
     info_url = f"{base_url_slave}/symbol_info/{SYMBOL}"
     log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
     

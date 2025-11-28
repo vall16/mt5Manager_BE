@@ -9,30 +9,23 @@ import time
 start_time = datetime.now()
 logs = []  # lista globale dei log
 
-# def log(message: str):
-#     """Aggiunge un messaggio con timestamp relativo."""
-#     elapsed = (datetime.now() - start_time).total_seconds()
-#     timestamp = f"[+{elapsed:.1f}s]"
-#     logs.append(f"{timestamp} {message}")
-#     print(f"{timestamp} {message}")
-
-# def log(message: str):
-#     elapsed = (datetime.now() - start_time).total_seconds()
-#     timestamp = f"[+{elapsed:.1f}s]"
-
-#     for line in message.splitlines():
-#         line_to_print = f"{timestamp} {line}"
-#         logs.append(line_to_print)
-#         print(line_to_print)
 
 def log(message):
+    global logs
+    # converte in stringa leggibile
     if isinstance(message, dict):
         message = pformat(message)
     elif not isinstance(message, str):
         message = str(message)
 
+    # timestamp relativo
+    elapsed = (datetime.now() - start_time).total_seconds()
+    timestamp = f"[+{elapsed:.1f}s]"
+
     for line in message.splitlines():
-        print(f"[+{time.time():.1f}s] {line}")
+        line_to_print = f"{timestamp} {line}"
+        logs.append(line_to_print)   # <-- mantiene lo storico
+        print(line_to_print)
 
 import requests
 
