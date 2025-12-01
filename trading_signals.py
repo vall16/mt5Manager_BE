@@ -181,7 +181,12 @@ def check_signal_new():
 
         # Invio BUY allo slave
         log(f"🚀 Invio BUY allo SLAVE")
-        send_buy_to_slave()
+        esito = send_buy_to_slave()
+
+        if not esito:
+            log("❌ BUY non inviato correttamente allo SLAVE! Riprovo al prossimo ciclo...")
+            return
+
 
     else:
         current_signal = "HOLD"
@@ -433,8 +438,17 @@ def send_buy_to_slave():
     try:
         resp = requests.post(url, json=payload, timeout=10)
         log(f"📥 Risposta SLAVE: {resp.text}")
+
+        if resp.status_code != 200:
+            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
+            return False
+
+        return True
+
     except requests.RequestException as e:
         log(f"❌ Errore invio ordine: {e}")
+        return False
+
 
 
 
