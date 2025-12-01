@@ -215,7 +215,7 @@ def orders_history(
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
-    Avvia un terminale MetaTrader 5 per il server indicato su host:port.
+    Avvia un terminale MetaTrader 5 (mt5_api\main.py) per il server indicato su host:port.
     """
     print(f"🚀 Avvio server {server.server} ({server.platform})...")
 
