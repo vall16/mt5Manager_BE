@@ -27,7 +27,7 @@ PORT = int(os.getenv("API_PORT"))    # default 8080
 BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
-SYMBOL = "USDCAD"
+# SYMBOL = "USDCAD"
 # SYMBOL = "EURUSD"
 # SYMBOL = "MSFT"
 # SYMBOL = "XAUUSD"
@@ -312,7 +312,8 @@ def polling_loop():
 @router.post("/start_polling")
 def start_polling(trader:Trader):
     
-    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL
+    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL
+
 
     print(">>> start_polling CHIAMATO, trader =", trader)
 
@@ -326,6 +327,10 @@ def start_polling(trader:Trader):
 
 
     print(CHECK_INTERVAL)
+
+    # Imposta simbolo dinamico
+    SYMBOL = trader.selectedSymbol
+
 
     if polling_running:
         return {"status": "already_running", "message": "Polling già attivo"}

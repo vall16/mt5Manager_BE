@@ -70,6 +70,8 @@ class Trader(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     customSignalInterval:Optional[int] =None
+    selectedSymbol: Optional[str] = None
+
 
 class Newtrader(BaseModel):
     
