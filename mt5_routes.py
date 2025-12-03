@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import socket
 import subprocess
+import sys
 import MetaTrader5 as mt5
 import logging
 from logger import log, logs
@@ -219,6 +220,9 @@ async def start_server(server: ServerRequest):
     """
     print(f"🚀 Avvio server {server.server} ({server.platform})...")
 
+    # 💡 PASSO CRUCIALE: Ottieni il percorso dell'interprete Python corrente (quello in venv)
+    python_executable = sys.executable
+    
     if not os.path.exists(server.path):
         raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
 
@@ -229,8 +233,14 @@ async def start_server(server: ServerRequest):
 
     try:
         # Lancia nuova istanza MT5 API su host:port
+        # subprocess.Popen(
+        #     ["python", "mt5_api\main.py", server.path, host_port],
+        #     shell=False
+        # )
+
+        # Lancia nuova istanza MT5 API su host:port
         subprocess.Popen(
-            ["python", "mt5_api\main.py", server.path, host_port],
+            [python_executable, "mt5_api\main.py", server.path, host_port],
             shell=False
         )
         print(f"✅ Terminal avviato da {server.path} su {host_port}")

@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 
+
 app = FastAPI(title="MT5 Local API")
 
 # Permette ad Angular in sviluppo di chiamare questa API
