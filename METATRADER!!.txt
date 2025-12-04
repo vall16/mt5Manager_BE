@@ -68,3 +68,5 @@ SL a 100 pips: 1.1900
 SL a 1000 pips (BUY): 1.1000
 
 tenere Sl mediamente a 100 pips
+
+PYTHON 3.11 !

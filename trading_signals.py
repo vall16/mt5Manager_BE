@@ -1,5 +1,6 @@
 # backend/app.py
 from datetime import datetime
+import json
 import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException
@@ -113,93 +114,93 @@ def compute_atr(df, period=14):
     atr = df['tr'].rolling(period).mean()
     return atr
 
-def check_signal_new():
-    global current_signal, previous_signal
+# def check_signal_new():
+#     global current_signal, previous_signal
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    positions = []
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     positions = []
 
-    if not mt5.initialize():
-        print("Errore MT5:", mt5.last_error())
-        return
+#     if not mt5.initialize():
+#         print("Errore MT5:", mt5.last_error())
+#         return
 
-    df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
-    if df is None:
-        return
+#     df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+#     if df is None:
+#         return
 
-    # Calcoli indicatori
-    ema_short = compute_ema(df, PARAMETERS["EMA_short"])
-    ema_long = compute_ema(df, PARAMETERS["EMA_long"])
-    rsi = compute_rsi(df, PARAMETERS["RSI_period"])
-    macd, macd_signal = compute_macd(df)
-    atr = compute_atr(df)
+#     # Calcoli indicatori
+#     ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+#     ema_long = compute_ema(df, PARAMETERS["EMA_long"])
+#     rsi = compute_rsi(df, PARAMETERS["RSI_period"])
+#     macd, macd_signal = compute_macd(df)
+#     atr = compute_atr(df)
 
-    # Calcolo pendenze EMA
-    ema_slope = ema_short.iloc[-1] - ema_short.iloc[-2]
-    ema_long_slope = ema_long.iloc[-1] - ema_long.iloc[-2]
+#     # Calcolo pendenze EMA
+#     ema_slope = ema_short.iloc[-1] - ema_short.iloc[-2]
+#     ema_long_slope = ema_long.iloc[-1] - ema_long.iloc[-2]
 
-    # Parametri di soglia
-    rsi_threshold = 60
-    atr_threshold = df['close'].std() * 0.1  # esempio, puoi personalizzare
+#     # Parametri di soglia
+#     rsi_threshold = 60
+#     atr_threshold = df['close'].std() * 0.1  # esempio, puoi personalizzare
 
-    # =======================
-    # Condizione BUY più acuminata
-    # =======================
-    if (ema_short.iloc[-1] > ema_long.iloc[-1] and
-        ema_slope > 0 and
-        ema_long_slope > 0 and
-        rsi.iloc[-1] < rsi_threshold and
-        macd.iloc[-1] > macd_signal.iloc[-1] and
-        atr.iloc[-1] > atr_threshold):
+#     # =======================
+#     # Condizione BUY più acuminata
+#     # =======================
+#     if (ema_short.iloc[-1] > ema_long.iloc[-1] and
+#         ema_slope > 0 and
+#         ema_long_slope > 0 and
+#         rsi.iloc[-1] < rsi_threshold and
+#         macd.iloc[-1] > macd_signal.iloc[-1] and
+#         atr.iloc[-1] > atr_threshold):
 
-        current_signal = "BUY"
-        previous_signal = current_signal
+#         current_signal = "BUY"
+#         previous_signal = current_signal
 
-        log("───────S-I-G-N-A-L──────────")
-        log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
+#         log("───────S-I-G-N-A-L──────────")
+#         log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
 
-        # Recupera posizioni SLAVE
-        try:
-            positions_url = f"{base_url_slave}/positions"
-            log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
-            # resp = (positions_url, timeout=10)
-            resp = safe_get(positions_url, timeout=10)
-            resp.raise_for_status()
-            positions = resp.json()
+#         # Recupera posizioni SLAVE
+#         try:
+#             positions_url = f"{base_url_slave}/positions"
+#             log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
+#             # resp = (positions_url, timeout=10)
+#             resp = safe_get(positions_url, timeout=10)
+#             resp.raise_for_status()
+#             positions = resp.json()
 
-            if positions:
-                log("📌 Posizioni aperte sullo SLAVE:")
-                for p in positions:
-                    log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+#             if positions:
+#                 log("📌 Posizioni aperte sullo SLAVE:")
+#                 for p in positions:
+#                     log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
 
-                if any(p["symbol"] == SYMBOL for p in positions):
-                    log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
-                    return
+#                 if any(p["symbol"] == SYMBOL for p in positions):
+#                     log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
+#                     return
 
-        except requests.exceptions.RequestException as e:
-            log(f"❌ Errore di connessione al slave API: {e}")
+#         except requests.exceptions.RequestException as e:
+#             log(f"❌ Errore di connessione al slave API: {e}")
 
-        # Invio BUY allo slave
-        log(f"🚀 Invio BUY allo SLAVE")
-        esito = send_buy_to_slave()
+#         # Invio BUY allo slave
+#         log(f"🚀 Invio BUY allo SLAVE")
+#         esito = send_buy_to_slave()
 
-        if not esito:
-            log("❌ BUY non inviato correttamente allo SLAVE! Riprovo al prossimo ciclo...")
-            return
+#         if not esito:
+#             log("❌ BUY non inviato correttamente allo SLAVE! Riprovo al prossimo ciclo...")
+#             return
 
 
-    else:
-        current_signal = "HOLD"
-        log("───────S-I-G-N-A-L──────────")
-        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
+#     else:
+#         current_signal = "HOLD"
+#         log("───────S-I-G-N-A-L──────────")
+#         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
 
-        # Se il segnale passa da BUY a HOLD, chiudi posizione
-        log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
-        if previous_signal == "BUY":
-            log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
-            close_slave_position()
+#         # Se il segnale passa da BUY a HOLD, chiudi posizione
+#         log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
+#         if previous_signal == "BUY":
+#             log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
+#             close_slave_position()
 
-    previous_signal = current_signal
+#     previous_signal = current_signal
 
 
 def check_signal():
@@ -234,10 +235,18 @@ def check_signal():
         
         log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
 
-
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
         # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
                 
         # base_url_slave = "http://127.0.0.1:9001"
+        # 1️⃣ Recupero trader
+        trader = get_trader(cursor, CURRENT_TRADER.id)
+        if not trader:
+            return {"status": "ko", "message": "Trader non trovato", "logs": logs}
+
+        # 2️⃣ Inizializza server SLAVE
+        base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
 
         try:
                 positions_url = f"{base_url_slave}/positions"
@@ -316,6 +325,12 @@ def start_polling(trader:Trader):
 
 
     print(">>> start_polling CHIAMATO, trader =", trader)
+
+    # Log del JSON formattato
+    trader_json = trader.dict()  # converte in dict
+    print(">>> start_polling CHIAMATO, trader JSON:\n", json.dumps(trader_json, indent=2))
+    log(f"📥 Body JSON ricevuto:\n{json.dumps(trader_json, indent=2)}")
+
 
     # Salva il trader globale
     CURRENT_TRADER = trader
