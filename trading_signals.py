@@ -28,6 +28,8 @@ PORT = int(os.getenv("API_PORT"))    # default 8080
 BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
+
+BASE_URL_SLAVE =""
 # SYMBOL = "USDCAD"
 # SYMBOL = "EURUSD"
 # SYMBOL = "MSFT"
@@ -204,7 +206,7 @@ def compute_atr(df, period=14):
 
 
 def check_signal():
-    global current_signal,previous_signal
+    global current_signal,previous_signal,BASE_URL_SLAVE 
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -247,6 +249,8 @@ def check_signal():
 
         # 2️⃣ Inizializza server SLAVE
         base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+        BASE_URL_SLAVE = base_url_slave
 
         try:
                 positions_url = f"{base_url_slave}/positions"
@@ -321,7 +325,7 @@ def polling_loop():
 @router.post("/start_polling")
 def start_polling(trader:Trader):
     
-    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL
+    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL,BASE_URL_SLAVE
 
 
     print(">>> start_polling CHIAMATO, trader =", trader)
@@ -381,7 +385,7 @@ def get_signal():
 
 def send_buy_to_slave():
 
-    info_url = f"{base_url_slave}/symbol_info/{SYMBOL}"
+    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
     log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
     
     resp = safe_get(info_url, timeout=10)
@@ -390,7 +394,7 @@ def send_buy_to_slave():
 
     # Prendi lo stop loss dal trader, se presente
      # 🔹 2️⃣ Recupero tick dal server slave via API
-    tick_url = f"{base_url_slave}/symbol_tick/{SYMBOL}"
+    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
     log(f"📡 Richiedo tick allo slave: {tick_url}")
 
             

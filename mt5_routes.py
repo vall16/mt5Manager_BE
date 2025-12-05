@@ -3,6 +3,7 @@ import os
 import socket
 import subprocess
 import sys
+import time
 import MetaTrader5 as mt5
 import logging
 
@@ -315,46 +316,118 @@ class ServerRequest(BaseModel):
 #         print(f"❌ Errore comunicazione agente remoto: {e}")
 #         raise HTTPException(status_code=500, detail=str(e))
 
+# # @router.post("/start_server")
+# # async def start_server(server: ServerRequest):
+#     """
+#     Avvia MT5 e lo inizializza per l'API.
+#     """
+#     log(f"🚀 Avvio server {server.server} ({server.platform}) su {server.ip}:{server.port}")
+
+#     if not os.path.exists(server.path):
+#         raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
+
+#     # 1️⃣ Avvia MT5 (l'exe)
+#     try:
+#         subprocess.Popen([server.path], shell=False)
+#         log(f"👍 MT5 exe avviato: {server.path}")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Errore avvio MT5 exe: {e}")
+
+#     # 2️⃣ Inizializza il wrapper Python
+#     try:
+#         # chiudi eventuali inizializzazioni precedenti
+#         try:
+#             mt5.shutdown()
+#         except Exception:
+#             pass
+
+#         if not mt5.initialize(server.path):
+#             err = mt5.last_error()
+#             raise HTTPException(status_code=500, detail=f"Fallita inizializzazione MT5: {err}")
+#         version = ".".join(map(str, mt5.version()))
+#         log(f"✅ MT5 inizializzato correttamente (versione {version})")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Errore init MT5: {e}")
+
+#     return {
+#         "status": "success",
+#         "message": f"MT5 avviato e inizializzato su {server.ip}:{server.port}",
+#         "path": server.path,
+#         "version": version
+#     }
+# sta in ascolto di nuova posizione dal master MT5
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
-    Avvia MT5 e lo inizializza per l'API.
+    Ordina all'agente remoto di avviare MT5 e lo inizializza.
     """
-    log(f"🚀 Avvio server {server.server} ({server.platform}) su {server.ip}:{server.port}")
+    import requests
+    from fastapi import HTTPException
 
-    if not os.path.exists(server.path):
-        raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
+    MAX_WAIT = 90  # secondi massimi di attesa
+    SLEEP_INTERVAL = 2  # intervallo tra i poll
 
-    # 1️⃣ Avvia MT5 (l'exe)
-    try:
-        subprocess.Popen([server.path], shell=False)
-        log(f"👍 MT5 exe avviato: {server.path}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Errore avvio MT5 exe: {e}")
 
-    # 2️⃣ Inizializza il wrapper Python
-    try:
-        # chiudi eventuali inizializzazioni precedenti
-        try:
-            mt5.shutdown()
-        except Exception:
-            pass
+    print(f"🚀 Richiesta avvio terminale MT5 su agente {server.ip}:{server.port}")
 
-        if not mt5.initialize(server.path):
-            err = mt5.last_error()
-            raise HTTPException(status_code=500, detail=f"Fallita inizializzazione MT5: {err}")
-        version = ".".join(map(str, mt5.version()))
-        log(f"✅ MT5 inizializzato correttamente (versione {version})")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Errore init MT5: {e}")
+    # URL dell'agente remoto
+    agent_url_start = f"http://{server.ip}:{server.port}/start_mt5"
+    agent_url_init = f"http://{server.ip}:{server.port}/init-mt5"
 
-    return {
-        "status": "success",
-        "message": f"MT5 avviato e inizializzato su {server.ip}:{server.port}",
-        "path": server.path,
-        "version": version
+    # Payload per start_mt5
+    payload_start = {
+        "path": server.path
     }
-# sta in ascolto di nuova posizione dal master MT5
+
+    # Payload per init-mt5
+    payload_init = {
+        "path": server.path
+    }
+
+    try:
+        # 1️⃣ Avvia MT5 tramite agente
+        response = requests.post(agent_url_start, json=payload_start, timeout=120)
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Errore avvio MT5 agente: {response.text}")
+        print(f"✅ MT5 avviato sul server remoto: {response.json()}")
+
+        # time.sleep(5)  # attendi 5 secondi prima di inizializzare
+        # 2️⃣ Aspetta che MT5 sia pronto tramite /health
+        # elapsed = 0
+        # while elapsed < MAX_WAIT:
+        #     try:
+        #         health = requests.get(f"http://{server.ip}:{server.port}/health", timeout=30).json()
+        #         if health.get("status") == "ok":
+        #             print(f"✅ MT5 pronto sul server remoto: {health}")
+        #             break
+        #     except Exception:
+        #         pass
+
+        #     time.sleep(SLEEP_INTERVAL)
+        #     elapsed += SLEEP_INTERVAL
+        # else:
+        #     raise HTTPException(status_code=500, detail="Timeout: MT5 non ha risposto su /health")
+
+
+        # 2️⃣ Inizializza MT5 tramite agente
+        response_init = requests.post(agent_url_init, json=payload_init, timeout=30)
+        if response_init.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Errore init MT5 agente: {response_init.text}")
+        print(f"✅ MT5 inizializzato sul server remoto: {response_init.json()}")
+
+        return {
+            "status": "success",
+            "agent": f"{server.ip}:{server.port}",
+            "message": "MT5 avviato e inizializzato tramite agente remoto",
+            "server_path": server.path,
+            "init_response": response_init.json()
+        }
+
+    except Exception as e:
+        print(f"❌ Errore comunicazione agente remoto: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/webhook/open_position")
 async def open_position(req: Request):
     data = await req.json()
