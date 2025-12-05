@@ -2,8 +2,10 @@
 from contextlib import asynccontextmanager
 from datetime import datetime
 import os
+import subprocess
 import MetaTrader5 as mt5
 import concurrent
+import subprocess
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sys
@@ -67,6 +69,25 @@ def init_mt5(req: InitRequest):
     log(f"✅ MT5 inizializzato da API al path {req.path} (versione {version})")
 
     return {"status": "ok", "message": f"MT5 inizializzato", "version": version, "path": req.path}
+
+# lancia l'exe locale
+@app.post("/start_mt5")
+def start_mt5(req: dict):
+    path = req.get("path")
+
+    print(f"▶️ Avvio MT5 da agente locale: {path}")
+
+    if not os.path.exists(path):
+        raise HTTPException(status_code=400, detail=f"MT5 non trovato: {path}")
+
+    try:
+        subprocess.Popen([path])
+        print("👍 MT5 avviato")
+        return {"status": "started", "path": path}
+
+    except Exception as e:
+        print(f"❌ Errore avvio MT5: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # @app.on_event("startup")
 # def startup_event():

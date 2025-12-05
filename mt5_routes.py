@@ -5,6 +5,8 @@ import subprocess
 import sys
 import MetaTrader5 as mt5
 import logging
+
+import requests
 from logger import log, logs
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -213,50 +215,97 @@ def orders_history(
         return {"error": mt5.last_error()}
     return [o._asdict() for o in orders]
 
+# @router.post("/start_server")
+# async def start_server(server: ServerRequest):
+#     """
+#     Avvia un terminale MetaTrader 5 (mt5_api\main.py) per il server indicato su host:port.
+#     """
+#     print(f"🚀 Avvio server {server.server} ({server.platform})...")
+
+#     # 💡 PASSO CRUCIALE: Ottieni il percorso dell'interprete Python corrente (quello in venv)
+#     python_executable = sys.executable
+    
+#     if not os.path.exists(server.path):
+#         raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
+
+#     # host e port definiti nel record server
+#     host = server.ip       # es. "192.168.1.208"
+#     port = server.port     # es. 8084
+#     host_port = f"{host}:{port}"
+
+#     try:
+#         # Lancia nuova istanza MT5 API su host:port
+#         # subprocess.Popen(
+#         #     ["python", "mt5_api\main.py", server.path, host_port],
+#         #     shell=False
+#         # )
+
+#         # Lancia nuova istanza MT5 API su host:port
+#         # subprocess.Popen(
+#         #     [python_executable, "mt5_api\main.py", server.path, host_port],
+#         #     shell=False
+#         # )
+#         # print(f"✅ Terminal avviato da {server.path} su {host_port}")
+
+#         # Lancia nuova istanza MT5 API su host:port, il path è di MT5
+#         subprocess.Popen(
+#             [python_executable, "main.py", server.path, host_port],
+#             shell=False
+#         )
+#         print(f"✅ Terminal avviato da {server.path} su {host_port}")
+
+#         return {
+#             "status": "success",
+#             "message": f"Terminal started for {server.server} on {host_port}",
+#             "path": server.path,
+#             "host": host,
+#             "port": port
+#         }
+
+#     except Exception as e:
+#         print(f"❌ Errore avvio terminal: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
-    Avvia un terminale MetaTrader 5 (mt5_api\main.py) per il server indicato su host:port.
+    Ordina all'agente remoto di avviare MT5 usando il percorso locale del server remoto.
     """
-    print(f"🚀 Avvio server {server.server} ({server.platform})...")
 
-    # 💡 PASSO CRUCIALE: Ottieni il percorso dell'interprete Python corrente (quello in venv)
-    python_executable = sys.executable
-    
-    if not os.path.exists(server.path):
-        raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
+    print(f"🚀 Richiesta avvio terminale MT5 su agente {server.ip}:{server.port}")
 
-    # host e port definiti nel record server
-    host = server.ip       # es. "192.168.1.208"
-    port = server.port     # es. 8084
-    host_port = f"{host}:{port}"
+    # costruiamo l'URL dell'agente remoto (già in esecuzione)
+    agent_url = f"http://{server.ip}:{server.port}/start_mt5"
+
+    payload = {
+        "path": server.path,   # esempio: C:\\Program Files\\MetaTrader 5\\terminal64.exe
+        "server": server.server,
+        "platform": server.platform
+    }
 
     try:
-        # Lancia nuova istanza MT5 API su host:port
-        # subprocess.Popen(
-        #     ["python", "mt5_api\main.py", server.path, host_port],
-        #     shell=False
-        # )
+        # manda la richiesta POST all'agente
+        response = requests.post(agent_url, json=payload, timeout=10)
 
-        # Lancia nuova istanza MT5 API su host:port
-        subprocess.Popen(
-            [python_executable, "mt5_api\main.py", server.path, host_port],
-            shell=False
-        )
-        print(f"✅ Terminal avviato da {server.path} su {host_port}")
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Errore dall'agente remoto: {response.text}"
+            )
+
+        print(f"✅ Agente remoto ha avviato MT5: {response.json()}")
 
         return {
             "status": "success",
-            "message": f"Terminal started for {server.server} on {host_port}",
-            "path": server.path,
-            "host": host,
-            "port": port
+            "agent": agent_url,
+            "message": "MT5 avviato tramite agente remoto",
+            "server_path": server.path
         }
 
     except Exception as e:
-        print(f"❌ Errore avvio terminal: {e}")
+        print(f"❌ Errore comunicazione agente remoto: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 # sta in ascolto di nuova posizione dal master MT5
 @router.post("/webhook/open_position")
 async def open_position(req: Request):

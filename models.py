@@ -49,6 +49,7 @@ class ServerRequest(BaseModel):
     server_alias: str
     platform: str
     ip: str
+    # path di mt5
     path: str
     port: int
     is_active: bool
