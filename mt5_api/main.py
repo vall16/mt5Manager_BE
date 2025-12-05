@@ -89,22 +89,6 @@ def start_mt5(req: dict):
         print(f"❌ Errore avvio MT5: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# @app.on_event("startup")
-# def startup_event():
-#     """
-#     Evento di startup di FastAPI:
-#     - Recupera il percorso del terminale MT5 dai parametri da linea di comando (sys.argv)
-#     - Inizializza MetaTrader 5 con il path fornito
-#     - Solleva un errore se l'inizializzazione fallisce
-#     """
-
-#     import sys
-#     # import MetaTrader5 as mt5
-
-
-# @app.on_event("shutdown")
-# def shutdown_event():
-#     mt5.shutdown()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
