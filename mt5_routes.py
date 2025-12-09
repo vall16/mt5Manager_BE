@@ -274,6 +274,8 @@ class ServerRequest(BaseModel):
     ip: str
     port: int
     path: str  # path completo al terminale MT5
+    user: str     
+    pwd: str
 
 
 # @router.post("/start_server")
@@ -376,6 +378,9 @@ async def start_server(server: ServerRequest):
     agent_url_start = f"http://{server.ip}:{server.port}/start_mt5"
     agent_url_init = f"http://{server.ip}:{server.port}/init-mt5"
 
+    agent_url_login = f"http://{server.ip}:{server.port}/login"
+
+
     # Payload per start_mt5
     payload_start = {
         "path": server.path
@@ -385,6 +390,19 @@ async def start_server(server: ServerRequest):
     payload_init = {
         "path": server.path
     }
+
+    # payload_login = {
+    #     "login": server.user,
+    #     "password": server.pwd,
+    #     "server": server.server
+    # }
+    payload_login = {
+        "login": server.user,
+        "password": server.pwd,
+        "server": server.server
+    }
+
+
 
     try:
         # 1️⃣ Avvia MT5 tramite agente (che è già avviato)
@@ -399,6 +417,13 @@ async def start_server(server: ServerRequest):
         if response_init.status_code != 200:
             raise HTTPException(status_code=500, detail=f"Errore init MT5 agente: {response_init.text}")
         print(f"✅ MT5 inizializzato sul server remoto: {response_init.json()}")
+
+        # 3️⃣ Login MT5 ()
+        response_login = requests.post(agent_url_login, json=payload_login, timeout=30)
+        if response_login.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Errore login MT5: {response_login.text}")
+        print(f"🔐 Login MT5 effettuato: {response_login.json()}")
+
 
         return {
             "status": "success",

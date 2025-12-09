@@ -539,14 +539,14 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     # 🔹 Log completo e leggibile
     print("🛠️ [UPDATE TRADER] Esecuzione aggiornamento trader")
     print("──────────────────────────────────────────────")
-    print(f"🔹 Trader ID: {trader_id}")
-    print("🔹 Campi aggiornati:")
-    for f, v in zip(fields, values[:-1]):  # salta l'ID alla fine
-        print(f"   • {f.replace(' = %s', '')} → {v}")
-    print("──────────────────────────────────────────────")
-    print(f"🧾 SQL: {query}")
-    print(f"💾 VALUES: {values}")
-    print("──────────────────────────────────────────────")
+    # print(f"🔹 Trader ID: {trader_id}")
+    # print("🔹 Campi aggiornati:")
+    # for f, v in zip(fields, values[:-1]):  # salta l'ID alla fine
+    #     print(f"   • {f.replace(' = %s', '')} → {v}")
+    # print("──────────────────────────────────────────────")
+    # print(f"🧾 SQL: {query}")
+    # print(f"💾 VALUES: {values}")
+    # print("──────────────────────────────────────────────")
 
 
     cursor.execute(query, tuple(values))
