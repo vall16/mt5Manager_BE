@@ -356,6 +356,8 @@ class ServerRequest(BaseModel):
 #         "version": version
 #     }
 # sta in ascolto di nuova posizione dal master MT5
+
+
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
@@ -370,7 +372,7 @@ async def start_server(server: ServerRequest):
 
     print(f"🚀 Richiesta avvio terminale MT5 su agente {server.ip}:{server.port}")
 
-    # URL dell'agente remoto
+    # URL dell'agente remoto/locale
     agent_url_start = f"http://{server.ip}:{server.port}/start_mt5"
     agent_url_init = f"http://{server.ip}:{server.port}/init-mt5"
 
@@ -385,31 +387,14 @@ async def start_server(server: ServerRequest):
     }
 
     try:
-        # 1️⃣ Avvia MT5 tramite agente
+        # 1️⃣ Avvia MT5 tramite agente (che è già avviato)
         response = requests.post(agent_url_start, json=payload_start, timeout=120)
         if response.status_code != 200:
             raise HTTPException(status_code=500, detail=f"Errore avvio MT5 agente: {response.text}")
         print(f"✅ MT5 avviato sul server remoto: {response.json()}")
 
-        # time.sleep(5)  # attendi 5 secondi prima di inizializzare
-        # 2️⃣ Aspetta che MT5 sia pronto tramite /health
-        # elapsed = 0
-        # while elapsed < MAX_WAIT:
-        #     try:
-        #         health = requests.get(f"http://{server.ip}:{server.port}/health", timeout=30).json()
-        #         if health.get("status") == "ok":
-        #             print(f"✅ MT5 pronto sul server remoto: {health}")
-        #             break
-        #     except Exception:
-        #         pass
-
-        #     time.sleep(SLEEP_INTERVAL)
-        #     elapsed += SLEEP_INTERVAL
-        # else:
-        #     raise HTTPException(status_code=500, detail="Timeout: MT5 non ha risposto su /health")
-
-
-        # 2️⃣ Inizializza MT5 tramite agente
+        
+        # 2️⃣ Inizializza MT5 (tramite agente già avviato)
         response_init = requests.post(agent_url_init, json=payload_init, timeout=30)
         if response_init.status_code != 200:
             raise HTTPException(status_code=500, detail=f"Errore init MT5 agente: {response_init.text}")

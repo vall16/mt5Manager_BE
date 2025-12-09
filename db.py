@@ -20,6 +20,8 @@ import re
 from mysql.connector import pooling
 from dotenv import load_dotenv
 from pprint import pformat
+from threading import Lock
+
 
 load_dotenv()
 
@@ -167,12 +169,12 @@ def get_trader(cursor, trader_id):
     # log(logs, start_time, f"Trader info: {trader}")
     log("=== Trader Info ===")
     log(trader)
-    log("===================")
-    log(trader["master_name"])
-    log(trader["master_user"])
-    log(trader["master_pwd"])
-    log(trader["master_ip"])
-    log(trader["master_port"])
+    # log("===================")
+    # log(trader["master_name"])
+    # log(trader["master_user"])
+    # log(trader["master_pwd"])
+    # log(trader["master_ip"])
+    # log(trader["master_port"])
 
     return trader
 
@@ -1066,134 +1068,140 @@ class OrderPayload(BaseModel):
     sl: Optional[float] = None
     tp: Optional[float] = None
 
+# Lock globale per evitare ordini duplicati simultanei
+open_order_lock = Lock()
+
 
 @router.post("/traders/{trader_id}/open_order_on_slave")
 def open_order_on_slave(payload: OrderPayload):
 
-    order_type = payload.order_type
-    volume = payload.volume
-    symbol = payload.symbol
-    trader_id = payload.trader_id
-    sl = payload.sl
-    tp = payload.tp
-
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    with open_order_lock:  # 🔒 blocca l'accesso concorrente
 
 
-    log("🚀 Entrato in open_order_on_slave()")
+        order_type = payload.order_type
+        volume = payload.volume
+        symbol = payload.symbol
+        trader_id = payload.trader_id
+        sl = payload.sl
+        tp = payload.tp
 
-    # 1️⃣ Recupero trader
-    trader = get_trader(cursor, trader_id)
-    if not trader:
-        return {"status": "ko", "message": "Trader non trovato", "logs": logs}
-
-    # 2️⃣ Inizializza server SLAVE
-    base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
-    log(f"🌐 Init MT5 slave: {base_url_slave}")
-    ensure_mt5_initialized(base_url_slave, trader["slave_path"], log)
-
-    # 3️⃣ Login SLAVE
-    login_url = f"{base_url_slave}/login"
-    login_body = {
-        "login": int(trader["slave_user"]),
-        "password": trader["slave_pwd"],
-        "server": trader["slave_name"]
-    }
-
-    log("🔐 Login allo SLAVE...")
-    resp = requests.post(login_url, json=login_body, timeout=20)
-    if resp.status_code != 200:
-        return {"status": "ko", "message": f"Errore login slave: {resp.text}",
-                #  "logs": logs
-                 "logs": "\n".join(logs)
-
-                 }
-
-    log("✅ Login SLAVE riuscito")
-
-    log(f"Simbolo dal payload è: {symbol}")
-
-    # 4️⃣ Recupero tick SLAVE
-    # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
-    tick_url = f"{base_url_slave}/symbol_tick/{symbol}"
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
 
 
-    log(f"📡 Richiedo tick dello SLAVE: {tick_url}")
-    resp_tick = safe_get(tick_url, timeout=10)
+        log("🚀 Entrato in open_order_on_slave()")
 
-    if resp_tick.status_code != 200:
-        log(f"🔎 Verifica simbolo sullo SLAVE: {symbol}")
+        # 1️⃣ Recupero trader
+        trader = get_trader(cursor, trader_id)
+        if not trader:
+            return {"status": "ko", "message": "Trader non trovato", "logs": logs}
 
-        return {"status": "ko", "message": f"Errore tick {resp_tick.text}",
-                "logs": "\n".join(logs)
-                #  "logs": logs
-                 }
+        # 2️⃣ Inizializza server SLAVE
+        base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+        log(f"🌐 Init MT5 slave: {base_url_slave}")
+        ensure_mt5_initialized(base_url_slave, trader["slave_path"], log)
 
-    tick = resp_tick.json()
-    log(f"📈 Tick ricevuto: BID={tick['bid']} ASK={tick['ask']}")
+        # 3️⃣ Login SLAVE
+        login_url = f"{base_url_slave}/login"
+        login_body = {
+            "login": int(trader["slave_user"]),
+            "password": trader["slave_pwd"],
+            "server": trader["slave_name"]
+        }
 
-    price = tick["ask"] if order_type.lower() == "buy" else tick["bid"]
+        log("🔐 Login allo SLAVE...")
+        resp = requests.post(login_url, json=login_body, timeout=20)
+        if resp.status_code != 200:
+            return {"status": "ko", "message": f"Errore login slave: {resp.text}",
+                    #  "logs": logs
+                    "logs": "\n".join(logs)
 
-    # 5️⃣ Prepara ordine
-    order_request = {
-        "symbol": symbol,
-        "volume": volume,
-        "type": order_type.lower(),
-        "price": price,
-        # "price": 0.0,
-        "sl": sl,
-        "tp": tp
+                    }
+
+        log("✅ Login SLAVE riuscito")
+
+        log(f"Simbolo dal payload è: {symbol}")
+
+        # 4️⃣ Recupero tick SLAVE
+        # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
+        tick_url = f"{base_url_slave}/symbol_tick/{symbol}"
+
+
+        log(f"📡 Richiedo tick dello SLAVE: {tick_url}")
+        resp_tick = safe_get(tick_url, timeout=10)
+
+        if resp_tick.status_code != 200:
+            log(f"🔎 Verifica simbolo sullo SLAVE: {symbol}")
+
+            return {"status": "ko", "message": f"Errore tick {resp_tick.text}",
+                    "logs": "\n".join(logs)
+                    #  "logs": logs
+                    }
+
+        tick = resp_tick.json()
+        log(f"📈 Tick ricevuto: BID={tick['bid']} ASK={tick['ask']}")
+
+        price = tick["ask"] if order_type.lower() == "buy" else tick["bid"]
+
+        # 5️⃣ Prepara ordine
+        order_request = {
+            "symbol": symbol,
+            "volume": volume,
+            "type": order_type.lower(),
+            "price": price,
+            # "price": 0.0,
+            "sl": sl,
+            "tp": tp
+            
+        }
+
+        order_url = f"{base_url_slave}/order"
+        log(f"📤 Invio ordine allo SLAVE → {order_url}")
+        # log(json.dumps(order_request, indent=2))
+        # log(pformat(order_request))
+        log("🧾 Dati inviati:" + pformat(order_request))
+
+
         
-    }
 
-    order_url = f"{base_url_slave}/order"
-    log(f"📤 Invio ordine allo SLAVE → {order_url}")
-    # log(json.dumps(order_request, indent=2))
-    # log(pformat(order_request))
-    log("🧾 Dati inviati:" + pformat(order_request))
+        resp_order = requests.post(order_url, json=order_request, timeout=20)
+        if resp_order.status_code != 200:
+            return {"status": "ko", "message": f"Errore invio ordine: {resp_order.text}",
+                    #  "logs": logs
+                    "logs": "\n".join(logs)
 
+                    }
 
-    
+        result = resp_order.json()
+        log(f"✅ Risposta SLAVE: {result}")
 
-    resp_order = requests.post(order_url, json=order_request, timeout=20)
-    if resp_order.status_code != 200:
-        return {"status": "ko", "message": f"Errore invio ordine: {resp_order.text}",
-                #  "logs": logs
-                 "logs": "\n".join(logs)
+        ticket = result.get("result", {}).get("order")
 
-                 }
+        # 6️⃣ Scrive nel DB solo slave_orders
+        # if ticket:
+        #     cursor.execute("""
+        #         INSERT INTO slave_orders
+        #             (trader_id, master_order_id, master_ticket, ticket,
+        #              symbol, type, volume, price_open, opened_at)
+        #         VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
+        #     """,
+        #     (trader_id, ticket, symbol, order_type, volume, price))
 
-    result = resp_order.json()
-    log(f"✅ Risposta SLAVE: {result}")
+        #     conn.commit()
+        #     log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
 
-    ticket = result.get("result", {}).get("order")
+        # 7️⃣ Fine
+        cursor.close()
+        conn.close()
 
-    # 6️⃣ Scrive nel DB solo slave_orders
-    # if ticket:
-    #     cursor.execute("""
-    #         INSERT INTO slave_orders
-    #             (trader_id, master_order_id, master_ticket, ticket,
-    #              symbol, type, volume, price_open, opened_at)
-    #         VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
-    #     """,
-    #     (trader_id, ticket, symbol, order_type, volume, price))
+        return {
+            "status": "ok",
+            "message": "Ordine inviato allo SLAVE",
+            "ticket": ticket,
+            # "logs": logs
+            "logs": "\n".join(logs)
 
-    #     conn.commit()
-    #     log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
-
-    # 7️⃣ Fine
-    cursor.close()
-    conn.close()
-
-    return {
-        "status": "ok",
-        "message": "Ordine inviato allo SLAVE",
-        "ticket": ticket,
-        # "logs": logs
-        "logs": "\n".join(logs)
-
-    }
+        }
 
 
 # chiusura ordine determinato

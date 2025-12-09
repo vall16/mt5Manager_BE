@@ -203,113 +203,117 @@ def compute_atr(df, period=14):
 #             close_slave_position()
 
 #     previous_signal = current_signal
+signal_lock = threading.Lock()
 
 
 def check_signal():
-    global current_signal,previous_signal,BASE_URL_SLAVE 
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with signal_lock:
 
-    positions = []   # ← SEMPRE nella prima riga
+        global current_signal,previous_signal,BASE_URL_SLAVE 
 
-    # blocco inizialize che sembra rallentare ...
-    if not mt5.initialize():
-        print("Errore MT5:", mt5.last_error())
-        return
-    
-    df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
-    if df is None:
-        # log(f"⚠️ get_data() ha restituito None per {SYMBOL}. Salto il ciclo.")
-        return  # esce da check_signal() senza fare danni
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    ema_short = compute_ema(df, PARAMETERS["EMA_short"])
-    ema_long = compute_ema(df, PARAMETERS["EMA_long"])
-    rsi = compute_rsi(df, PARAMETERS["RSI_period"])
+        positions = []   # ← SEMPRE nella prima riga
 
-    #  Determina segnale attuale
-    if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
-
-        current_signal = "BUY"
-        previous_signal = current_signal  # aggiorna prima di uscire
-
-
-        log("───────S-I-G-N-A-L──────────")
+        # blocco inizialize che sembra rallentare ...
+        if not mt5.initialize():
+            print("Errore MT5:", mt5.last_error())
+            return
         
-        log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+        if df is None:
+            # log(f"⚠️ get_data() ha restituito None per {SYMBOL}. Salto il ciclo.")
+            return  # esce da check_signal() senza fare danni
 
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-        # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
-                
-        # base_url_slave = "http://127.0.0.1:9001"
-        # 1️⃣ Recupero trader
-        trader = get_trader(cursor, CURRENT_TRADER.id)
-        if not trader:
-            return {"status": "ko", "message": "Trader non trovato", "logs": logs}
+        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+        ema_long = compute_ema(df, PARAMETERS["EMA_long"])
+        rsi = compute_rsi(df, PARAMETERS["RSI_period"])
 
-        # 2️⃣ Inizializza server SLAVE
-        base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+        #  Determina segnale attuale
+        if ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 70:
 
-        BASE_URL_SLAVE = base_url_slave
-
-        try:
-                positions_url = f"{base_url_slave}/positions"
-                log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
-
-                resp = safe_get(positions_url, timeout=10)
-
-                # ⛔ SE SAFE_GET FALLISCE → resp è None → esci subito
-                if resp is None:
-                    log("❌ Slave offline → esco da check_signal()")
-                    return
+            current_signal = "BUY"
+            previous_signal = current_signal  # aggiorna prima di uscire
 
 
+            log("───────S-I-G-N-A-L──────────")
+            
+            log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
 
-                resp.raise_for_status()
-                positions = resp.json()
-
-                if positions:
-                    log("📌 Posizioni aperte sullo SLAVE:")
-                    for p in positions:
-                        log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+            conn = get_connection()
+            cursor = conn.cursor(dictionary=True)
+            # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
                     
+            # base_url_slave = "http://127.0.0.1:9001"
+            # 1️⃣ Recupero trader
+            trader = get_trader(cursor, CURRENT_TRADER.id)
+            if not trader:
+                return {"status": "ko", "message": "Trader non trovato", "logs": logs}
 
-                    # Se c'è già il simbolo  non inviare nuovo ordine
-                    if any(p["symbol"] == SYMBOL for p in positions):
-                        log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
-                        
+            # 2️⃣ Inizializza server SLAVE
+            base_url_slave = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+            BASE_URL_SLAVE = base_url_slave
+
+            try:
+                    positions_url = f"{base_url_slave}/positions"
+                    log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
+
+                    resp = safe_get(positions_url, timeout=10)
+
+                    # ⛔ SE SAFE_GET FALLISCE → resp è None → esci subito
+                    if resp is None:
+                        log("❌ Slave offline → esco da check_signal()")
                         return
 
-        except requests.exceptions.RequestException as e:
-                log(f"❌ Errore di connessione al slave API: {e}")
-                
 
-        # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
-        if any(p.get("symbol") == SYMBOL for p in positions):
-            log("⚠️ Posizione già aperta sullo SLAVE, skip invio BUY")
-            return
+
+                    resp.raise_for_status()
+                    positions = resp.json()
+
+                    if positions:
+                        log("📌 Posizioni aperte sullo SLAVE:")
+                        for p in positions:
+                            log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+                        
+
+                        # Se c'è già il simbolo  non inviare nuovo ordine
+                        if any(p["symbol"] == SYMBOL for p in positions):
+                            log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
+                            
+                            return
+
+            except requests.exceptions.RequestException as e:
+                    log(f"❌ Errore di connessione al slave API: {e}")
+                    
+
+            # 2️⃣ Controlla se c'è già una posizione aperta su XAUUSD
+            if any(p.get("symbol") == SYMBOL for p in positions):
+                log("⚠️ Posizione già aperta sullo SLAVE, skip invio BUY")
+                return
+            else:
+                log(f"🚀 Invio BUY allo SLAVE")
+                send_buy_to_slave()
+
         else:
-            log(f"🚀 Invio BUY allo SLAVE")
-            send_buy_to_slave()
-
-    else:
-        # send_buy_to_slave()
-        current_signal = "HOLD"
-        log("───────S-I-G-N-A-L──────────")
-        # log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
-        log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
+            # send_buy_to_slave()
+            current_signal = "HOLD"
+            log("───────S-I-G-N-A-L──────────")
+            # log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")   
+            log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
 
 
-        # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
-        # Log dello stato precedente e attuale
-        log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
+            # Se il segnale passa da BUY a HOLD, chiudiamo la posizione
+            # Log dello stato precedente e attuale
+            log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
 
-        if previous_signal == "BUY":
-            log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
-            close_slave_position()
-     
-    # Aggiorna lo stato precedente
-    previous_signal = current_signal
+            if previous_signal == "BUY":
+                log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
+                close_slave_position()
+        
+        # Aggiorna lo stato precedente
+        previous_signal = current_signal
 
     
 
