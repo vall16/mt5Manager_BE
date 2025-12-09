@@ -1,6 +1,8 @@
 # logger.py
 from datetime import datetime
 # logger.py
+from decimal import Decimal
+import json
 from pprint import pformat
 import time
 import sys
@@ -15,23 +17,52 @@ start_time = datetime.now()
 logs = []  # lista globale dei log
 
 
+# def log(message):
+#     global logs
+#     # converte in stringa leggibile
+#     if isinstance(message, dict):
+#         # message = pformat(message)
+#         message = json.dumps(message, indent=2, ensure_ascii=False)
+
+#     elif not isinstance(message, str):
+#         message = str(message)
+
+#     # timestamp relativo
+#     elapsed = (datetime.now() - start_time).total_seconds()
+#     timestamp = f"[+{elapsed:.1f}s]"
+
+#     for line in message.splitlines():
+#         line_to_print = f"{timestamp} {line}"
+#         logs.append(line_to_print)   # <-- mantiene lo storico
+#         print(line_to_print, flush=True)  
+
+
 def log(message):
     global logs
+
+    def default_serializer(obj):
+        if isinstance(obj, Decimal):
+            return float(obj)   # oppure str(obj) se preferisci
+        return str(obj)
+
     # converte in stringa leggibile
     if isinstance(message, dict):
-        message = pformat(message)
+        message = json.dumps(
+            message,
+            indent=2,
+            ensure_ascii=False,
+            default=default_serializer   # <- qui la magia
+        )
     elif not isinstance(message, str):
         message = str(message)
 
-    # timestamp relativo
     elapsed = (datetime.now() - start_time).total_seconds()
     timestamp = f"[+{elapsed:.1f}s]"
 
     for line in message.splitlines():
         line_to_print = f"{timestamp} {line}"
-        logs.append(line_to_print)   # <-- mantiene lo storico
-        print(line_to_print, flush=True)  
-
+        logs.append(line_to_print)
+        print(line_to_print, flush=True)
 # start_time = time.time()
 
 # def log(message):
