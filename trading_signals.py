@@ -208,6 +208,9 @@ signal_lock = threading.Lock()
 
 def check_signal():
 
+    # reset log
+    logs.clear()
+
     with signal_lock:
 
         global current_signal,previous_signal,BASE_URL_SLAVE 
