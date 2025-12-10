@@ -332,12 +332,12 @@ def start_polling(trader:Trader):
     global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL,BASE_URL_SLAVE
 
 
-    print(">>> start_polling CHIAMATO, trader =", trader)
+    # print(">>> start_polling CHIAMATO, trader =", trader)
 
     # Log del JSON formattato
     trader_json = trader.dict()  # converte in dict
     print(">>> start_polling CHIAMATO, trader JSON:\n", json.dumps(trader_json, indent=2))
-    log(f"📥 Body JSON ricevuto:\n{json.dumps(trader_json, indent=2)}")
+    # log(f"📥 Body JSON ricevuto:\n{json.dumps(trader_json, indent=2)}")
 
 
     # Salva il trader globale
