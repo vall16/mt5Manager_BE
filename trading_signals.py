@@ -115,98 +115,231 @@ def compute_atr(df, period=14):
     df['tr'] = df['high'] - df['low']
     atr = df['tr'].rolling(period).mean()
     return atr
+def compute_bollinger(df, period=20, num_std=2):
+    """
+    Calcola le Bollinger Bands.
+    
+    Args:
+        df (DataFrame): dati OHLC con colonna 'close'
+        period (int): periodo della SMA
+        num_std (float): numero di deviazioni standard per le bande
 
-# def check_signal_new():
-#     global current_signal, previous_signal
+    Returns:
+        tuple: (SMA, upper_band, lower_band) come pd.Series
+    """
+    sma = df['close'].rolling(window=period).mean()
+    std = df['close'].rolling(window=period).std()
 
-#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     positions = []
+    upper_band = sma + (std * num_std)
+    lower_band = sma - (std * num_std)
 
-#     if not mt5.initialize():
-#         print("Errore MT5:", mt5.last_error())
-#         return
+    return sma, upper_band, lower_band
 
-#     df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
-#     if df is None:
-#         return
+import numpy as np
 
-#     # Calcoli indicatori
-#     ema_short = compute_ema(df, PARAMETERS["EMA_short"])
-#     ema_long = compute_ema(df, PARAMETERS["EMA_long"])
-#     rsi = compute_rsi(df, PARAMETERS["RSI_period"])
-#     macd, macd_signal = compute_macd(df)
-#     atr = compute_atr(df)
+def compute_hma(df, period=16):
+    """
+    Calcola l'Hull Moving Average (HMA) su una serie 'close'.
 
-#     # Calcolo pendenze EMA
-#     ema_slope = ema_short.iloc[-1] - ema_short.iloc[-2]
-#     ema_long_slope = ema_long.iloc[-1] - ema_long.iloc[-2]
+    Args:
+        df (DataFrame): dati OHLC con colonna 'close'
+        period (int): periodo della HMA (tipico: 16, 20, 21)
 
-#     # Parametri di soglia
-#     rsi_threshold = 60
-#     atr_threshold = df['close'].std() * 0.1  # esempio, puoi personalizzare
+    Returns:
+        pd.Series: serie HMA
+    """
+    half_period = int(period / 2)
+    sqrt_period = int(np.sqrt(period))
 
-#     # =======================
-#     # Condizione BUY più acuminata
-#     # =======================
-#     if (ema_short.iloc[-1] > ema_long.iloc[-1] and
-#         ema_slope > 0 and
-#         ema_long_slope > 0 and
-#         rsi.iloc[-1] < rsi_threshold and
-#         macd.iloc[-1] > macd_signal.iloc[-1] and
-#         atr.iloc[-1] > atr_threshold):
+    # WMA ponderata
+    def wma(series, n):
+        weights = np.arange(1, n + 1)
+        return series.rolling(n).apply(lambda x: np.dot(x, weights)/weights.sum(), raw=True)
 
-#         current_signal = "BUY"
-#         previous_signal = current_signal
+    wma_half = wma(df['close'], half_period)
+    wma_full = wma(df['close'], period)
 
-#         log("───────S-I-G-N-A-L──────────")
-#         log(f"🔥🔥🔥 [{now}] BUY signal per {SYMBOL} !")
+    hma = wma(2 * wma_half - wma_full, sqrt_period)
+    return hma
 
-#         # Recupera posizioni SLAVE
-#         try:
-#             positions_url = f"{base_url_slave}/positions"
-#             log(f"🔹 Recupero posizioni dallo slave via {positions_url}")
-#             # resp = (positions_url, timeout=10)
-#             resp = safe_get(positions_url, timeout=10)
-#             resp.raise_for_status()
-#             positions = resp.json()
+def compute_adx(df, period=14):
+    """
+    Calcola l'Average Directional Index (ADX) e i componenti +DI e -DI.
 
-#             if positions:
-#                 log("📌 Posizioni aperte sullo SLAVE:")
-#                 for p in positions:
-#                     log(f"  - Symbol: {p['symbol']}, Volume: {p['volume']}, Type: {p['type']}")
+    Args:
+        df (DataFrame): dati OHLC con colonne 'high', 'low', 'close'
+        period (int): periodo per il calcolo (default=14)
 
-#                 if any(p["symbol"] == SYMBOL for p in positions):
-#                     log(f"⚠️ Posizione {SYMBOL} già aperta sullo SLAVE. Skip BUY.")
-#                     return
+    Returns:
+        pd.DataFrame: colonne ['ADX', '+DI', '-DI']
+    """
+    high = df['high']
+    low = df['low']
+    close = df['close']
 
-#         except requests.exceptions.RequestException as e:
-#             log(f"❌ Errore di connessione al slave API: {e}")
+    # True Range
+    tr1 = high - low
+    tr2 = (high - close.shift()).abs()
+    tr3 = (low - close.shift()).abs()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
-#         # Invio BUY allo slave
-#         log(f"🚀 Invio BUY allo SLAVE")
-#         esito = send_buy_to_slave()
+    # +DM e -DM
+    up_move = high - high.shift()
+    down_move = low.shift() - low
+    plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
+    minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
 
-#         if not esito:
-#             log("❌ BUY non inviato correttamente allo SLAVE! Riprovo al prossimo ciclo...")
-#             return
+    # Smoothed TR, +DM, -DM
+    atr = tr.rolling(period).mean()
+    plus_di = 100 * pd.Series(plus_dm).rolling(period).mean() / atr
+    minus_di = 100 * pd.Series(minus_dm).rolling(period).mean() / atr
+
+    dx = (abs(plus_di - minus_di) / (plus_di + minus_di)) * 100
+    adx = dx.rolling(period).mean()
+
+    return pd.DataFrame({'ADX': adx, '+DI': plus_di, '-DI': minus_di})
 
 
-#     else:
-#         current_signal = "HOLD"
-#         log("───────S-I-G-N-A-L──────────")
-#         log(f"⚠️  [{now}] HOLD signal per {SYMBOL} ...")
+signal_lock = threading.Lock()
+# gestisce buy e sell
+def check_signal():
 
-#         # Se il segnale passa da BUY a HOLD, chiudi posizione
-#         log(f"🔄 previous_signal = {previous_signal}, current_signal = {current_signal}")
-#         if previous_signal == "BUY":
-#             log(f"⚠️ Segnale passato da BUY a HOLD → chiudo posizione {SYMBOL} sullo SLAVE")
-#             close_slave_position()
+    logs.clear()
 
-#     previous_signal = current_signal
+    with signal_lock:
+        global current_signal, previous_signal, BASE_URL_SLAVE
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        positions = []
+
+        if not mt5.initialize():
+            print("Errore MT5:", mt5.last_error())
+            return
+
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+        if df is None:
+            return
+
+        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+        ema_long = compute_ema(df, PARAMETERS["EMA_long"])
+        rsi = compute_rsi(df, PARAMETERS["RSI_period"])
+
+        # ============================
+        #   🔍 Determinazione segnale
+        # ============================
+        buy_condition  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+        sell_condition = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+
+        # ============================
+        #   🔄 Recupera info trader/slave
+        # ============================
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        trader = get_trader(cursor, CURRENT_TRADER.id)
+        if not trader:
+            log("❌ Trader non trovato.")
+            return
+
+        BASE_URL_SLAVE = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+        # ============================
+        #   📌 Recupero posizioni SLAVE
+        # ============================
+        try:
+            positions_url = f"{BASE_URL_SLAVE}/positions"
+            resp = safe_get(positions_url, timeout=10)
+
+            if resp is None:
+                log("❌ Slave offline → esco")
+                return
+
+            resp.raise_for_status()
+            positions = resp.json()
+
+        except Exception as e:
+            log(f"❌ Errore posizioni slave: {e}")
+            return
+
+        # helper
+        def slave_has_position(symbol):
+            return any(p.get("symbol") == symbol for p in positions)
+
+        # ============================
+        #   📈 BUY SIGNAL
+        # ============================
+        if buy_condition:
+            current_signal = "BUY"
+            log("───────S-I-G-N-A-L──────────")
+            log(f"🔥 [{now}] BUY signal per {SYMBOL}")
+
+            # Se lo SLAVE ha già BUY → skip
+            if slave_has_position(SYMBOL):
+                log(f"⚠️ BUY su {SYMBOL} già aperto. Skip.")
+                previous_signal = current_signal
+                return
+
+            # Non aprire BUY se una SELL è aperta (es. hedge vietato)
+            if any(p.get("type") == 1 and p.get("symbol") == SYMBOL for p in positions):
+                log(f"⚠️ Esiste SELL aperta su {SYMBOL}, skip BUY.")
+                previous_signal = current_signal
+                return
+
+            log("🚀 Invio BUY allo SLAVE")
+            send_buy_to_slave()
+            previous_signal = current_signal
+            return
+
+        # ============================
+        #   📉 SELL SIGNAL
+        # ============================
+        if sell_condition:
+            current_signal = "SELL"
+            log("───────S-I-G-N-A-L──────────")
+            log(f"🔻 [{now}] SELL signal per {SYMBOL}")
+
+            # Se lo SLAVE ha già SELL → skip
+            if any(p.get("symbol") == SYMBOL and p.get("type") == 1 for p in positions):
+                log(f"⚠️ SELL su {SYMBOL} già aperta. Skip.")
+                previous_signal = current_signal
+                return
+
+            # Non aprire SELL se un BUY è aperto
+            if any(p.get("type") == 0 and p.get("symbol") == SYMBOL for p in positions):
+                log(f"⚠️ BUY aperto su {SYMBOL}, skip SELL.")
+                previous_signal = current_signal
+                return
+
+            log("🚀 Invio SELL allo SLAVE")
+            send_sell_to_slave()   
+            previous_signal = current_signal
+            return
+
+        # ============================
+        #   ⏸️ HOLD (nessun BUY / SELL)
+        # ============================
+        current_signal = "HOLD"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"⚠️ [{now}] HOLD per {SYMBOL}")
+
+        log(f"🔄 previous_signal={previous_signal}, current={current_signal}")
+
+        # Se era BUY e diventa HOLD → chiudi BUY
+        if previous_signal == "BUY":
+            log(f"⚠️ BUY → HOLD: chiudo BUY {SYMBOL}")
+            close_slave_position()
+
+        # Se era SELL e diventa HOLD → chiudi SELL
+        if previous_signal == "SELL":
+            log(f"⚠️ SELL → HOLD: chiudo SELL {SYMBOL}")
+            close_slave_position()
+
+        previous_signal = current_signal
+
+
 signal_lock = threading.Lock()
 
-
-def check_signal():
+def check_signal_old():
 
     # reset log
     logs.clear()
@@ -248,7 +381,6 @@ def check_signal():
             cursor = conn.cursor(dictionary=True)
             # 1️⃣ Recupera le posizioni correnti sullo SLAVE per vedere se c'è già il buy per lui
                     
-            # base_url_slave = "http://127.0.0.1:9001"
             # 1️⃣ Recupero trader
             trader = get_trader(cursor, CURRENT_TRADER.id)
             if not trader:
@@ -390,6 +522,89 @@ def stop_polling():
 def get_signal():
     return {"signal": current_signal}
 
+def send_sell_to_slave():
+
+    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
+    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+    
+    resp = safe_get(info_url, timeout=10)
+    if resp is None:
+        log("❌ Impossibile ottenere symbol_info dallo slave")
+        return False
+
+    sym_info = resp.json()
+
+    # 🔹 Tick request
+    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
+    log(f"📡 Richiedo tick allo slave: {tick_url}")
+
+    resp_tick = safe_get(tick_url, timeout=10)
+    if resp_tick is None or resp_tick.status_code != 200:
+        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave")
+        return False
+
+    tick = resp_tick.json()
+    if not tick or "bid" not in tick or "ask" not in tick:
+        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
+        return False
+
+    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
+
+    # --- CALCOLO SL / TP PER SELL ---
+    sl_pips = CURRENT_TRADER.sl
+    tp_pips = CURRENT_TRADER.tp
+
+    pip_value = float(sym_info.get("point"))
+
+    # SL SOPRA IL PREZZO BID (per SELL)
+    if sl_pips and float(sl_pips) > 0:
+        sl_distance = float(sl_pips) * pip_value
+        calculated_sl = tick["bid"] + sl_distance
+    else:
+        calculated_sl = None
+
+    # TP SOTTO IL PREZZO BID (per SELL)
+    if tp_pips and float(tp_pips) > 0:
+        tp_distance = float(tp_pips) * pip_value
+        calculated_tp = tick["bid"] - tp_distance
+    else:
+        calculated_tp = None
+
+    sl_value = calculated_sl
+    tp_value = calculated_tp
+    trader_id = CURRENT_TRADER.id
+
+    log(f"SL = {sl_value}, TP = {tp_value}")
+
+    # Endpoint Manager che invia allo slave
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+
+    payload = {
+        "trader_id": trader_id,
+        "order_type": "sell",
+        "volume": 0.10,
+        "symbol": SYMBOL,
+        "sl": sl_value,
+        "tp": tp_value,
+    }
+
+    log(f"📤 Invio SELL [symbol={SYMBOL}] allo SLAVE → {url}")
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Risposta SLAVE: {resp.text}")
+
+        if resp.status_code != 200:
+            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
+            return False
+
+        return True
+
+    except requests.RequestException as e:
+        log(f"❌ Errore invio ordine SELL: {e}")
+        return False
+
+
 def send_buy_to_slave():
 
     info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
@@ -494,3 +709,183 @@ def close_slave_position():
     except requests.RequestException as e:
         log(f"❌ Errore chiusura posizione: {e}")
 
+import numpy as np
+from datetime import datetime
+
+def check_signal_super():
+    """
+    🔹 Versione avanzata del segnale:
+    - Filtri trend e volatilità
+    - Controllo posizioni slave
+    - Evita falsi segnali in news, gap, low volume
+    """
+    logs.clear()
+
+    with signal_lock:
+        global current_signal, previous_signal, BASE_URL_SLAVE
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        positions = []
+
+        if not mt5.initialize():
+            log(f"❌ Errore MT5: {mt5.last_error()}")
+            return
+
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+        if df is None:
+            return
+
+        # ------------------------
+        # Indicatori principali
+        # ------------------------
+        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+        ema_long  = compute_ema(df, PARAMETERS["EMA_long"])
+        rsi       = compute_rsi(df, PARAMETERS["RSI_period"])
+        macd, macd_signal = compute_macd(df)
+        atr       = compute_atr(df)
+        sma, upper_bb, lower_bb = compute_bollinger(df)
+        hma       = compute_hma(df)
+        adx_val   = compute_adx(df).iloc[-1]
+
+        # ------------------------
+        # Filtri aggiuntivi
+        # ------------------------
+        # Trend M15
+        df15 = get_data(SYMBOL, mt5.TIMEFRAME_M15, N_CANDLES)
+        big_trend_up = compute_ema(df15, 20).iloc[-1] > compute_ema(df15, 50).iloc[-1] if df15 is not None else True
+        big_trend_down = not big_trend_up
+
+        # Volatilità e volume
+        vol_mean = df['tick_volume'].rolling(20).mean().iloc[-1]
+        vol_now  = df['tick_volume'].iloc[-1]
+        volume_ok = vol_now > vol_mean * 1.3 if vol_mean else True
+
+        volatility_ok = atr.iloc[-1] > atr.iloc[-5] if len(atr) >= 5 else True
+        strong_trend = adx_val > 20
+
+        # Gap detection
+        gap = abs(df['open'].iloc[-1] - df['close'].iloc[-2]) > (df['close'].iloc[-2]*0.001)
+        if gap:
+            log("⚠️ GAP troppo grande → Skip")
+            current_signal = "HOLD"
+            return
+
+        # News filter
+        # if is_news_time():
+        #     log("⚠️ NEWS event → Skip trading")
+        #     current_signal = "HOLD"
+        #     return
+
+        # ------------------------
+        # Recupero trader / slave
+        # ------------------------
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        trader = get_trader(cursor, CURRENT_TRADER.id)
+        if not trader:
+            log("❌ Trader non trovato")
+            return
+        BASE_URL_SLAVE = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+        try:
+            resp = safe_get(f"{BASE_URL_SLAVE}/positions", timeout=10)
+            if resp is None:
+                log("❌ Slave offline → Skip")
+                return
+            resp.raise_for_status()
+            positions = resp.json()
+        except Exception as e:
+            log(f"❌ Errore posizioni slave: {e}")
+            return
+
+        def slave_has_position(symbol, order_type=None):
+            return any(
+                p.get("symbol") == symbol and (order_type is None or p.get("type") == order_type)
+                for p in positions
+            )
+
+        # ------------------------
+        # Condizioni BUY
+        # ------------------------
+        buy_condition = (
+            ema_short.iloc[-1] > ema_long.iloc[-1] and
+            rsi.iloc[-1] < 65 and
+            macd.iloc[-1] > macd_signal.iloc[-1] and
+            hma.iloc[-1] > hma.iloc[-2] and
+            volume_ok and volatility_ok and strong_trend and big_trend_up
+        )
+
+        # ------------------------
+        # Condizioni SELL
+        # ------------------------
+        sell_condition = (
+            ema_short.iloc[-1] < ema_long.iloc[-1] and
+            rsi.iloc[-1] > 35 and
+            macd.iloc[-1] < macd_signal.iloc[-1] and
+            hma.iloc[-1] < hma.iloc[-2] and
+            volume_ok and volatility_ok and strong_trend and big_trend_down
+        )
+
+        # ============================
+        # BUY
+        # ============================
+        if buy_condition:
+            current_signal = "BUY"
+            log("───────S-I-G-N-A-L──────────")
+            log(f"🔥 [{now}] BUY signal per {SYMBOL}")
+
+            if slave_has_position(SYMBOL):
+                log(f"⚠️ BUY su {SYMBOL} già aperto. Skip.")
+                previous_signal = current_signal
+                return
+
+            if any(p.get("type") == 1 and p.get("symbol") == SYMBOL for p in positions):
+                log(f"⚠️ Esiste SELL aperta su {SYMBOL}, skip BUY.")
+                previous_signal = current_signal
+                return
+
+            log("🚀 Invio BUY allo SLAVE")
+            send_buy_to_slave()
+            previous_signal = current_signal
+            return
+
+        # ============================
+        # SELL
+        # ============================
+        if sell_condition:
+            current_signal = "SELL"
+            log("───────S-I-G-N-A-L──────────")
+            log(f"🔻 [{now}] SELL signal per {SYMBOL}")
+
+            if slave_has_position(SYMBOL, order_type=1):
+                log(f"⚠️ SELL su {SYMBOL} già aperta. Skip.")
+                previous_signal = current_signal
+                return
+
+            if any(p.get("type") == 0 and p.get("symbol") == SYMBOL for p in positions):
+                log(f"⚠️ BUY aperto su {SYMBOL}, skip SELL.")
+                previous_signal = current_signal
+                return
+
+            log("🚀 Invio SELL allo SLAVE")
+            send_sell_to_slave()
+            previous_signal = current_signal
+            return
+
+        # ============================
+        # HOLD
+        # ============================
+        current_signal = "HOLD"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"⚠️ [{now}] HOLD per {SYMBOL}")
+        log(f"🔄 previous_signal={previous_signal}, current_signal={current_signal}")
+
+        # chiudi eventuali posizioni aperte se segnale HOLD
+        if previous_signal == "BUY":
+            log(f"⚠️ BUY → HOLD: chiudo BUY {SYMBOL}")
+            close_slave_position()
+        if previous_signal == "SELL":
+            log(f"⚠️ SELL → HOLD: chiudo SELL {SYMBOL}")
+            close_slave_position()
+
+        previous_signal = current_signal

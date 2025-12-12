@@ -574,15 +574,6 @@ def copy_orders(trader_id: int):
 
     logs = []  # elenco dei messaggi di log
 
-    # start_time = datetime.now()  
-
-    # def log(message: str):
-    #     """Aggiunge un messaggio con timestamp relativo."""
-    #     elapsed = (datetime.now() - start_time).total_seconds()
-    #     timestamp = f"[+{elapsed:.1f}s]"
-    #     logs.append(f"{timestamp} {message}")
-    #     print(f"{timestamp} {message}")  # Mantieni anche la stampa in console
-
 
     log("🚀 Entrato in copy_orders()")
 
@@ -822,8 +813,7 @@ def copy_orders(trader_id: int):
             # 🔹 3️⃣ Invio ordine allo slave via API
             order_url = f"{base_url}/order"
             log(f"🔁 Invio ordine allo slave via API: {order_url}")
-            # log(f"🧾 Dati inviati: {json.dumps(request, indent=2)}")
-            # log(f"🧾 Dati inviati: {json.dumps(request, indent=2)}")
+            
             log("🧾 Dati inviati:\n" + pformat(request))
 
 
