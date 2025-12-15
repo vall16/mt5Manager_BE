@@ -1,21 +1,19 @@
-# --- 1. Base image ---
-FROM python:3.12-slim
+# 1️⃣ Usa Python 3.11.9 come base
+FROM python:3.11.9-slim
 
-# --- 2. Imposta working directory ---
-WORKDIR /app
+# 2️⃣ Imposta la working directory dentro il container
+WORKDIR /code
 
-# --- 3. Copia requirements ---
+# 3️⃣ Copia requirements.txt e installa dipendenze
 COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# --- 4. Installa dipendenze ---
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-# --- 5. Copia tutto il progetto ---
+# 4️⃣ Copia tutto il codice del progetto
 COPY . .
 
-# --- 6. Espone la porta 8080 ---
+# 5️⃣ Espone la porta usata dal backend
 EXPOSE 8080
 
-# --- 7. Comando di avvio ---
+# 6️⃣ Comando per avviare l'app con uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
