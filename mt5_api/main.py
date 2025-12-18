@@ -278,6 +278,7 @@ def get_symbol_info(symbol: str):
         "point": info.point
     }
 
+# serve a "accendere" o "spegnere" un simbolo all'interno della finestra Market Watch
 @app.post("/symbol_select")
 def select_symbol(data: dict):
     symbol = data.get("symbol")

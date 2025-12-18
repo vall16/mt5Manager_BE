@@ -13,7 +13,7 @@ from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpda
 from fastapi import FastAPI, HTTPException
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-import MetaTrader5 as mt5
+# import MetaTrader5 as mt5
 import bcrypt
 import os
 import re
@@ -721,35 +721,74 @@ def copy_orders(trader_id: int):
                 continue
 
                 
+            # if not sym_info.get("visible", False):
+            #     log(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
+            #     if not mt5.symbol_select(symbol, True):
+            #         log(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
+            #         # 🔹 Tentativo con simbolo normalizzato
+            #         normalized_symbol = normalize_symbol(symbol)
+                    
+            #         if normalized_symbol != symbol:
+            #             log(f"🔄 Tentativo 2: provo simbolo normalizzato '{normalized_symbol}'...")
+            #             info_url = f"{base_url}/symbol_info/{normalized_symbol}"
+            #             try:
+            #                 resp = safe_get(info_url, timeout=10)
+            #                 sym_info = resp.json()
+            #             except Exception as e:
+            #                 log(f"⚠️ Errore richiesta info simbolo normalizzato {normalized_symbol}: {e}")
+            #                 continue
+
+            #             if resp.status_code == 200 and sym_info.get("visible", False):
+            #                 log(f"✅ Simbolo normalizzato '{normalized_symbol}' trovato sullo slave.")
+            #                 # ** il simbolo dello slave è quello normalizzato
+            #                 symbol = normalized_symbol
+            #             else:
+            #                 log(f"❌ Anche simbolo normalizzato '{normalized_symbol}' non trovato sullo slave, salto ordine.")
+            #                 continue
+
+            #         else:
+            #             log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
+            # else:
+            #     log(f"✅ Simbolo {symbol} è già visibile sullo slave.")
+
             if not sym_info.get("visible", False):
-                log(f"🔹 Simbolo {symbol} non visibile. Provo ad abilitarlo...")
-                if not mt5.symbol_select(symbol, True):
-                    log(f"❌ Errore: impossibile attivare {symbol} sullo slave.")
+                log(f"🔹 Simbolo {symbol} non visibile sullo slave. Provo ad abilitarlo...")
+                
+                # Chiamata API allo slave per abilitare il simbolo
+                select_url = f"{base_url}/symbol_select"
+                select_resp = requests.post(select_url, json={"symbol": symbol, "enable": True}, timeout=10)
+                
+                if select_resp.status_code != 200 or not select_resp.json().get("enabled", False):
+                    log(f"❌ Errore: impossibile attivare {symbol} sullo slave via API.")
+                    
                     # 🔹 Tentativo con simbolo normalizzato
                     normalized_symbol = normalize_symbol(symbol)
                     
                     if normalized_symbol != symbol:
                         log(f"🔄 Tentativo 2: provo simbolo normalizzato '{normalized_symbol}'...")
-                        info_url = f"{base_url}/symbol_info/{normalized_symbol}"
+                        info_url_norm = f"{base_url}/symbol_info/{normalized_symbol}"
                         try:
-                            resp = safe_get(info_url, timeout=10)
-                            sym_info = resp.json()
+                            resp_norm = safe_get(info_url_norm, timeout=10)
+                            sym_info_norm = resp_norm.json()
+                            
+                            if resp_norm.status_code == 200 and sym_info_norm.get("visible", False):
+                                log(f"✅ Simbolo normalizzato '{normalized_symbol}' trovato sullo slave.")
+                                symbol = normalized_symbol
+                                sym_info = sym_info_norm # Aggiorno sym_info con i dati corretti (point, ecc)
+                            else:
+                                log(f"❌ Anche simbolo normalizzato '{normalized_symbol}' non trovato, salto ordine.")
+                                continue
                         except Exception as e:
-                            log(f"⚠️ Errore richiesta info simbolo normalizzato {normalized_symbol}: {e}")
+                            log(f"⚠️ Errore richiesta info normalizzato {normalized_symbol}: {e}")
                             continue
-
-                        if resp.status_code == 200 and sym_info.get("visible", False):
-                            log(f"✅ Simbolo normalizzato '{normalized_symbol}' trovato sullo slave.")
-                            # ** il simbolo dello slave è quello normalizzato
-                            symbol = normalized_symbol
-                        else:
-                            log(f"❌ Anche simbolo normalizzato '{normalized_symbol}' non trovato sullo slave, salto ordine.")
-                            continue
-
                     else:
-                        log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
+                        log(f"❌ Attivazione fallita e nessuna normalizzazione possibile per {symbol}.")
+                        continue
+                else:
+                    log(f"✅ Simbolo {symbol} attivato con successo sullo slave.")
             else:
                 log(f"✅ Simbolo {symbol} è già visibile sullo slave.")
+            # --- FINE INTEGRAZIONE SYMBOL SELECT ---
 
             
             # 🔹 2️⃣ Recupero tick dal server slave via API
@@ -947,7 +986,7 @@ def copy_orders(trader_id: int):
         
 
     # ✅ Pulizia finale
-    mt5.shutdown()
+    # mt5.shutdown()
     cursor.close()
     conn.close()
 
