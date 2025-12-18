@@ -1,10 +1,7 @@
 from datetime import datetime
-# import MetaTrader5 as mt5
-
 from pydantic import BaseModel
-from logger import log, logs
-
-from fastapi import APIRouter, HTTPException, Query, Request
+from logger import  logs
+from fastapi import APIRouter, HTTPException, Request
 from models import (
     LoginRequest, LoginResponse, BuyRequest, SellRequest, CloseRequest,
     GetLastCandleRequest, GetLastDealsHistoryRequest, DealsAllResponse,
@@ -279,8 +276,8 @@ async def start_server(server: ServerRequest):
     import requests
     from fastapi import HTTPException
 
-    MAX_WAIT = 90  # secondi massimi di attesa
-    SLEEP_INTERVAL = 2  # intervallo tra i poll
+    # MAX_WAIT = 90  # secondi massimi di attesa
+    # SLEEP_INTERVAL = 2  # intervallo tra i poll
 
 
     print(f"🚀 Richiesta avvio terminale MT5 su agente {server.ip}:{server.port}")
@@ -342,11 +339,11 @@ async def start_server(server: ServerRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/webhook/open_position")
-async def open_position(req: Request):
-    data = await req.json()
-    print("📩 Nuova posizione ricevuta:", data)
-    # Qui puoi inserire nel DB, loggare o avviare il processo di copia
-    return {"status": "ok"}
-    # Esempio: chiama la funzione di copia (definita nel tuo db.py)
+# @router.post("/webhook/open_position")
+# async def open_position(req: Request):
+#     data = await req.json()
+#     print("📩 Nuova posizione ricevuta:", data)
+#     # Qui puoi inserire nel DB, loggare o avviare il processo di copia
+#     return {"status": "ok"}
+#     # Esempio: chiama la funzione di copia (definita nel tuo db.py)
     
