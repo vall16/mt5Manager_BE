@@ -13,9 +13,6 @@ import uvicorn
 from logger import log, logs
 from fastapi.middleware.cors import CORSMiddleware
 
-
-
-
 app = FastAPI(title="MT5_API")
 
 # Permette ad Angular in sviluppo di chiamare questa API
@@ -182,13 +179,6 @@ def health_check():
         return {"status": "error", "message": str(e)}
 
 
-# @app.get("/positions")
-# def get_positions():
-#     positions = mt5.positions_get()
-#     if positions is None:
-#         raise HTTPException(status_code=400, detail="Cannot get positions")
-#     return [p._asdict() for p in positions]
-
 @app.get("/positions")
 def get_positions():
     positions = mt5.positions_get()
@@ -274,6 +264,7 @@ def get_active_symbols():
     }
 
 
+# interroga MetaTrader per conoscere le impostazioni "fisse" di quel simbolo
 @app.get("/symbol_info/{symbol}")
 def get_symbol_info(symbol: str):
     info = mt5.symbol_info(symbol)
@@ -295,6 +286,8 @@ def select_symbol(data: dict):
     success = mt5.symbol_select(symbol, True)
     return {"symbol": symbol, "enabled": success}
 
+# Chiede l'ultimo "tick" disponibile per quel simbolo. 
+# Un tick rappresenta l'aggiornamento più recente del prezzo sul mercato.
 @app.get("/symbol_tick/{symbol}")
 def get_symbol_tick(symbol: str):
     tick = mt5.symbol_info_tick(symbol)

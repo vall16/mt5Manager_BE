@@ -6,16 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
-import requests
 
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
 from trading_signals import router as trade_router
-# from trading_signals import start_polling
-
-# MT5_API_URL = "http://127.0.0.1:8081"
-# MT5_API_KEY = "superkey123"
 
 # --- LOGGING ---
 log_file_path = "./fxscript.log"
@@ -59,20 +54,6 @@ app.add_middleware(
 app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
 app.include_router(trade_router, prefix="/trade", tags=["AppTrader5"])
-
-
-# --- STARTUP ---
-# @app.on_event("startup")
-# def startup_event():
-#     """
-#     Evento di avvio dell'API Manager:
-#     - verifica connessione al DB
-#     - crea file di log
-#     - NON inizializza MetaTrader
-#     """
-#     logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
-#     # start_polling()
-
 
 
 # --- ERROR HANDLERS ---
