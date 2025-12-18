@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 import os
 import subprocess
+# importante! gira solo in Windows !
 import MetaTrader5 as mt5
 import concurrent
 import subprocess

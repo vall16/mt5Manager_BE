@@ -35,6 +35,9 @@ N_CANDLES = 50
 CHECK_INTERVAL = 10  # secondi
 PARAMETERS = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14}
 
+# 1. Definisci SYMBOL in alto
+SYMBOL = "XAUUSD"
+
 # Stato globale del segnale
 current_signal = "HOLD"
 previous_signal = "HOLD"
@@ -256,24 +259,6 @@ def check_signal():
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         positions = []
 
-        # if not mt5.initialize():
-        #     print("Errore MT5:", mt5.last_error())
-        #     return
-
-        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
-        if df is None:
-            return
-
-        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
-        ema_long = compute_ema(df, PARAMETERS["EMA_long"])
-        rsi = compute_rsi(df, PARAMETERS["RSI_period"])
-
-        # ============================
-        #   🔍 Determinazione segnale
-        # ============================
-        buy_condition  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
-        sell_condition = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
-
         # ============================
         #   🔄 Recupera info trader/slave
         # ============================
@@ -287,6 +272,25 @@ def check_signal():
 
         BASE_URL_SLAVE = f"http://{trader['slave_ip']}:{trader['slave_port']}"
 
+        # if not mt5.initialize():
+        #     print("Errore MT5:", mt5.last_error())
+        #     return
+
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES,BASE_URL_SLAVE)
+        if df is None:
+            return
+
+        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+        ema_long = compute_ema(df, PARAMETERS["EMA_long"])
+        rsi = compute_rsi(df, PARAMETERS["RSI_period"])
+
+        # ============================
+        #   🔍 Determinazione segnale
+        # ============================
+        buy_condition  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+        sell_condition = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+
+        
         # ============================
         #   📌 Recupero posizioni SLAVE
         # ============================
@@ -684,7 +688,7 @@ def check_signal_super():
         # Filtri aggiuntivi
         # ------------------------
         # Trend M15
-        df15 = get_data(SYMBOL, 15, N_CANDLES)
+        df15 = get_data(SYMBOL, 15, N_CANDLES,BASE_URL_SLAVE)
         big_trend_up = compute_ema(df15, 20).iloc[-1] > compute_ema(df15, 50).iloc[-1] if df15 is not None else True
         big_trend_down = not big_trend_up
 
