@@ -1,14 +1,7 @@
 from datetime import datetime
-import os
-import socket
-import subprocess
-import sys
-import time
-import MetaTrader5 as mt5
-import logging
+# import MetaTrader5 as mt5
 
 from pydantic import BaseModel
-import requests
 from logger import log, logs
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -21,201 +14,201 @@ from models import (
 router = APIRouter()
 
 # --- LOGIN ---
-@router.post("/login", response_model=LoginResponse)
-def login(request: LoginRequest):
-    if not mt5.initialize(login=int(request.login), password=request.password, server=request.server):
-        logging.error(f"MT5 login failed: {mt5.last_error()}")
-        raise HTTPException(status_code=400, detail="MT5 login failed")
-    info = mt5.account_info()
-    return {"login": info.login, "server": info.server, "balance": info.balance}
+# @router.post("/login", response_model=LoginResponse)
+# def login(request: LoginRequest):
+#     if not mt5.initialize(login=int(request.login), password=request.password, server=request.server):
+#         logging.error(f"MT5 login failed: {mt5.last_error()}")
+#         raise HTTPException(status_code=400, detail="MT5 login failed")
+#     info = mt5.account_info()
+#     return {"login": info.login, "server": info.server, "balance": info.balance}
 
 # --- ACCOUNT INFO & MARGIN ---
-@router.get("/account/info")
-def account_info():
-    info = mt5.account_info()
-    return info._asdict() if info else {"error": mt5.last_error()}
+# @router.get("/account/info")
+# def account_info():
+#     info = mt5.account_info()
+#     return info._asdict() if info else {"error": mt5.last_error()}
 
-@router.get("/account/margin")
-def account_margin():
-    info = mt5.account_info()
-    if info:
-        return {
-            "balance": info.balance,
-            "equity": info.equity,
-            "margin": info.margin,
-            "margin_level": info.margin_level,
-        }
-    return {"error": mt5.last_error()}
+# @router.get("/account/margin")
+# def account_margin():
+#     info = mt5.account_info()
+#     if info:
+#         return {
+#             "balance": info.balance,
+#             "equity": info.equity,
+#             "margin": info.margin,
+#             "margin_level": info.margin_level,
+#         }
+#     return {"error": mt5.last_error()}
 
 
 # --- SYMBOLS ---
-@router.get("/symbols/tradable")
-def symbols_tradable():
-    symbols = mt5.symbols_get()
-    if not symbols:
-        return {"error": mt5.last_error()}
+# @router.get("/symbols/tradable")
+# def symbols_tradable():
+#     symbols = mt5.symbols_get()
+#     if not symbols:
+#         return {"error": mt5.last_error()}
 
-    result = []
-    for s in symbols:
-        result.append({
-            "symbol": s.name,
-            "tradable": s.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL,
-            "selected": s.select,
-            "currency_base": s.currency_base,
-            "currency_profit": s.currency_profit,
-            "spread": s.spread,
-            "point": s.point
-        })
-    return result
+#     result = []
+#     for s in symbols:
+#         result.append({
+#             "symbol": s.name,
+#             "tradable": s.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL,
+#             "selected": s.select,
+#             "currency_base": s.currency_base,
+#             "currency_profit": s.currency_profit,
+#             "spread": s.spread,
+#             "point": s.point
+#         })
+#     return result
 
 # --verfica la tradibilità di un simbolo
-@router.get("/diagnostic/{symbol}")
-def diagnostic(symbol: str):
-    info = {}
+# @router.get("/diagnostic/{symbol}")
+# def diagnostic(symbol: str):
+#     info = {}
 
-    # 1) Terminale inizializzato?
-    info["initialized"] = mt5.initialize()
+#     # 1) Terminale inizializzato?
+#     info["initialized"] = mt5.initialize()
 
-    # 2) Account info
-    acc = mt5.account_info()
-    info["account_connected"] = acc is not None
-    if acc:
-        info["trade_allowed"] = acc.trade_allowed
-        info["trade_mode"] = acc.trade_mode
-        info["margin_mode"] = acc.margin_mode
+#     # 2) Account info
+#     acc = mt5.account_info()
+#     info["account_connected"] = acc is not None
+#     if acc:
+#         info["trade_allowed"] = acc.trade_allowed
+#         info["trade_mode"] = acc.trade_mode
+#         info["margin_mode"] = acc.margin_mode
 
-    # 3) Simbolo
-    sym = mt5.symbol_info(symbol)
-    info["symbol_exists"] = sym is not None
-    if sym:
-        info["symbol_tradable"] = sym.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL
-        info["symbol_trade_mode"] = sym.trade_mode
-        # Se non selezionato → selezioniamolo
-        info["symbol_selected"] = sym.select if sym.select else mt5.symbol_select(symbol, True)
+#     # 3) Simbolo
+#     sym = mt5.symbol_info(symbol)
+#     info["symbol_exists"] = sym is not None
+#     if sym:
+#         info["symbol_tradable"] = sym.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL
+#         info["symbol_trade_mode"] = sym.trade_mode
+#         # Se non selezionato → selezioniamolo
+#         info["symbol_selected"] = sym.select if sym.select else mt5.symbol_select(symbol, True)
 
-    # 4) Prova ORDER_CHECK (simulazione ordine)
-    if sym and acc:
-        tick = mt5.symbol_info_tick(symbol)
-        req = {
-            "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": symbol,
-            "volume": 0.1,
-            "type": mt5.ORDER_TYPE_BUY,
-            "price": tick.ask if tick else 0,
-            "sl": 0,
-            "tp": 0,
-            "deviation": 10,
-            "type_time": mt5.ORDER_TIME_GTC,
-            "type_filling": mt5.ORDER_FILLING_IOC,
-        }
-        check = mt5.order_check(req)
-        info["order_check"] = check._asdict() if check else mt5.last_error()
+#     # 4) Prova ORDER_CHECK (simulazione ordine)
+#     if sym and acc:
+#         tick = mt5.symbol_info_tick(symbol)
+#         req = {
+#             "action": mt5.TRADE_ACTION_DEAL,
+#             "symbol": symbol,
+#             "volume": 0.1,
+#             "type": mt5.ORDER_TYPE_BUY,
+#             "price": tick.ask if tick else 0,
+#             "sl": 0,
+#             "tp": 0,
+#             "deviation": 10,
+#             "type_time": mt5.ORDER_TIME_GTC,
+#             "type_filling": mt5.ORDER_FILLING_IOC,
+#         }
+#         check = mt5.order_check(req)
+#         info["order_check"] = check._asdict() if check else mt5.last_error()
 
-    return info
+#     return info
 
 
 # --- BUY ORDER ---
-@router.post("/order/buy")
-def buy(request: BuyRequest):
-    symbol = request.symbol
-    lot = request.volume
-    price = mt5.symbol_info_tick(symbol).ask
-    order = mt5.order_send({
-        "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": symbol,
-        "volume": lot,
-        "type": mt5.ORDER_TYPE_BUY,
-        "price": price,
-        "deviation": 10,
-        "magic": 42,
-        "comment": "API Buy Order",
-    })
-    if order.retcode != mt5.TRADE_RETCODE_DONE:
-        raise HTTPException(status_code=400, detail=f"Order failed: {order.comment}")
-    return {"status": "ok", "order": order._asdict()}
+# @router.post("/order/buy")
+# def buy(request: BuyRequest):
+#     symbol = request.symbol
+#     lot = request.volume
+#     price = mt5.symbol_info_tick(symbol).ask
+#     order = mt5.order_send({
+#         "action": mt5.TRADE_ACTION_DEAL,
+#         "symbol": symbol,
+#         "volume": lot,
+#         "type": mt5.ORDER_TYPE_BUY,
+#         "price": price,
+#         "deviation": 10,
+#         "magic": 42,
+#         "comment": "API Buy Order",
+#     })
+#     if order.retcode != mt5.TRADE_RETCODE_DONE:
+#         raise HTTPException(status_code=400, detail=f"Order failed: {order.comment}")
+#     return {"status": "ok", "order": order._asdict()}
 
 # --- CLOSE ALL ORDERS ---
-@router.post("/orders/close_all")
-def close_all():
-    positions = mt5.positions_get()
-    if not positions:
-        return {"message": "No open positions"}
-    for pos in positions:
-        close_request = {
-            "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": pos.symbol,
-            "volume": pos.volume,
-            "type": mt5.ORDER_TYPE_SELL if pos.type == 0 else mt5.ORDER_TYPE_BUY,
-            "position": pos.ticket,
-            "price": mt5.symbol_info_tick(pos.symbol).bid if pos.type == 0 else mt5.symbol_info_tick(pos.symbol).ask,
-            "deviation": 20,
-            "magic": 42,
-            "comment": "API Close All"
-        }
-        result = mt5.order_send(close_request)
-        if result.retcode != mt5.TRADE_RETCODE_DONE:
-            logging.error(f"Failed to close {pos.symbol}: {result.comment}")
-    return {"status": "ok"}
+# @router.post("/orders/close_all")
+# def close_all():
+#     positions = mt5.positions_get()
+#     if not positions:
+#         return {"message": "No open positions"}
+#     for pos in positions:
+#         close_request = {
+#             "action": mt5.TRADE_ACTION_DEAL,
+#             "symbol": pos.symbol,
+#             "volume": pos.volume,
+#             "type": mt5.ORDER_TYPE_SELL if pos.type == 0 else mt5.ORDER_TYPE_BUY,
+#             "position": pos.ticket,
+#             "price": mt5.symbol_info_tick(pos.symbol).bid if pos.type == 0 else mt5.symbol_info_tick(pos.symbol).ask,
+#             "deviation": 20,
+#             "magic": 42,
+#             "comment": "API Close All"
+#         }
+#         result = mt5.order_send(close_request)
+#         if result.retcode != mt5.TRADE_RETCODE_DONE:
+#             logging.error(f"Failed to close {pos.symbol}: {result.comment}")
+#     return {"status": "ok"}
 
 
 
-@router.post("/check-server")
-async def check_server(data: ServerCheckRequest):
-    """
-    Verifica se un server MT5 è raggiungibile sulla rete tramite host e porta.
-    """
-    print("Verifica server remoto:", data.dict())
+# @router.post("/check-server")
+# async def check_server(data: ServerCheckRequest):
+#     """
+#     Verifica se un server MT5 è raggiungibile sulla rete tramite host e porta.
+#     """
+#     print("Verifica server remoto:", data.dict())
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(10)  # timeout di 2 secondi per la connessione
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     sock.settimeout(10)  # timeout di 2 secondi per la connessione
 
-    try:
-        sock.connect((data.host, data.port))
-        print("Verifica server remoto:OK")
-        return {"status": "success", "message": f"Server reachable at {data.host}:{data.port}"}
-    except Exception as e:
-        return {"status": "error", "message": f"Cannot connect: {e}"}
-    finally:
-        sock.close()
+#     try:
+#         sock.connect((data.host, data.port))
+#         print("Verifica server remoto:OK")
+#         return {"status": "success", "message": f"Server reachable at {data.host}:{data.port}"}
+#     except Exception as e:
+#         return {"status": "error", "message": f"Cannot connect: {e}"}
+#     finally:
+#         sock.close()
 
-@router.post("/order/sell")
-def order_sell(req: SellRequest):
-    tick = mt5.symbol_info_tick(req.symbol)
-    if not tick:
-        return {"error": mt5.last_error()}
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": req.symbol,
-        "volume": req.lot,
-        "type": mt5.ORDER_TYPE_SELL,
-        "price": tick.bid,
-        "sl": tick.bid + req.sl_point * mt5.symbol_info(req.symbol).point,
-        "tp": tick.bid - req.tp_point * mt5.symbol_info(req.symbol).point,
-        "deviation": req.deviation,
-        "magic": req.magic,
-        "comment": req.comment,
-        "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_IOC,
-    }
-    result = mt5.order_send(request)
-    return result._asdict() if result else {"error": mt5.last_error()}
+# @router.post("/order/sell")
+# def order_sell(req: SellRequest):
+#     tick = mt5.symbol_info_tick(req.symbol)
+#     if not tick:
+#         return {"error": mt5.last_error()}
+#     request = {
+#         "action": mt5.TRADE_ACTION_DEAL,
+#         "symbol": req.symbol,
+#         "volume": req.lot,
+#         "type": mt5.ORDER_TYPE_SELL,
+#         "price": tick.bid,
+#         "sl": tick.bid + req.sl_point * mt5.symbol_info(req.symbol).point,
+#         "tp": tick.bid - req.tp_point * mt5.symbol_info(req.symbol).point,
+#         "deviation": req.deviation,
+#         "magic": req.magic,
+#         "comment": req.comment,
+#         "type_time": mt5.ORDER_TIME_GTC,
+#         "type_filling": mt5.ORDER_FILLING_IOC,
+#     }
+#     result = mt5.order_send(request)
+#     return result._asdict() if result else {"error": mt5.last_error()}
 
 # --- ORDERS HISTORY : NON ANCORA ESEGUITI !---
-@router.get("/orders/history", summary="Storico ordini", description="Restituisce lo storico ordini tra due date.")
-def orders_history(
-    from_date: str = Query("2024-01-01 00:00:00", description="Data inizio"),
-    to_date: str = Query(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description="Data fine"),
-):
-    try:
-        from_dt = datetime.strptime(from_date, "%Y-%m-%d %H:%M:%S")
-        to_dt = datetime.strptime(to_date, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        return {"error": "Formato data non valido. Usa YYYY-MM-DD HH:MM:SS"}
+# @router.get("/orders/history", summary="Storico ordini", description="Restituisce lo storico ordini tra due date.")
+# def orders_history(
+#     from_date: str = Query("2024-01-01 00:00:00", description="Data inizio"),
+#     to_date: str = Query(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), description="Data fine"),
+# ):
+#     try:
+#         from_dt = datetime.strptime(from_date, "%Y-%m-%d %H:%M:%S")
+#         to_dt = datetime.strptime(to_date, "%Y-%m-%d %H:%M:%S")
+#     except ValueError:
+#         return {"error": "Formato data non valido. Usa YYYY-MM-DD HH:MM:SS"}
 
-    orders = mt5.history_orders_get(from_dt, to_dt)
-    if orders is None:
-        return {"error": mt5.last_error()}
-    return [o._asdict() for o in orders]
+#     orders = mt5.history_orders_get(from_dt, to_dt)
+#     if orders is None:
+#         return {"error": mt5.last_error()}
+#     return [o._asdict() for o in orders]
 
 # @router.post("/start_server")
 # async def start_server(server: ServerRequest):
@@ -278,88 +271,6 @@ class ServerRequest(BaseModel):
     pwd: str
 
 
-# @router.post("/start_server")
-# async def start_server(server: ServerRequest):
-#     """
-#     Ordina all'agente remoto di avviare MT5 usando il percorso locale del server remoto.
-#     """
-
-#     print(f"🚀 Richiesta avvio terminale MT5 su agente {server.ip}:{server.port}")
-
-#     # costruiamo l'URL dell'agente remoto (già in esecuzione), dove c'è mt5-api
-#     agent_url = f"http://{server.ip}:{server.port}/start_mt5"
-
-#     payload = {
-#         "path": server.path,   # esempio: C:\\Program Files\\MetaTrader 5\\terminal64.exe
-#         # "server": server.server,
-#         # "platform": server.platform
-#     }
-
-#     try:
-#         # manda la richiesta POST all'agente
-#         response = requests.post(agent_url, json=payload, timeout=10)
-
-#         if response.status_code != 200:
-#             raise HTTPException(
-#                 status_code=500,
-#                 detail=f"Errore dall'agente remoto: {response.text}"
-#             )
-
-#         print(f"✅ Agente remoto ha avviato MT5: {response.json()}")
-
-#         return {
-#             "status": "success",
-#             "agent": agent_url,
-#             "message": "MT5 avviato tramite agente remoto",
-#             "server_path": server.path
-#         }
-
-#     except Exception as e:
-#         print(f"❌ Errore comunicazione agente remoto: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
-
-# # @router.post("/start_server")
-# # async def start_server(server: ServerRequest):
-#     """
-#     Avvia MT5 e lo inizializza per l'API.
-#     """
-#     log(f"🚀 Avvio server {server.server} ({server.platform}) su {server.ip}:{server.port}")
-
-#     if not os.path.exists(server.path):
-#         raise HTTPException(status_code=400, detail=f"Terminal not found at {server.path}")
-
-#     # 1️⃣ Avvia MT5 (l'exe)
-#     try:
-#         subprocess.Popen([server.path], shell=False)
-#         log(f"👍 MT5 exe avviato: {server.path}")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Errore avvio MT5 exe: {e}")
-
-#     # 2️⃣ Inizializza il wrapper Python
-#     try:
-#         # chiudi eventuali inizializzazioni precedenti
-#         try:
-#             mt5.shutdown()
-#         except Exception:
-#             pass
-
-#         if not mt5.initialize(server.path):
-#             err = mt5.last_error()
-#             raise HTTPException(status_code=500, detail=f"Fallita inizializzazione MT5: {err}")
-#         version = ".".join(map(str, mt5.version()))
-#         log(f"✅ MT5 inizializzato correttamente (versione {version})")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Errore init MT5: {e}")
-
-#     return {
-#         "status": "success",
-#         "message": f"MT5 avviato e inizializzato su {server.ip}:{server.port}",
-#         "path": server.path,
-#         "version": version
-#     }
-# sta in ascolto di nuova posizione dal master MT5
-
-
 @router.post("/start_server")
 async def start_server(server: ServerRequest):
     """
@@ -391,18 +302,11 @@ async def start_server(server: ServerRequest):
         "path": server.path
     }
 
-    # payload_login = {
-    #     "login": server.user,
-    #     "password": server.pwd,
-    #     "server": server.server
-    # }
     payload_login = {
         "login": server.user,
         "password": server.pwd,
         "server": server.server
     }
-
-
 
     try:
         # 1️⃣ Avvia MT5 tramite agente (che è già avviato)
@@ -446,26 +350,3 @@ async def open_position(req: Request):
     return {"status": "ok"}
     # Esempio: chiama la funzione di copia (definita nel tuo db.py)
     
-# --- ORDER MODIFY ---
-@router.post("/order/modify", summary="Modifica posizione", description="Modifica StopLoss e TakeProfit di una posizione aperta.")
-def order_modify(
-    symbol: str,
-    ticket: int,
-    new_sl: float,
-    new_tp: float,
-):
-    position = mt5.positions_get(ticket=ticket)
-    if not position:
-        return {"error": f"Posizione {ticket} non trovata."}
-    pos = position[0]
-    request = {
-        "action": mt5.TRADE_ACTION_SLTP,
-        "symbol": symbol,
-        "position": ticket,
-        "sl": new_sl,
-        "tp": new_tp,
-        "magic": pos.magic,
-        "comment": "modify SL/TP",
-    }
-    result = mt5.order_send(request)
-    return result._asdict() if result else {"error": mt5.last_error()}

@@ -34,6 +34,9 @@ class LoginRequest(BaseModel):
 class InitRequest(BaseModel):
     path: str
     
+class ServerCheckRequest(BaseModel):
+    host: str
+    port: int
 
 @app.post("/init-mt5")
 def init_mt5(req: InitRequest):
@@ -490,6 +493,91 @@ def send_order(order: dict):
 
     log(f"✅ Ordine eseguito correttamente: {result}")
     return {"message": "✅ Order sent", "result": result._asdict()}
+
+# non usato per ora
+@app.get("/server_status")
+def server_status():
+    """
+    Stato completo del server MT5 locale.
+    Usato dal manager per verificare se il server è pronto.
+    """
+    status = {
+        "mt5_initialized": False,
+        "terminal": None,
+        "account": None,
+        "ready": False
+    }
+
+    try:
+        terminal = mt5.terminal_info()
+        if terminal is None:
+            return {
+                **status,
+                "error": "MT5 non inizializzato"
+            }
+
+        status["mt5_initialized"] = True
+        status["terminal"] = {
+            "name": terminal.name,
+            "path": terminal.path,
+            "company": terminal.company,
+            "version": ".".join(map(str, mt5.version()))
+        }
+
+        account = mt5.account_info()
+        if account:
+            status["account"] = {
+                "login": account.login,
+                "server": account.server,
+                "balance": account.balance,
+                "equity": account.equity,
+                "currency": account.currency
+            }
+            status["ready"] = True  # 🔥 server pronto a tradare
+
+        return status
+
+    except Exception as e:
+        return {
+            **status,
+            "error": str(e)
+        }
+
+@app.post("/check-server")
+def check_server(payload: dict):
+    """
+    Check minimale del server MT5.
+    Usato dal manager / Angular per verificare che il server risponda.
+    NON fa login, NON inizializza.
+    """
+    log(f"🔎 Check server ricevuto: {payload}")
+
+    try:
+        info = mt5.terminal_info()
+        if info is None:
+            return {
+                "status": "ko",
+                "message": "MT5 non inizializzato o terminale non avviato"
+            }
+
+        version = ".".join(map(str, mt5.version()))
+
+        return {
+            "status": "ok",
+            "message": "MT5 raggiungibile",
+            "mt5_version": version,
+            "terminal": {
+                "name": info.name,
+                "company": info.company
+            }
+        }
+
+    except Exception as e:
+        log(f"❌ Errore check-server: {e}")
+        return {
+            "status": "ko",
+            "message": str(e)
+        }
 
 
 # -----------------------
