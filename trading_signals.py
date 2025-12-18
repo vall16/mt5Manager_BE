@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import MetaTrader5 as mt5
+# import MetaTrader5 as mt5
 from logger import log, logs
 from logger import safe_get
 from db import get_trader, get_connection
@@ -15,7 +15,6 @@ from models import (
 import pandas as pd
 import threading
 import time
-
 import requests
 
 router = APIRouter()
@@ -30,7 +29,8 @@ TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
 
 BASE_URL_SLAVE =""
-TIMEFRAME = mt5.TIMEFRAME_M5
+# TIMEFRAME = mt5.TIMEFRAME_M5
+TIMEFRAME = 5
 N_CANDLES = 50
 CHECK_INTERVAL = 10  # secondi
 PARAMETERS = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14}
@@ -68,24 +68,72 @@ def polling_loop_timer():
 
 
 
-def get_data(symbol, timeframe, n_candles):
-    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
+# def get_data(symbol, timeframe, n_candles):
+#     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
 
-    if rates is None or len(rates) == 0:
-        # log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
+#     if rates is None or len(rates) == 0:
+#         # log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
 
+#         return None
+
+#     df = pd.DataFrame(rates)
+
+#     if "time" not in df.columns:
+#         log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
+
+#         return None
+
+#     df['time'] = pd.to_datetime(df['time'], unit='s')
+#     return df
+
+def get_data(symbol, timeframe, n_candles, agent_url):
+    """
+    Recupera i dati storici chiamando l'API remota mt5_api.
+    
+    :param symbol: str, es. "EURUSD"
+    :param timeframe: int, costante MT5 (es. 15 per M15)
+    :param n_candles: int, numero di candele
+    :param agent_url: str, URL base dell'agente (es. "http://1.2.3.4:5000")
+    """
+    # Endpoint che abbiamo aggiunto a mt5_api.py
+    url = f"{agent_url}/get_rates"
+    
+    payload = {
+        "symbol": symbol,
+        "timeframe": timeframe,
+        "n_candles": n_candles
+    }
+
+    try:
+        # Timeout di 30s coerente con le tue mt5_routes (init-mt5/login)
+        response = requests.post(url, json=payload, timeout=30)
+        
+        if response.status_code != 200:
+            # log(f"❌ Errore API {response.status_code}: {response.text}")
+            return None
+
+        data = response.json()
+        rates = data.get("rates", [])
+
+        if not rates:
+            # log(f"❌ Nessun dato ricevuto da API per {symbol}")
+            return None
+
+        # Creiamo il DataFrame dalla lista di dizionari ricevuta
+        df = pd.DataFrame(rates)
+
+        if "time" not in df.columns:
+            # log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
+            return None
+
+        # Conversione corretta del timestamp Unix in datetime
+        df['time'] = pd.to_datetime(df['time'], unit='s')
+        
+        return df
+
+    except Exception as e:
+        # log(f"❌ Eccezione durante la chiamata a {url}: {e}")
         return None
-
-    df = pd.DataFrame(rates)
-
-    if "time" not in df.columns:
-        log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
-
-        return None
-
-    df['time'] = pd.to_datetime(df['time'], unit='s')
-    return df
-
 
 def compute_ema(df, period):
     return df['close'].ewm(span=period, adjust=False).mean()
@@ -208,9 +256,9 @@ def check_signal():
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         positions = []
 
-        if not mt5.initialize():
-            print("Errore MT5:", mt5.last_error())
-            return
+        # if not mt5.initialize():
+        #     print("Errore MT5:", mt5.last_error())
+        #     return
 
         df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
         if df is None:
@@ -612,11 +660,11 @@ def check_signal_super():
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         positions = []
 
-        if not mt5.initialize():
-            log(f"❌ Errore MT5: {mt5.last_error()}")
-            return
+        # if not mt5.initialize():
+        #     log(f"❌ Errore MT5: {mt5.last_error()}")
+        #     return
 
-        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES)
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES,BASE_URL_SLAVE)
         if df is None:
             return
 
@@ -636,7 +684,7 @@ def check_signal_super():
         # Filtri aggiuntivi
         # ------------------------
         # Trend M15
-        df15 = get_data(SYMBOL, mt5.TIMEFRAME_M15, N_CANDLES)
+        df15 = get_data(SYMBOL, 15, N_CANDLES)
         big_trend_up = compute_ema(df15, 20).iloc[-1] > compute_ema(df15, 50).iloc[-1] if df15 is not None else True
         big_trend_down = not big_trend_up
 

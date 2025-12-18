@@ -579,6 +579,35 @@ def check_server(payload: dict):
             "message": str(e)
         }
 
+# Aggiungi questo import in alto se non c'è
+from fastapi import Body
+
+# ... (restante codice)
+
+@app.post("/get_rates")
+def get_rates(payload: dict = Body(...)):
+    """
+    Ritorna i dati storici (candele) per un simbolo e timeframe specifici.
+    Payload: {"symbol": "EURUSD", "timeframe": 15, "n_candles": 100}
+    """
+    symbol = payload.get("symbol")
+    timeframe = payload.get("timeframe")
+    n_candles = payload.get("n_candles", 100)
+
+    if not symbol or timeframe is None:
+        raise HTTPException(status_code=400, detail="Missing symbol or timeframe")
+
+    # Recupero dati da MT5
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
+
+    if rates is None or len(rates) == 0:
+        return {"rates": []}
+
+    # Trasforma il numpy array strutturato di MT5 in una lista di dizionari
+    # Questo rende i dati serializzabili in JSON per FastAPI
+    rates_list = [dict(zip(rates.dtype.names, x)) for x in rates]
+
+    return {"rates": rates_list}
 
 # -----------------------
 # BLOCCO DI AVVIO
