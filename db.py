@@ -870,8 +870,8 @@ def copy_orders(trader_id: int):
                 log(f"⚠️ Errore di connessione con lo slave: {e}")
                 continue
 
-            # if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-            if result and result.get("result", {}).get("retcode") == mt5.TRADE_RETCODE_DONE:
+            # if result and result.get("result", {}).get("retcode") == mt5.TRADE_RETCODE_DONE:
+            if result and result.get("result", {}).get("retcode") == 10009:
 
                 # 🔹 Inserimento nel DB master_orders
                 
