@@ -5,8 +5,11 @@ import os
 import subprocess
 # importante! gira solo in Windows !
 import MetaTrader5 as mt5
+# importante! gira solo in Windows !
 import concurrent
 import subprocess
+import pandas as pd
+import json
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sys
@@ -598,15 +601,18 @@ def get_rates(payload: dict = Body(...)):
     if not symbol or timeframe is None:
         raise HTTPException(status_code=400, detail="Missing symbol or timeframe")
 
-    # Recupero dati da MT5
+    # 1. Recupero dati da MT5
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
 
     if rates is None or len(rates) == 0:
         return {"rates": []}
 
-    # Trasforma il numpy array strutturato di MT5 in una lista di dizionari
-    # Questo rende i dati serializzabili in JSON per FastAPI
-    rates_list = [dict(zip(rates.dtype.names, x)) for x in rates]
+    # 2. Trasforma in DataFrame (gestisce automaticamente i tipi numpy)
+    df = pd.DataFrame(rates)
+
+    # 3. Converte il DataFrame in una lista di dizionari con tipi Python standard
+    # .to_json() con orient="records" converte correttamente numpy.int64 in int e float64 in float
+    rates_list = json.loads(df.to_json(orient="records"))
 
     return {"rates": rates_list}
 
