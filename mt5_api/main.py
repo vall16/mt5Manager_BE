@@ -549,30 +549,35 @@ def server_status():
 
 @app.post("/check-server")
 def check_server(payload: dict):
-    """
-    Check minimale del server MT5.
-    Usato dal manager / Angular per verificare che il server risponda.
-    NON fa login, NON inizializza.
-    """
     log(f"🔎 Check server ricevuto: {payload}")
 
     try:
+        # Tenta di recuperare le info
         info = mt5.terminal_info()
+        
+        # Se info è None, proviamo a inizializzare al volo 
+        # (magari l'agente è attivo ma il link al terminale è caduto)
         if info is None:
-            return {
-                "status": "ko",
-                "message": "MT5 non inizializzato o terminale non avviato"
-            }
+            if not mt5.initialize():
+                return {
+                    "status": "ko",
+                    "message": f"MT5 non inizializzato. Errore: {mt5.last_error()}"
+                }
+            info = mt5.terminal_info()
 
-        version = ".".join(map(str, mt5.version()))
+        # Conversione versione in stringa leggibile
+        v_tuple = mt5.version()
+        version = f"{v_tuple[0]}.{v_tuple[1]} (Build {v_tuple[2]})"
 
         return {
             "status": "ok",
             "message": "MT5 raggiungibile",
             "mt5_version": version,
+            "connected": info.connected, # Indica se il terminale è connesso ai server del broker
             "terminal": {
                 "name": info.name,
-                "company": info.company
+                "company": info.company,
+                "path": info.path
             }
         }
 

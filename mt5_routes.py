@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
+import requests
 from logger import  logs
 from fastapi import APIRouter, HTTPException, Request
 from models import (
@@ -149,24 +150,13 @@ router = APIRouter()
 
 
 
-# @router.post("/check-server")
-# async def check_server(data: ServerCheckRequest):
-#     """
-#     Verifica se un server MT5 è raggiungibile sulla rete tramite host e porta.
-#     """
-#     print("Verifica server remoto:", data.dict())
-
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     sock.settimeout(10)  # timeout di 2 secondi per la connessione
-
-#     try:
-#         sock.connect((data.host, data.port))
-#         print("Verifica server remoto:OK")
-#         return {"status": "success", "message": f"Server reachable at {data.host}:{data.port}"}
-#     except Exception as e:
-#         return {"status": "error", "message": f"Cannot connect: {e}"}
-#     finally:
-#         sock.close()
+@router.post("/check-server")
+async def manager_check_server(payload: dict):
+    # L'host e port arrivano da Angular
+    agent_url = f"http://{payload['host']}:{payload['port']}/check-server"
+    # Chiamata all'agente mt5_api (che abbiamo memorizzato prima)
+    r = requests.post(agent_url, json={}, timeout=5) 
+    return r.json()
 
 # @router.post("/order/sell")
 # def order_sell(req: SellRequest):
