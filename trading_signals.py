@@ -249,7 +249,7 @@ def compute_adx(df, period=14):
 
 signal_lock = threading.Lock()
 # gestisce buy e sell
-def check_signal():
+def check_signal_original():
 
     logs.clear()
 
@@ -380,6 +380,166 @@ def check_signal():
         # Se era SELL e diventa HOLD → chiudi SELL
         if previous_signal == "SELL":
             log(f"⚠️ SELL → HOLD: chiudo SELL {SYMBOL}")
+            close_slave_position()
+
+        previous_signal = current_signal
+
+# 22/12: ottimizzato per XAUUSD con molte migliorie
+signal_lock = threading.Lock()
+# def check_trendguard_xau_signal():
+def check_signal():
+
+    logs.clear()
+
+    with signal_lock:
+        global current_signal, previous_signal, BASE_URL_SLAVE
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        positions = []
+
+        # ============================
+        # 🔄 Recupero info trader / slave
+        # ============================
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        trader = get_trader(cursor, CURRENT_TRADER.id)
+        if not trader:
+            log("❌ Trader non trovato.")
+            return
+
+        BASE_URL_SLAVE = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+        # ============================
+        # 📊 Dati di mercato
+        # ============================
+        df = get_data(SYMBOL, TIMEFRAME, N_CANDLES, BASE_URL_SLAVE)
+        if df is None or len(df) < 50:
+            log("❌ Dati insufficienti")
+            return
+
+        ema_short = compute_ema(df, PARAMETERS["EMA_short"])
+        ema_long  = compute_ema(df, PARAMETERS["EMA_long"])
+        rsi       = compute_rsi(df, PARAMETERS["RSI_period"])
+        # atr       = compute_atr(df, PARAMETERS["ATR_period"])
+        atr = compute_atr(df, PARAMETERS.get("ATR_period", 14))
+
+
+        ema_s = ema_short.iloc[-1]
+        ema_l = ema_long.iloc[-1]
+        rsi_v = rsi.iloc[-1]
+        atr_v = atr.iloc[-1]
+
+        # ============================
+        # ⚙️ Parametri XAUUSD (tuning)
+        # ============================
+        RSI_BUY_MAX  = PARAMETERS.get("RSI_BUY_MAX", 62)
+        RSI_SELL_MIN = PARAMETERS.get("RSI_SELL_MIN", 38)
+        ATR_MIN      = PARAMETERS.get("ATR_MIN", atr.mean() * 0.7)
+
+        # ============================
+        # 🌪️ Filtro volatilità
+        # ============================
+        if atr_v < ATR_MIN:
+            log(f"⏸️ [{now}] ATR troppo basso ({atr_v:.2f}) → HOLD")
+            current_signal = "HOLD"
+            previous_signal = current_signal
+            return
+
+        # ============================
+        # 🔍 Condizioni di trend
+        # ============================
+        trend_up   = ema_s > ema_l
+        trend_down = ema_s < ema_l
+
+        buy_condition  = trend_up   and rsi_v < RSI_BUY_MAX
+        sell_condition = trend_down and rsi_v > RSI_SELL_MIN
+
+        # ============================
+        # 📌 Recupero posizioni SLAVE
+        # ============================
+        try:
+            resp = safe_get(f"{BASE_URL_SLAVE}/positions", timeout=10)
+            if resp is None:
+                log("❌ Slave offline")
+                return
+
+            resp.raise_for_status()
+            positions = resp.json()
+
+        except Exception as e:
+            log(f"❌ Errore posizioni slave: {e}")
+            return
+
+        def has_buy():
+            return any(p["symbol"] == SYMBOL and p["type"] == 0 for p in positions)
+
+        def has_sell():
+            return any(p["symbol"] == SYMBOL and p["type"] == 1 for p in positions)
+
+        # ============================
+        # 📈 BUY SIGNAL
+        # ============================
+        if buy_condition:
+            current_signal = "BUY"
+            log("─────── T R E N D G U A R D ───────")
+            log(f"🔥 [{now}] BUY XAU | RSI={rsi_v:.1f} ATR={atr_v:.2f}")
+
+            if has_buy():
+                log("⚠️ BUY già aperto → skip")
+                previous_signal = current_signal
+                return
+
+            if has_sell():
+                log("⚠️ SELL aperta → hedge vietato")
+                previous_signal = current_signal
+                return
+
+            send_buy_to_slave()
+            previous_signal = current_signal
+            return
+
+        # ============================
+        # 📉 SELL SIGNAL
+        # ============================
+        if sell_condition:
+            current_signal = "SELL"
+            log("─────── T R E N D G U A R D ───────")
+            log(f"🔻 [{now}] SELL XAU | RSI={rsi_v:.1f} ATR={atr_v:.2f}")
+
+            if has_sell():
+                log("⚠️ SELL già aperta → skip")
+                previous_signal = current_signal
+                return
+
+            if has_buy():
+                log("⚠️ BUY aperto → hedge vietato")
+                previous_signal = current_signal
+                return
+
+            send_sell_to_slave()
+            previous_signal = current_signal
+            return
+
+        # ============================
+        # ⏸️ HOLD INTELLIGENTE
+        # ============================
+        current_signal = "HOLD"
+        log("─────── T R E N D G U A R D ───────")
+        log(f"⏸️ [{now}] HOLD | RSI={rsi_v:.1f}")
+
+        # ❗ NON chiudere se il trend è ancora valido
+        if previous_signal == "BUY" and trend_up:
+            log("🟢 Trend BUY ancora valido → mantengo posizione")
+            return
+
+        if previous_signal == "SELL" and trend_down:
+            log("🔴 Trend SELL ancora valido → mantengo posizione")
+            return
+
+        # 🔥 Qui il trend è davvero rotto → chiudo
+        if previous_signal in ("BUY", "SELL"):
+            log(f"❌ Trend rotto → chiudo {previous_signal}")
             close_slave_position()
 
         previous_signal = current_signal

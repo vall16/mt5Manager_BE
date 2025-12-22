@@ -1,0 +1,7 @@
+2025-12-18 23:22:35,390 - ERROR - Unhandled exception: HTTPConnectionPool(host='127.0.0.1', port=8001): Max retries exceeded with url: /login (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000264030EC810>: Failed to establish a new connection: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione'))
+2025-12-18 23:43:10,763 - INFO - Starting API
+2025-12-18 23:43:11,049 - INFO - Starting API
+2025-12-19 10:32:29,120 - INFO - Starting API
+2025-12-19 10:32:29,425 - INFO - Starting API
+2025-12-19 11:45:34,162 - INFO - Starting API
+2025-12-19 11:45:34,336 - INFO - Starting API
