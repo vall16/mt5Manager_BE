@@ -381,6 +381,94 @@ def delete_server(server_id: int):
         print(e)
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+@router.put("/servers/{server_id}")
+def update_server(server_id: int, server: ServerRequest):
+    conn = get_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+
+    try:
+        cursor = conn.cursor()
+
+        # Controlla se il server esiste
+        cursor.execute("SELECT id FROM servers WHERE id = %s", (server_id,))
+        row = cursor.fetchone()
+        if not row:
+            cursor.close()
+            conn.close()
+            raise HTTPException(status_code=404, detail="Server not found")
+
+        # Prepara i campi aggiornabili
+        fields = []
+        values = []
+
+        if server.user is not None:
+            fields.append("user = %s")
+            values.append(server.user)
+        if server.pwd is not None:
+            fields.append("pwd = %s")
+            values.append(server.pwd)
+        if server.server is not None:
+            fields.append("server = %s")
+            values.append(server.server)
+        if server.server_alias is not None:
+            fields.append("server_alias = %s")
+            values.append(server.server_alias)
+        if server.platform is not None:
+            fields.append("platform = %s")
+            values.append(server.platform)
+        if server.ip is not None:
+            fields.append("ip = %s")
+            values.append(server.ip)
+        if server.path is not None:
+            fields.append("path = %s")
+            values.append(server.path)
+        if server.port is not None:
+            fields.append("port = %s")
+            values.append(server.port)
+        if server.is_active is not None:
+            fields.append("is_active = %s")
+            values.append(server.is_active)
+
+        # Se non ci sono campi da aggiornare
+        if not fields:
+            cursor.close()
+            conn.close()
+            return {"message": "Nothing to update"}
+
+        # Aggiunge updated_at
+        fields.append("updated_at = NOW()")
+
+        query = f"UPDATE servers SET {', '.join(fields)} WHERE id = %s"
+        values.append(server_id)
+
+        print("🛠️ [UPDATE SERVER] Esecuzione query:")
+        print("SQL:", query)
+        print("Values:", values)
+
+        cursor.execute(query, tuple(values))
+        conn.commit()
+
+        cursor.execute("SELECT * FROM servers WHERE id = %s", (server_id,))
+        updated_server = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return {
+            "status": "ok",
+            "message": f"Server {server_id} updated successfully",
+            "server": updated_server
+        }
+
+    except MySQLError as e:
+        print("❌ Errore MySQL durante update server:", e)
+        raise HTTPException(status_code=500, detail=f"MySQL Error: {e}")
+    except Exception as e:
+        print("❌ Errore generico durante update server:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Endpoint per recuperare tutti i trader
 @router.get("/traders", response_model=List[Trader])
 def get_traders():

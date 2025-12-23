@@ -249,7 +249,7 @@ def compute_adx(df, period=14):
 
 signal_lock = threading.Lock()
 # gestisce buy e sell
-def check_signal_original():
+def check_signal():
 
     logs.clear()
 
@@ -386,8 +386,8 @@ def check_signal_original():
 
 # 22/12: ottimizzato per XAUUSD con molte migliorie
 signal_lock = threading.Lock()
-# def check_trendguard_xau_signal():
-def check_signal():
+# def è check_trendguard_xau_signal()!!:
+def check_trendguard_xau_signal():
 
     logs.clear()
 
