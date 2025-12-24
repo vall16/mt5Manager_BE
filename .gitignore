@@ -6,4 +6,5 @@ venv/
 
 # Logs
 *.log
+*.txt
 

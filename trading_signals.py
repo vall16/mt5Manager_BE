@@ -27,6 +27,7 @@ PORT = int(os.getenv("API_PORT"))    # default 8080
 BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
+CHOSEN_TRADESIGNAL = ""
 
 BASE_URL_SLAVE =""
 # TIMEFRAME = mt5.TIMEFRAME_M5
@@ -581,7 +582,7 @@ def start_polling(trader:Trader):
         CHECK_INTERVAL = 2
 
 
-    print(CHECK_INTERVAL)
+    log(CHECK_INTERVAL)
 
     # Imposta simbolo dinamico
     SYMBOL = trader.selectedSymbol
