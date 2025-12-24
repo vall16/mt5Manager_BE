@@ -21,6 +21,8 @@ router = APIRouter()
 
 load_dotenv()  # legge il file .env
 
+
+
 HOST = os.getenv("API_HOST")  # default localhost
 PORT = int(os.getenv("API_PORT"))    # default 8080
 
@@ -28,6 +30,7 @@ BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 TRADER_ID = 1
 CURRENT_TRADER: Trader | None = None
 CHOSEN_TRADESIGNAL = ""
+SIGNAL_HANDLERS = {}  # Inizializza vuoto
 
 BASE_URL_SLAVE =""
 # TIMEFRAME = mt5.TIMEFRAME_M5
@@ -58,37 +61,19 @@ base_url_slave = "http://127.0.0.1:9001"
 # =========================
 # Funzioni indicatori
 # =========================
-def polling_loop_timer():
-    global polling_timer, polling_running
-    if not polling_running:
-        return  # stop se il polling è stato fermato
+# def polling_loop_timer_origin():
+#     global polling_timer, polling_running
+#     if not polling_running:
+#         return  # stop se il polling è stato fermato
 
-    check_signal()
+#     check_signal()
     
-    # richiama se stesso dopo CHECK_INTERVAL secondi
-    polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
-    polling_timer.daemon = True
-    polling_timer.start()
+#     # richiama se stesso dopo CHECK_INTERVAL secondi
+#     polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
+#     polling_timer.daemon = True
+#     polling_timer.start()
 
 
-
-# def get_data(symbol, timeframe, n_candles):
-#     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
-
-#     if rates is None or len(rates) == 0:
-#         # log(f"❌ Nessun dato ricevuto da MT5 per {symbol}")
-
-#         return None
-
-#     df = pd.DataFrame(rates)
-
-#     if "time" not in df.columns:
-#         log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
-
-#         return None
-
-#     df['time'] = pd.to_datetime(df['time'], unit='s')
-#     return df
 
 def get_data(symbol, timeframe, n_candles, agent_url):
     """
@@ -562,7 +547,7 @@ def polling_loop():
 @router.post("/start_polling")
 def start_polling(trader:Trader):
     
-    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL,BASE_URL_SLAVE
+    global polling_running, polling_timer,CURRENT_TRADER, CHECK_INTERVAL, SYMBOL,BASE_URL_SLAVE,CHOSEN_TRADESIGNAL
 
 
     # print(">>> start_polling CHIAMATO, trader =", trader)
@@ -587,11 +572,17 @@ def start_polling(trader:Trader):
     # Imposta simbolo dinamico
     SYMBOL = trader.selectedSymbol
 
+    with signal_lock:
+        CHOSEN_TRADESIGNAL = trader.selectedSignal or "BASE"
+
+    log(f"📡 Segnale attivo: {CHOSEN_TRADESIGNAL}")
+
 
     if polling_running:
         return {"status": "already_running", "message": "Polling già attivo"}
 
     polling_running = True
+
     polling_loop_timer()  # avvia subito il ciclo
 
     log("▶️ Polling avviato manualmente dal frontend!")
@@ -987,3 +978,33 @@ def check_signal_super():
             close_slave_position()
 
         previous_signal = current_signal
+
+SIGNAL_HANDLERS = {
+    "BASE": check_signal,
+    "SUPER": check_signal_super,
+    "TRENDGUARD_XAU": check_trendguard_xau_signal,
+}
+
+def polling_loop_timer():
+    global polling_timer, polling_running,CHOSEN_TRADESIGNAL,CHECK_INTERVAL
+
+    if not polling_running:
+        return
+
+    # Forza fallback se vuoto
+    if not CHOSEN_TRADESIGNAL:
+        log(f"⚠️ CHOSEN_TRADESIGNAL vuoto, forzo fallback a BASE")
+        CHOSEN_TRADESIGNAL = "BASE"
+
+    log(f"⏱️ Polling loop → CHOSEN_TRADESIGNAL = '{CHOSEN_TRADESIGNAL}'")
+
+    handler = SIGNAL_HANDLERS.get(CHOSEN_TRADESIGNAL)
+    if not handler:
+        log(f"❌ Segnale non valido: {CHOSEN_TRADESIGNAL}, fallback BASE")
+        handler = check_signal
+
+    handler()
+
+    polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
+    polling_timer.daemon = True
+    polling_timer.start()
