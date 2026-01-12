@@ -361,12 +361,14 @@ def check_signal():
         # Se era BUY e diventa HOLD → chiudi BUY
         if previous_signal == "BUY":
             log(f"⚠️ BUY → HOLD: chiudo BUY {SYMBOL}")
-            close_slave_position()
+            # provo a togliere chiusura per cambio..
+            # close_slave_position()
 
         # Se era SELL e diventa HOLD → chiudi SELL
         if previous_signal == "SELL":
             log(f"⚠️ SELL → HOLD: chiudo SELL {SYMBOL}")
-            close_slave_position()
+            # provo a togliere chiusura per cambio..
+            # close_slave_position()
 
         previous_signal = current_signal
 

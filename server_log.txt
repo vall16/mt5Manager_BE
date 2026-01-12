@@ -1,898 +1,815 @@
-[+22.5s] 10
-[+22.6s] 📡 Segnale attivo: XAUUSD_BASE
-[+22.6s] ❌ Segnale non valido: , fallback BASE
-[+24.6s] ───────S-I-G-N-A-L──────────
-[+24.7s] 🔻 [2025-12-24 11:51:46] SELL signal per XAUUSD
-[+24.7s] 🚀 Invio SELL allo SLAVE
-[+25.0s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
-[+25.6s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+25.7s] ✅ Tick ricevuto per XAUUSD: bid=4488.39, ask=4488.56
-[+25.7s] SL = 4491.89, TP = 4485.89
-[+25.8s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave
-[+26.3s] 🚀 Entrato in open_order_on_slave()
-[+26.7s] 🌐 Init MT5 slave: http://127.0.0.1:8001
-[+26.7s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
-[+27.3s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
-[+27.6s] 🔐 Login allo SLAVE...
-[+28.3s] ✅ Login SLAVE riuscito
-[+28.3s] Simbolo dal payload è: XAUUSD
-[+28.3s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+28.7s] 📈 Tick ricevuto: BID=4488.39 ASK=4488.56
-[+28.7s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
-[+28.7s] 🧾 Dati inviati:{'price': 4488.39,
-[+28.7s]  'sl': 4491.89,
-[+28.7s]  'symbol': 'XAUUSD',
-[+28.7s]  'tp': 4485.89,
-[+28.7s]  'type': 'sell',
-[+28.7s]  'volume': 0.1}
-[+30.9s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151260884349, 'order': 151334510369, 'volume': 0.1, 'price': 4488.69, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472895, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4488.39, 0.0, 4491.89, 4485.89, 10, 1, 0, 0, 0, '', 0, 0]}}
-[+31.5s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151334510369,"logs":"[+24.6s] ───────S-I-G-N-A-L──────────\n[+24.7s] 🔻 [2025-12-24 11:51:46] SELL signal per XAUUSD\n[+24.7s] 🚀 Invio SELL allo SLAVE\n[+25.0s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+25.6s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+25.7s] ✅ Tick ricevuto per XAUUSD: bid=4488.39, ask=4488.56\n[+25.7s] SL = 4491.89, TP = 4485.89\n[+25.8s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave\n[+26.3s] 🚀 Entrato in open_order_on_slave()\n[+26.7s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+26.7s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+27.3s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+27.6s] 🔐 Login allo SLAVE...\n[+28.3s] ✅ Login SLAVE riuscito\n[+28.3s] Simbolo dal payload è: XAUUSD\n[+28.3s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+28.7s] 📈 Tick ricevuto: BID=4488.39 ASK=4488.56\n[+28.7s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+28.7s] 🧾 Dati inviati:{'price': 4488.39,\n[+28.7s]  'sl': 4491.89,\n[+28.7s]  'symbol': 'XAUUSD',\n[+28.7s]  'tp': 4485.89,\n[+28.7s]  'type': 'sell',\n[+28.7s]  'volume': 0.1}\n[+30.9s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151260884349, 'order': 151334510369, 'volume': 0.1, 'price': 4488.69, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472895, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4488.39, 0.0, 4491.89, 4485.89, 10, 1, 0, 0, 0, '', 0, 0]}}"}
-[+32.9s] ▶️ Polling avviato manualmente dal frontend!
-[+43.0s] ❌ Segnale non valido: , fallback BASE
-[+43.4s] ───────S-I-G-N-A-L──────────
-[+43.5s] 🔻 [2025-12-24 11:52:06] SELL signal per XAUUSD
-[+43.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+54.1s] ❌ Segnale non valido: , fallback BASE
-[+54.3s] ───────S-I-G-N-A-L──────────
-[+54.3s] 🔻 [2025-12-24 11:52:17] SELL signal per XAUUSD
-[+54.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+64.3s] ❌ Segnale non valido: , fallback BASE
-[+64.5s] ───────S-I-G-N-A-L──────────
-[+64.6s] 🔻 [2025-12-24 11:52:27] SELL signal per XAUUSD
-[+64.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+74.9s] ❌ Segnale non valido: , fallback BASE
-[+75.1s] ───────S-I-G-N-A-L──────────
-[+75.1s] 🔻 [2025-12-24 11:52:38] SELL signal per XAUUSD
-[+75.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+85.2s] ❌ Segnale non valido: , fallback BASE
-[+85.4s] ───────S-I-G-N-A-L──────────
-[+85.4s] 🔻 [2025-12-24 11:52:48] SELL signal per XAUUSD
-[+85.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+95.6s] ❌ Segnale non valido: , fallback BASE
-[+95.9s] ───────S-I-G-N-A-L──────────
-[+96.0s] 🔻 [2025-12-24 11:52:59] SELL signal per XAUUSD
-[+96.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+106.3s] ❌ Segnale non valido: , fallback BASE
-[+106.6s] ───────S-I-G-N-A-L──────────
-[+106.6s] 🔻 [2025-12-24 11:53:09] SELL signal per XAUUSD
-[+106.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+116.7s] ❌ Segnale non valido: , fallback BASE
-[+116.8s] ───────S-I-G-N-A-L──────────
-[+116.9s] 🔻 [2025-12-24 11:53:20] SELL signal per XAUUSD
-[+116.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+127.0s] ❌ Segnale non valido: , fallback BASE
-[+127.2s] ───────S-I-G-N-A-L──────────
-[+127.2s] 🔻 [2025-12-24 11:53:30] SELL signal per XAUUSD
-[+127.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+137.9s] ❌ Segnale non valido: , fallback BASE
-[+138.3s] ───────S-I-G-N-A-L──────────
-[+138.3s] 🔻 [2025-12-24 11:53:41] SELL signal per XAUUSD
-[+138.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+148.7s] ❌ Segnale non valido: , fallback BASE
-[+149.0s] ───────S-I-G-N-A-L──────────
-[+149.0s] 🔻 [2025-12-24 11:53:52] SELL signal per XAUUSD
-[+149.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+61.0s] 5
-[+61.8s] 📡 Segnale attivo: BASE
-[+62.4s] ❌ Segnale non valido: , fallback BASE
-[+64.3s] ───────S-I-G-N-A-L──────────
-[+64.4s] 🔻 [2025-12-24 12:45:31] SELL signal per XAUUSD
-[+65.0s] 🚀 Invio SELL allo SLAVE
-[+65.5s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
-[+68.3s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+69.6s] ✅ Tick ricevuto per XAUUSD: bid=4486.62, ask=4486.78
-[+70.0s] SL = 4490.12, TP = 4484.12
-[+70.3s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave
-[+74.2s] 🚀 Entrato in open_order_on_slave()
-[+74.3s] 🌐 Init MT5 slave: http://127.0.0.1:8001
-[+74.6s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
-[+75.2s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
-[+75.4s] 🔐 Login allo SLAVE...
-[+77.9s] ✅ Login SLAVE riuscito
-[+78.0s] Simbolo dal payload è: XAUUSD
-[+78.5s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+80.2s] 📈 Tick ricevuto: BID=4486.77 ASK=4486.95
-[+80.5s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
-[+80.5s] 🧾 Dati inviati:{'price': 4486.77,
-[+80.5s]  'sl': 4490.12,
-[+80.5s]  'symbol': 'XAUUSD',
-[+80.5s]  'tp': 4484.12,
-[+80.5s]  'type': 'sell',
-[+81.6s] ❌ Errore invio ordine SELL: HTTPConnectionPool(host='127.0.0.1', port=8080): Read timed out. (read timeout=10)
-[+80.5s]  'volume': 0.1}
-[+86.4s] ▶️ Polling avviato manualmente dal frontend!
-[+89.9s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261065949, 'order': 151334691360, 'volume': 0.1, 'price': 4486.55, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472896, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4486.77, 0.0, 4490.12, 4484.12, 10, 1, 0, 0, 0, '', 0, 0]}}
-[+91.5s] ❌ Segnale non valido: , fallback BASE
-[+93.9s] ───────S-I-G-N-A-L──────────
-[+94.2s] 🔻 [2025-12-24 12:46:00] SELL signal per XAUUSD
-[+94.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+106.5s] ❌ Segnale non valido: , fallback BASE
-[+109.3s] ───────S-I-G-N-A-L──────────
-[+109.9s] 🔻 [2025-12-24 12:46:16] SELL signal per XAUUSD
-[+109.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+117.0s] ❌ Segnale non valido: , fallback BASE
-[+118.2s] ───────S-I-G-N-A-L──────────
-[+118.6s] 🔻 [2025-12-24 12:46:25] SELL signal per XAUUSD
-[+119.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+129.0s] ❌ Segnale non valido: , fallback BASE
-[+130.4s] ───────S-I-G-N-A-L──────────
-[+131.1s] 🔻 [2025-12-24 12:46:38] SELL signal per XAUUSD
-[+131.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+137.8s] ❌ Segnale non valido: , fallback BASE
-[+142.5s] ───────S-I-G-N-A-L──────────
-[+143.3s] 🔻 [2025-12-24 12:46:47] SELL signal per XAUUSD
-[+145.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+161.2s] ❌ Segnale non valido: , fallback BASE
-[+163.1s] ───────S-I-G-N-A-L──────────
-[+164.0s] 🔻 [2025-12-24 12:47:10] SELL signal per XAUUSD
-[+164.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+170.5s] ❌ Segnale non valido: , fallback BASE
-[+171.3s] ───────S-I-G-N-A-L──────────
-[+171.9s] 🔻 [2025-12-24 12:47:19] SELL signal per XAUUSD
-[+174.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+182.6s] ❌ Segnale non valido: , fallback BASE
-[+184.1s] ───────S-I-G-N-A-L──────────
-[+184.4s] 🔻 [2025-12-24 12:47:31] SELL signal per XAUUSD
-[+185.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+192.3s] ❌ Segnale non valido: , fallback BASE
-[+195.0s] ───────S-I-G-N-A-L──────────
-[+195.1s] 🔻 [2025-12-24 12:47:41] SELL signal per XAUUSD
-[+197.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+206.1s] ❌ Segnale non valido: , fallback BASE
-[+207.7s] ───────S-I-G-N-A-L──────────
-[+208.6s] 🔻 [2025-12-24 12:47:54] SELL signal per XAUUSD
-[+210.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+218.0s] ❌ Segnale non valido: , fallback BASE
-[+219.3s] ───────S-I-G-N-A-L──────────
-[+219.6s] 🔻 [2025-12-24 12:48:06] SELL signal per XAUUSD
-[+219.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+226.0s] ❌ Segnale non valido: , fallback BASE
-[+227.8s] ───────S-I-G-N-A-L──────────
-[+228.6s] 🔻 [2025-12-24 12:48:14] SELL signal per XAUUSD
-[+228.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+236.4s] ❌ Segnale non valido: , fallback BASE
-[+236.8s] ───────S-I-G-N-A-L──────────
-[+236.9s] 🔻 [2025-12-24 12:48:24] SELL signal per XAUUSD
-[+237.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+242.6s] ❌ Segnale non valido: , fallback BASE
-[+244.9s] ───────S-I-G-N-A-L──────────
-[+245.3s] 🔻 [2025-12-24 12:48:31] SELL signal per XAUUSD
-[+245.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+251.6s] ❌ Segnale non valido: , fallback BASE
-[+254.2s] ───────S-I-G-N-A-L──────────
-[+254.5s] 🔻 [2025-12-24 12:48:40] SELL signal per XAUUSD
-[+254.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+262.8s] ❌ Segnale non valido: , fallback BASE
-[+266.9s] ───────S-I-G-N-A-L──────────
-[+267.7s] 🔻 [2025-12-24 12:48:54] SELL signal per XAUUSD
-[+267.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+279.1s] ❌ Segnale non valido: , fallback BASE
-[+279.9s] ───────S-I-G-N-A-L──────────
-[+280.3s] 🔻 [2025-12-24 12:49:08] SELL signal per XAUUSD
-[+280.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+286.5s] ❌ Segnale non valido: , fallback BASE
-[+286.7s] ───────S-I-G-N-A-L──────────
-[+286.9s] 🔻 [2025-12-24 12:49:14] SELL signal per XAUUSD
-[+286.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+293.7s] ❌ Segnale non valido: , fallback BASE
-[+295.1s] ───────S-I-G-N-A-L──────────
-[+295.3s] 🔻 [2025-12-24 12:49:23] SELL signal per XAUUSD
-[+295.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+302.0s] ❌ Segnale non valido: , fallback BASE
-[+302.3s] ───────S-I-G-N-A-L──────────
-[+302.3s] 🔻 [2025-12-24 12:49:30] SELL signal per XAUUSD
-[+302.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+307.9s] ❌ Segnale non valido: , fallback BASE
-[+308.5s] ───────S-I-G-N-A-L──────────
-[+308.6s] 🔻 [2025-12-24 12:49:36] SELL signal per XAUUSD
-[+308.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+314.1s] ❌ Segnale non valido: , fallback BASE
-[+314.4s] ───────S-I-G-N-A-L──────────
-[+314.4s] 🔻 [2025-12-24 12:49:42] SELL signal per XAUUSD
-[+314.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+320.4s] ❌ Segnale non valido: , fallback BASE
-[+320.8s] ───────S-I-G-N-A-L──────────
-[+320.8s] 🔻 [2025-12-24 12:49:48] SELL signal per XAUUSD
-[+320.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+326.3s] ❌ Segnale non valido: , fallback BASE
-[+326.8s] ───────S-I-G-N-A-L──────────
-[+327.1s] 🔻 [2025-12-24 12:49:54] SELL signal per XAUUSD
-[+327.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+334.1s] ❌ Segnale non valido: , fallback BASE
-[+334.6s] ───────S-I-G-N-A-L──────────
-[+334.8s] 🔻 [2025-12-24 12:50:02] SELL signal per XAUUSD
-[+334.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+340.5s] ❌ Segnale non valido: , fallback BASE
-[+340.9s] ───────S-I-G-N-A-L──────────
-[+341.0s] 🔻 [2025-12-24 12:50:08] SELL signal per XAUUSD
-[+341.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+346.2s] ❌ Segnale non valido: , fallback BASE
-[+346.7s] ───────S-I-G-N-A-L──────────
-[+346.9s] 🔻 [2025-12-24 12:50:14] SELL signal per XAUUSD
-[+347.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+354.6s] ❌ Segnale non valido: , fallback BASE
-[+355.8s] ───────S-I-G-N-A-L──────────
-[+355.9s] 🔻 [2025-12-24 12:50:24] SELL signal per XAUUSD
-[+355.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+361.2s] ❌ Segnale non valido: , fallback BASE
-[+361.3s] ───────S-I-G-N-A-L──────────
-[+361.3s] 🔻 [2025-12-24 12:50:29] SELL signal per XAUUSD
-[+361.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
-[+366.7s] ❌ Segnale non valido: , fallback BASE
-[+366.8s] ───────S-I-G-N-A-L──────────
-[+366.8s] 🔥 [2025-12-24 12:50:35] BUY signal per XAUUSD
-[+366.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+372.1s] ❌ Segnale non valido: , fallback BASE
-[+372.5s] ───────S-I-G-N-A-L──────────
-[+372.5s] 🔥 [2025-12-24 12:50:40] BUY signal per XAUUSD
-[+372.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+377.8s] ❌ Segnale non valido: , fallback BASE
-[+378.0s] ───────S-I-G-N-A-L──────────
-[+378.1s] 🔥 [2025-12-24 12:50:46] BUY signal per XAUUSD
-[+378.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+384.4s] ❌ Segnale non valido: , fallback BASE
-[+387.1s] ───────S-I-G-N-A-L──────────
-[+387.2s] 🔥 [2025-12-24 12:50:53] BUY signal per XAUUSD
-[+387.2s] 🚀 Invio BUY allo SLAVE
-[+387.2s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
-[+388.7s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+389.9s] ✅ Tick ricevuto per XAUUSD: bid=4489.9, ask=4490.06
-[+390.2s] SL = 4486.56, TP = 4492.56
-[+390.8s] 📤 Invio BUY [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave 
-[+390.9s] 🚀 Entrato in open_order_on_slave()
-[+390.9s] 🌐 Init MT5 slave: http://127.0.0.1:8001
-[+391.0s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
-[+391.2s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
-[+391.2s] 🔐 Login allo SLAVE...
-[+400.9s] ❌ Errore invio ordine: HTTPConnectionPool(host='127.0.0.1', port=8080): Read timed out. (read timeout=10)
-[+406.6s] ✅ Login SLAVE riuscito
-[+406.8s] Simbolo dal payload è: XAUUSD
-[+406.8s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+407.5s] 📈 Tick ricevuto: BID=4489.88 ASK=4490.03
-[+408.6s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
-[+408.6s] 🧾 Dati inviati:{'price': 4490.03,
-[+408.6s]  'sl': 4486.56,
-[+408.6s]  'symbol': 'XAUUSD',
-[+408.6s]  'tp': 4492.56,
-[+408.6s]  'type': 'buy',
-[+408.6s]  'volume': 0.1}
-[+411.5s] ❌ Segnale non valido: , fallback BASE
-[+411.9s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261084437, 'order': 151334709842, 'volume': 0.1, 'price': 4490.14, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472897, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4490.03, 0.0, 4486.56, 4492.56, 10, 0, 0, 0, 0, '', 0, 0]}}
-[+412.0s] ───────S-I-G-N-A-L──────────
-[+412.1s] 🔥 [2025-12-24 12:51:20] BUY signal per XAUUSD
-[+412.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+417.6s] ❌ Segnale non valido: , fallback BASE
-[+420.6s] ───────S-I-G-N-A-L──────────
-[+420.8s] 🔥 [2025-12-24 12:51:26] BUY signal per XAUUSD
-[+422.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+429.4s] ❌ Segnale non valido: , fallback BASE
-[+430.0s] ───────S-I-G-N-A-L──────────
-[+430.4s] 🔥 [2025-12-24 12:51:37] BUY signal per XAUUSD
-[+430.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+436.2s] ❌ Segnale non valido: , fallback BASE
-[+436.4s] ───────S-I-G-N-A-L──────────
-[+436.4s] 🔥 [2025-12-24 12:51:44] BUY signal per XAUUSD
-[+436.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+442.5s] ❌ Segnale non valido: , fallback BASE
-[+443.7s] ───────S-I-G-N-A-L──────────
-[+443.9s] 🔥 [2025-12-24 12:51:51] BUY signal per XAUUSD
-[+443.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+445.3s] ⏹️ Polling fermato manualmente dal frontend!
-[+449.7s] 5
-[+450.0s] 📡 Segnale attivo: TRENDGUARD_XAU
-[+450.3s] ❌ Segnale non valido: , fallback BASE
-[+452.1s] ───────S-I-G-N-A-L──────────
-[+452.2s] 🔥 [2025-12-24 12:51:58] BUY signal per XAUUSD
-[+452.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+452.4s] ▶️ Polling avviato manualmente dal frontend!
-[+457.4s] ❌ Segnale non valido: , fallback BASE
-[+457.7s] ───────S-I-G-N-A-L──────────
-[+457.8s] 🔥 [2025-12-24 12:52:05] BUY signal per XAUUSD
-[+457.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+463.4s] ❌ Segnale non valido: , fallback BASE
-[+463.8s] ───────S-I-G-N-A-L──────────
-[+463.8s] 🔥 [2025-12-24 12:52:11] BUY signal per XAUUSD
-[+463.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+465.0s] ⏹️ Polling fermato manualmente dal frontend!
-[+470.2s] 5
-[+470.2s] 📡 Segnale attivo: BASE
-[+470.4s] ❌ Segnale non valido: , fallback BASE
-[+471.0s] ───────S-I-G-N-A-L──────────
-[+471.2s] 🔥 [2025-12-24 12:52:18] BUY signal per XAUUSD
-[+471.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+472.3s] ▶️ Polling avviato manualmente dal frontend!
-[+477.3s] ❌ Segnale non valido: , fallback BASE
-[+477.6s] ───────S-I-G-N-A-L──────────
-[+477.6s] 🔥 [2025-12-24 12:52:25] BUY signal per XAUUSD
-[+477.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+482.9s] ❌ Segnale non valido: , fallback BASE
-[+483.1s] ───────S-I-G-N-A-L──────────
-[+483.1s] 🔥 [2025-12-24 12:52:31] BUY signal per XAUUSD
-[+483.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+488.6s] ❌ Segnale non valido: , fallback BASE
+[+235.2s] 10
+[+235.2s] 📡 Segnale attivo: BASE
+[+235.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+236.1s] ───────S-I-G-N-A-L──────────
+[+236.1s] 🔻 [2026-01-12 11:02:19] SELL signal per XAUUSD
+[+236.1s] 🚀 Invio SELL allo SLAVE
+[+236.2s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
+[+236.2s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+236.3s] ✅ Tick ricevuto per XAUUSD: bid=4592.66, ask=4592.85
+[+236.3s] SL = None, TP = 4590.16
+[+236.4s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave
+[+236.6s] 🚀 Entrato in open_order_on_slave()
+[+236.6s] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[+236.6s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[+236.7s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
+[+236.7s] 🔐 Login allo SLAVE...
+[+236.8s] ✅ Login SLAVE riuscito
+[+236.8s] Simbolo dal payload è: XAUUSD
+[+236.9s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+237.0s] 📈 Tick ricevuto: BID=4592.71 ASK=4592.87
+[+237.0s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[+237.0s] 🧾 Dati inviati:{'price': 4592.71,
+[+237.0s]  'sl': None,
+[+237.0s]  'symbol': 'XAUUSD',
+[+237.0s]  'tp': 4590.16,
+[+237.0s]  'type': 'sell',
+[+237.0s]  'volume': 0.1}
+[+237.4s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323487525, 'order': 151396832119, 'volume': 0.1, 'price': 4592.74, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011531, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4592.71, 0.0, 0.0, 4590.16, 10, 1, 0, 0, 0, '', 0, 0]}}
+[+237.7s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151396832119,"logs":"[+236.1s] ───────S-I-G-N-A-L──────────\n[+236.1s] 🔻 [2026-01-12 11:02:19] SELL signal per XAUUSD\n[+236.1s] 🚀 Invio SELL allo SLAVE\n[+236.2s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+236.2s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+236.3s] ✅ Tick ricevuto per XAUUSD: bid=4592.66, ask=4592.85\n[+236.3s] SL = None, TP = 4590.16\n[+236.4s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave\n[+236.6s] 🚀 Entrato in open_order_on_slave()\n[+236.6s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+236.6s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+236.7s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+236.7s] 🔐 Login allo SLAVE...\n[+236.8s] ✅ Login SLAVE riuscito\n[+236.8s] Simbolo dal payload è: XAUUSD\n[+236.9s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+237.0s] 📈 Tick ricevuto: BID=4592.71 ASK=4592.87\n[+237.0s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+237.0s] 🧾 Dati inviati:{'price': 4592.71,\n[+237.0s]  'sl': None,\n[+237.0s]  'symbol': 'XAUUSD',\n[+237.0s]  'tp': 4590.16,\n[+237.0s]  'type': 'sell',\n[+237.0s]  'volume': 0.1}\n[+237.4s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323487525, 'order': 151396832119, 'volume': 0.1, 'price': 4592.74, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011531, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4592.71, 0.0, 0.0, 4590.16, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[+237.8s] ▶️ Polling avviato manualmente dal frontend!
+[+247.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+248.0s] ───────S-I-G-N-A-L──────────
+[+248.0s] 🔻 [2026-01-12 11:02:31] SELL signal per XAUUSD
+[+248.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+258.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+258.2s] ───────S-I-G-N-A-L──────────
+[+258.2s] 🔻 [2026-01-12 11:02:41] SELL signal per XAUUSD
+[+258.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+268.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+268.3s] ───────S-I-G-N-A-L──────────
+[+268.3s] 🔻 [2026-01-12 11:02:52] SELL signal per XAUUSD
+[+268.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+278.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+278.5s] ───────S-I-G-N-A-L──────────
+[+278.5s] 🔻 [2026-01-12 11:03:02] SELL signal per XAUUSD
+[+278.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+288.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+288.7s] ───────S-I-G-N-A-L──────────
+[+288.7s] 🔻 [2026-01-12 11:03:12] SELL signal per XAUUSD
+[+288.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+298.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+298.8s] ───────S-I-G-N-A-L──────────
+[+298.8s] 🔻 [2026-01-12 11:03:22] SELL signal per XAUUSD
+[+298.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+309.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+309.2s] ───────S-I-G-N-A-L──────────
+[+309.3s] 🔻 [2026-01-12 11:03:32] SELL signal per XAUUSD
+[+309.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+319.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+319.8s] ───────S-I-G-N-A-L──────────
+[+319.8s] 🔻 [2026-01-12 11:03:43] SELL signal per XAUUSD
+[+319.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+330.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+330.1s] ───────S-I-G-N-A-L──────────
+[+330.1s] 🔻 [2026-01-12 11:03:53] SELL signal per XAUUSD
+[+330.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+340.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+341.0s] ───────S-I-G-N-A-L──────────
+[+341.1s] 🔻 [2026-01-12 11:04:04] SELL signal per XAUUSD
+[+341.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+351.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+351.6s] ───────S-I-G-N-A-L──────────
+[+351.7s] 🔻 [2026-01-12 11:04:15] SELL signal per XAUUSD
+[+351.9s] 🚀 Invio SELL allo SLAVE
+[+351.9s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
+[+352.0s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+352.1s] ✅ Tick ricevuto per XAUUSD: bid=4590.57, ask=4590.75
+[+352.1s] SL = None, TP = 4588.07
+[+352.1s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave
+[+352.1s] 🚀 Entrato in open_order_on_slave()
+[+352.2s] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[+352.2s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[+352.5s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
+[+352.5s] 🔐 Login allo SLAVE...
+[+353.1s] ✅ Login SLAVE riuscito
+[+353.1s] Simbolo dal payload è: XAUUSD
+[+353.2s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+353.3s] 📈 Tick ricevuto: BID=4590.76 ASK=4590.92
+[+353.3s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[+353.3s] 🧾 Dati inviati:{'price': 4590.76,
+[+353.3s]  'sl': None,
+[+353.3s]  'symbol': 'XAUUSD',
+[+353.3s]  'tp': 4588.07,
+[+353.3s]  'type': 'sell',
+[+353.3s]  'volume': 0.1}
+[+353.8s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323499348, 'order': 151396843921, 'volume': 0.1, 'price': 4590.81, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011532, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4590.76, 0.0, 0.0, 4588.07, 10, 1, 0, 0, 0, '', 0, 0]}}
+[+353.9s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151396843921,"logs":"[+351.6s] ───────S-I-G-N-A-L──────────\n[+351.7s] 🔻 [2026-01-12 11:04:15] SELL signal per XAUUSD\n[+351.9s] 🚀 Invio SELL allo SLAVE\n[+351.9s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+352.0s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+352.1s] ✅ Tick ricevuto per XAUUSD: bid=4590.57, ask=4590.75\n[+352.1s] SL = None, TP = 4588.07\n[+352.1s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave\n[+352.1s] 🚀 Entrato in open_order_on_slave()\n[+352.2s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+352.2s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+352.5s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+352.5s] 🔐 Login allo SLAVE...\n[+353.1s] ✅ Login SLAVE riuscito\n[+353.1s] Simbolo dal payload è: XAUUSD\n[+353.2s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+353.3s] 📈 Tick ricevuto: BID=4590.76 ASK=4590.92\n[+353.3s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+353.3s] 🧾 Dati inviati:{'price': 4590.76,\n[+353.3s]  'sl': None,\n[+353.3s]  'symbol': 'XAUUSD',\n[+353.3s]  'tp': 4588.07,\n[+353.3s]  'type': 'sell',\n[+353.3s]  'volume': 0.1}\n[+353.8s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323499348, 'order': 151396843921, 'volume': 0.1, 'price': 4590.81, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011532, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4590.76, 0.0, 0.0, 4588.07, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[+364.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+364.8s] ───────S-I-G-N-A-L──────────
+[+365.0s] 🔻 [2026-01-12 11:04:28] SELL signal per XAUUSD
+[+365.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+375.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+375.1s] ───────S-I-G-N-A-L──────────
+[+375.1s] 🔻 [2026-01-12 11:04:38] SELL signal per XAUUSD
+[+375.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+385.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+385.3s] ───────S-I-G-N-A-L──────────
+[+385.3s] 🔻 [2026-01-12 11:04:49] SELL signal per XAUUSD
+[+385.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+395.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+395.8s] ───────S-I-G-N-A-L──────────
+[+396.0s] 🔻 [2026-01-12 11:04:59] SELL signal per XAUUSD
+[+396.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+406.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+406.1s] ───────S-I-G-N-A-L──────────
+[+406.1s] 🔻 [2026-01-12 11:05:09] SELL signal per XAUUSD
+[+406.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+416.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+416.4s] ───────S-I-G-N-A-L──────────
+[+416.4s] 🔻 [2026-01-12 11:05:20] SELL signal per XAUUSD
+[+416.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+426.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+426.7s] ───────S-I-G-N-A-L──────────
+[+427.0s] 🔻 [2026-01-12 11:05:30] SELL signal per XAUUSD
+[+427.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+437.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+437.4s] ───────S-I-G-N-A-L──────────
+[+437.5s] 🔻 [2026-01-12 11:05:41] SELL signal per XAUUSD
+[+437.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+447.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+447.9s] ───────S-I-G-N-A-L──────────
+[+448.1s] 🔻 [2026-01-12 11:05:51] SELL signal per XAUUSD
+[+448.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+458.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+458.5s] ───────S-I-G-N-A-L──────────
+[+458.5s] 🔻 [2026-01-12 11:06:02] SELL signal per XAUUSD
+[+458.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+468.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+469.0s] ───────S-I-G-N-A-L──────────
+[+469.2s] 🔻 [2026-01-12 11:06:12] SELL signal per XAUUSD
+[+469.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+479.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+479.5s] ───────S-I-G-N-A-L──────────
+[+479.5s] 🔻 [2026-01-12 11:06:23] SELL signal per XAUUSD
+[+479.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+489.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
 [+489.6s] ───────S-I-G-N-A-L──────────
-[+489.6s] 🔥 [2025-12-24 12:52:37] BUY signal per XAUUSD
-[+489.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+495.0s] ❌ Segnale non valido: , fallback BASE
-[+495.8s] ───────S-I-G-N-A-L──────────
-[+496.0s] 🔥 [2025-12-24 12:52:43] BUY signal per XAUUSD
-[+496.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+502.0s] ❌ Segnale non valido: , fallback BASE
-[+502.4s] ───────S-I-G-N-A-L──────────
-[+502.4s] 🔥 [2025-12-24 12:52:50] BUY signal per XAUUSD
-[+502.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+509.1s] ❌ Segnale non valido: , fallback BASE
-[+509.4s] ───────S-I-G-N-A-L──────────
-[+509.4s] 🔥 [2025-12-24 12:52:57] BUY signal per XAUUSD
-[+509.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+514.9s] ❌ Segnale non valido: , fallback BASE
-[+515.1s] ───────S-I-G-N-A-L──────────
-[+515.2s] 🔥 [2025-12-24 12:53:03] BUY signal per XAUUSD
-[+515.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+520.4s] ❌ Segnale non valido: , fallback BASE
-[+522.3s] ───────S-I-G-N-A-L──────────
-[+523.3s] 🔥 [2025-12-24 12:53:08] BUY signal per XAUUSD
-[+523.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+529.8s] ❌ Segnale non valido: , fallback BASE
-[+530.6s] ───────S-I-G-N-A-L──────────
-[+530.8s] 🔥 [2025-12-24 12:53:18] BUY signal per XAUUSD
-[+531.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+536.4s] ❌ Segnale non valido: , fallback BASE
-[+536.8s] ───────S-I-G-N-A-L──────────
-[+536.8s] 🔥 [2025-12-24 12:53:24] BUY signal per XAUUSD
-[+537.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+542.6s] ❌ Segnale non valido: , fallback BASE
-[+543.0s] ───────S-I-G-N-A-L──────────
-[+543.0s] 🔥 [2025-12-24 12:53:31] BUY signal per XAUUSD
-[+543.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+548.3s] ❌ Segnale non valido: , fallback BASE
-[+548.5s] ───────S-I-G-N-A-L──────────
-[+548.6s] 🔥 [2025-12-24 12:53:36] BUY signal per XAUUSD
-[+548.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+554.5s] ❌ Segnale non valido: , fallback BASE
-[+555.0s] ───────S-I-G-N-A-L──────────
-[+555.1s] 🔥 [2025-12-24 12:53:43] BUY signal per XAUUSD
-[+555.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+560.3s] ❌ Segnale non valido: , fallback BASE
-[+561.1s] ───────S-I-G-N-A-L──────────
-[+561.3s] 🔥 [2025-12-24 12:53:49] BUY signal per XAUUSD
-[+561.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+566.7s] ❌ Segnale non valido: , fallback BASE
-[+567.9s] ───────S-I-G-N-A-L──────────
-[+568.0s] 🔥 [2025-12-24 12:53:55] BUY signal per XAUUSD
-[+568.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+574.3s] ❌ Segnale non valido: , fallback BASE
-[+578.5s] ───────S-I-G-N-A-L──────────
-[+578.9s] 🔥 [2025-12-24 12:54:03] BUY signal per XAUUSD
-[+578.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+585.3s] ❌ Segnale non valido: , fallback BASE
-[+586.3s] ───────S-I-G-N-A-L──────────
-[+586.4s] 🔥 [2025-12-24 12:54:14] BUY signal per XAUUSD
-[+586.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+591.6s] ❌ Segnale non valido: , fallback BASE
-[+591.7s] ───────S-I-G-N-A-L──────────
-[+591.7s] 🔥 [2025-12-24 12:54:19] BUY signal per XAUUSD
-[+591.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+596.8s] ❌ Segnale non valido: , fallback BASE
-[+596.9s] ───────S-I-G-N-A-L──────────
-[+596.9s] 🔥 [2025-12-24 12:54:25] BUY signal per XAUUSD
-[+596.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+602.0s] ❌ Segnale non valido: , fallback BASE
-[+602.5s] ───────S-I-G-N-A-L──────────
-[+602.7s] 🔥 [2025-12-24 12:54:30] BUY signal per XAUUSD
-[+602.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+607.9s] ❌ Segnale non valido: , fallback BASE
-[+608.2s] ───────S-I-G-N-A-L──────────
-[+608.3s] 🔥 [2025-12-24 12:54:36] BUY signal per XAUUSD
-[+608.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+613.6s] ❌ Segnale non valido: , fallback BASE
-[+613.9s] ───────S-I-G-N-A-L──────────
-[+614.0s] 🔥 [2025-12-24 12:54:42] BUY signal per XAUUSD
-[+614.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+619.7s] ❌ Segnale non valido: , fallback BASE
-[+622.4s] ───────S-I-G-N-A-L──────────
-[+622.8s] 🔥 [2025-12-24 12:54:48] BUY signal per XAUUSD
-[+622.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+628.5s] ❌ Segnale non valido: , fallback BASE
-[+629.4s] ───────S-I-G-N-A-L──────────
-[+629.6s] 🔥 [2025-12-24 12:54:57] BUY signal per XAUUSD
-[+630.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+642.1s] ❌ Segnale non valido: , fallback BASE
-[+649.6s] ───────S-I-G-N-A-L──────────
-[+651.3s] 🔥 [2025-12-24 12:55:13] BUY signal per XAUUSD
-[+651.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+658.9s] ❌ Segnale non valido: , fallback BASE
-[+659.7s] ───────S-I-G-N-A-L──────────
-[+660.0s] 🔥 [2025-12-24 12:55:27] BUY signal per XAUUSD
-[+660.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+666.7s] ❌ Segnale non valido: , fallback BASE
-[+668.5s] ───────S-I-G-N-A-L──────────
-[+668.9s] 🔥 [2025-12-24 12:55:35] BUY signal per XAUUSD
-[+668.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+675.7s] ❌ Segnale non valido: , fallback BASE
-[+676.4s] ───────S-I-G-N-A-L──────────
-[+676.4s] 🔥 [2025-12-24 12:55:44] BUY signal per XAUUSD
-[+676.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+681.6s] ❌ Segnale non valido: , fallback BASE
-[+681.8s] ───────S-I-G-N-A-L──────────
-[+681.9s] 🔥 [2025-12-24 12:55:50] BUY signal per XAUUSD
-[+681.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+687.1s] ❌ Segnale non valido: , fallback BASE
-[+687.4s] ───────S-I-G-N-A-L──────────
-[+687.4s] 🔥 [2025-12-24 12:55:55] BUY signal per XAUUSD
-[+687.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+692.6s] ❌ Segnale non valido: , fallback BASE
-[+692.7s] ───────S-I-G-N-A-L──────────
-[+692.8s] 🔥 [2025-12-24 12:56:00] BUY signal per XAUUSD
-[+692.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+698.0s] ❌ Segnale non valido: , fallback BASE
-[+698.3s] ───────S-I-G-N-A-L──────────
-[+698.4s] 🔥 [2025-12-24 12:56:06] BUY signal per XAUUSD
-[+698.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+705.1s] ❌ Segnale non valido: , fallback BASE
-[+706.5s] ───────S-I-G-N-A-L──────────
-[+706.5s] 🔥 [2025-12-24 12:56:14] BUY signal per XAUUSD
-[+706.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+711.8s] ❌ Segnale non valido: , fallback BASE
-[+712.2s] ───────S-I-G-N-A-L──────────
-[+712.2s] 🔥 [2025-12-24 12:56:20] BUY signal per XAUUSD
-[+712.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+718.0s] ❌ Segnale non valido: , fallback BASE
-[+718.3s] ───────S-I-G-N-A-L──────────
-[+718.4s] 🔥 [2025-12-24 12:56:26] BUY signal per XAUUSD
-[+718.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+724.1s] ❌ Segnale non valido: , fallback BASE
-[+724.6s] ───────S-I-G-N-A-L──────────
-[+724.8s] 🔥 [2025-12-24 12:56:32] BUY signal per XAUUSD
-[+725.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+730.9s] ❌ Segnale non valido: , fallback BASE
-[+731.5s] ───────S-I-G-N-A-L──────────
-[+731.5s] 🔥 [2025-12-24 12:56:39] BUY signal per XAUUSD
-[+731.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+737.2s] ❌ Segnale non valido: , fallback BASE
-[+737.7s] ───────S-I-G-N-A-L──────────
-[+738.0s] 🔥 [2025-12-24 12:56:45] BUY signal per XAUUSD
-[+738.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+743.7s] ❌ Segnale non valido: , fallback BASE
-[+744.4s] ───────S-I-G-N-A-L──────────
-[+744.7s] 🔥 [2025-12-24 12:56:52] BUY signal per XAUUSD
-[+744.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+751.1s] ❌ Segnale non valido: , fallback BASE
-[+751.7s] ───────S-I-G-N-A-L──────────
-[+751.9s] 🔥 [2025-12-24 12:56:59] BUY signal per XAUUSD
-[+751.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+757.9s] ❌ Segnale non valido: , fallback BASE
-[+758.4s] ───────S-I-G-N-A-L──────────
-[+758.5s] 🔥 [2025-12-24 12:57:06] BUY signal per XAUUSD
-[+759.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+766.2s] ❌ Segnale non valido: , fallback BASE
-[+766.9s] ───────S-I-G-N-A-L──────────
-[+767.2s] 🔥 [2025-12-24 12:57:14] BUY signal per XAUUSD
-[+767.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+773.0s] ❌ Segnale non valido: , fallback BASE
-[+773.6s] ───────S-I-G-N-A-L──────────
-[+773.6s] 🔥 [2025-12-24 12:57:21] BUY signal per XAUUSD
-[+773.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+779.1s] ❌ Segnale non valido: , fallback BASE
-[+779.2s] ───────S-I-G-N-A-L──────────
-[+779.9s] 🔥 [2025-12-24 12:57:27] BUY signal per XAUUSD
-[+780.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+786.4s] ❌ Segnale non valido: , fallback BASE
-[+787.3s] ───────S-I-G-N-A-L──────────
-[+787.4s] 🔥 [2025-12-24 12:57:35] BUY signal per XAUUSD
-[+787.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+794.1s] ❌ Segnale non valido: , fallback BASE
-[+795.1s] ───────S-I-G-N-A-L──────────
-[+795.3s] 🔥 [2025-12-24 12:57:42] BUY signal per XAUUSD
-[+795.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+801.3s] ❌ Segnale non valido: , fallback BASE
-[+803.1s] ───────S-I-G-N-A-L──────────
-[+803.4s] 🔥 [2025-12-24 12:57:50] BUY signal per XAUUSD
-[+804.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+810.0s] ❌ Segnale non valido: , fallback BASE
-[+810.8s] ───────S-I-G-N-A-L──────────
-[+810.9s] 🔥 [2025-12-24 12:57:58] BUY signal per XAUUSD
-[+811.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+819.1s] ❌ Segnale non valido: , fallback BASE
-[+820.0s] ───────S-I-G-N-A-L──────────
-[+820.1s] 🔥 [2025-12-24 12:58:07] BUY signal per XAUUSD
-[+820.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+826.3s] ❌ Segnale non valido: , fallback BASE
-[+827.3s] ───────S-I-G-N-A-L──────────
-[+827.6s] 🔥 [2025-12-24 12:58:15] BUY signal per XAUUSD
-[+827.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+834.9s] ❌ Segnale non valido: , fallback BASE
-[+836.5s] ───────S-I-G-N-A-L──────────
-[+836.8s] 🔥 [2025-12-24 12:58:24] BUY signal per XAUUSD
-[+837.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+844.3s] ❌ Segnale non valido: , fallback BASE
-[+845.5s] ───────S-I-G-N-A-L──────────
-[+845.5s] 🔥 [2025-12-24 12:58:33] BUY signal per XAUUSD
-[+845.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+851.9s] ❌ Segnale non valido: , fallback BASE
-[+852.7s] ───────S-I-G-N-A-L──────────
-[+852.9s] 🔥 [2025-12-24 12:58:40] BUY signal per XAUUSD
-[+852.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+860.3s] ❌ Segnale non valido: , fallback BASE
-[+862.0s] ───────S-I-G-N-A-L──────────
-[+862.3s] 🔥 [2025-12-24 12:58:49] BUY signal per XAUUSD
-[+863.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+871.0s] ❌ Segnale non valido: , fallback BASE
-[+872.4s] ───────S-I-G-N-A-L──────────
-[+872.7s] 🔥 [2025-12-24 12:59:00] BUY signal per XAUUSD
-[+872.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+878.3s] ❌ Segnale non valido: , fallback BASE
-[+879.1s] ───────S-I-G-N-A-L──────────
-[+879.5s] 🔥 [2025-12-24 12:59:06] BUY signal per XAUUSD
-[+879.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+886.2s] ❌ Segnale non valido: , fallback BASE
-[+887.5s] ───────S-I-G-N-A-L──────────
-[+887.6s] 🔥 [2025-12-24 12:59:15] BUY signal per XAUUSD
-[+888.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+896.3s] ❌ Segnale non valido: , fallback BASE
-[+897.2s] ───────S-I-G-N-A-L──────────
-[+897.7s] 🔥 [2025-12-24 12:59:24] BUY signal per XAUUSD
-[+898.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+905.9s] ❌ Segnale non valido: , fallback BASE
-[+906.7s] ───────S-I-G-N-A-L──────────
-[+907.0s] 🔥 [2025-12-24 12:59:34] BUY signal per XAUUSD
-[+907.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+915.8s] ❌ Segnale non valido: , fallback BASE
-[+917.4s] ───────S-I-G-N-A-L──────────
-[+917.7s] 🔥 [2025-12-24 12:59:44] BUY signal per XAUUSD
-[+917.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+923.7s] ❌ Segnale non valido: , fallback BASE
-[+924.4s] ───────S-I-G-N-A-L──────────
-[+924.7s] 🔥 [2025-12-24 12:59:52] BUY signal per XAUUSD
-[+925.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+931.3s] ❌ Segnale non valido: , fallback BASE
-[+932.4s] ───────S-I-G-N-A-L──────────
-[+932.5s] 🔥 [2025-12-24 12:59:59] BUY signal per XAUUSD
-[+933.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+938.5s] ❌ Segnale non valido: , fallback BASE
-[+939.0s] ───────S-I-G-N-A-L──────────
-[+939.0s] 🔥 [2025-12-24 13:00:07] BUY signal per XAUUSD
-[+939.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+944.2s] ❌ Segnale non valido: , fallback BASE
-[+944.5s] ───────S-I-G-N-A-L──────────
-[+944.5s] 🔥 [2025-12-24 13:00:12] BUY signal per XAUUSD
-[+944.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+949.7s] ❌ Segnale non valido: , fallback BASE
-[+950.5s] ───────S-I-G-N-A-L──────────
-[+950.5s] 🔥 [2025-12-24 13:00:18] BUY signal per XAUUSD
-[+950.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+957.1s] ❌ Segnale non valido: , fallback BASE
-[+957.2s] ───────S-I-G-N-A-L──────────
-[+957.3s] 🔥 [2025-12-24 13:00:25] BUY signal per XAUUSD
-[+957.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+962.4s] ❌ Segnale non valido: , fallback BASE
-[+962.7s] ───────S-I-G-N-A-L──────────
-[+962.8s] 🔥 [2025-12-24 13:00:30] BUY signal per XAUUSD
-[+962.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+968.0s] ❌ Segnale non valido: , fallback BASE
-[+968.4s] ───────S-I-G-N-A-L──────────
-[+968.4s] 🔥 [2025-12-24 13:00:36] BUY signal per XAUUSD
-[+968.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+973.8s] ❌ Segnale non valido: , fallback BASE
-[+974.0s] ───────S-I-G-N-A-L──────────
-[+974.0s] 🔥 [2025-12-24 13:00:42] BUY signal per XAUUSD
-[+974.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+979.6s] ❌ Segnale non valido: , fallback BASE
-[+980.1s] ───────S-I-G-N-A-L──────────
-[+980.2s] 🔥 [2025-12-24 13:00:48] BUY signal per XAUUSD
-[+980.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+985.7s] ❌ Segnale non valido: , fallback BASE
-[+985.8s] ───────S-I-G-N-A-L──────────
-[+985.8s] 🔥 [2025-12-24 13:00:54] BUY signal per XAUUSD
-[+985.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+990.9s] ❌ Segnale non valido: , fallback BASE
-[+991.2s] ───────S-I-G-N-A-L──────────
-[+991.2s] 🔥 [2025-12-24 13:00:59] BUY signal per XAUUSD
-[+991.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+996.2s] ❌ Segnale non valido: , fallback BASE
-[+996.4s] ───────S-I-G-N-A-L──────────
-[+996.4s] 🔥 [2025-12-24 13:01:04] BUY signal per XAUUSD
-[+996.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1002.0s] ❌ Segnale non valido: , fallback BASE
-[+1002.3s] ───────S-I-G-N-A-L──────────
-[+1002.6s] 🔥 [2025-12-24 13:01:10] BUY signal per XAUUSD
-[+1003.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1008.8s] ❌ Segnale non valido: , fallback BASE
-[+1009.1s] ───────S-I-G-N-A-L──────────
-[+1010.5s] 🔥 [2025-12-24 13:01:17] BUY signal per XAUUSD
-[+1011.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1016.7s] ❌ Segnale non valido: , fallback BASE
-[+1016.9s] ───────S-I-G-N-A-L──────────
-[+1017.1s] 🔥 [2025-12-24 13:01:25] BUY signal per XAUUSD
-[+1017.6s] 🚀 Invio BUY allo SLAVE
-[+1018.1s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
-[+1018.3s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+1018.5s] ✅ Tick ricevuto per XAUUSD: bid=4492.77, ask=4492.86
-[+1018.6s] SL = 4489.36, TP = 4495.36
-[+1018.7s] 📤 Invio BUY [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave 
-[+1019.0s] 🚀 Entrato in open_order_on_slave()
-[+1019.1s] 🌐 Init MT5 slave: http://127.0.0.1:8001
-[+1019.1s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
-[+1019.4s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
-[+1019.5s] 🔐 Login allo SLAVE...
-[+1019.9s] ✅ Login SLAVE riuscito
-[+1019.9s] Simbolo dal payload è: XAUUSD
-[+1020.0s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+1020.2s] 📈 Tick ricevuto: BID=4493.09 ASK=4493.13
-[+1020.3s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
-[+1020.3s] 🧾 Dati inviati:{'price': 4493.13,
-[+1020.3s]  'sl': 4489.36,
-[+1020.3s]  'symbol': 'XAUUSD',
-[+1020.3s]  'tp': 4495.36,
-[+1020.3s]  'type': 'buy',
-[+1020.3s]  'volume': 0.1}
-[+1021.7s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261119677, 'order': 151334744808, 'volume': 0.1, 'price': 4493.19, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472898, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4493.13, 0.0, 4489.36, 4495.36, 10, 0, 0, 0, 0, '', 0, 0]}}
-[+1021.7s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151334744808,"logs":"[+1016.9s] ───────S-I-G-N-A-L──────────\n[+1017.1s] 🔥 [2025-12-24 13:01:25] BUY signal per XAUUSD\n[+1017.6s] 🚀 Invio BUY allo SLAVE\n[+1018.1s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+1018.3s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+1018.5s] ✅ Tick ricevuto per XAUUSD: bid=4492.77, ask=4492.86\n[+1018.6s] SL = 4489.36, TP = 4495.36\n[+1018.7s] 📤 Invio BUY [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave \n[+1019.0s] 🚀 Entrato in open_order_on_slave()\n[+1019.1s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+1019.1s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+1019.4s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+1019.5s] 🔐 Login allo SLAVE...\n[+1019.9s] ✅ Login SLAVE riuscito\n[+1019.9s] Simbolo dal payload è: XAUUSD\n[+1020.0s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+1020.2s] 📈 Tick ricevuto: BID=4493.09 ASK=4493.13\n[+1020.3s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+1020.3s] 🧾 Dati inviati:{'price': 4493.13,\n[+1020.3s]  'sl': 4489.36,\n[+1020.3s]  'symbol': 'XAUUSD',\n[+1020.3s]  'tp': 4495.36,\n[+1020.3s]  'type': 'buy',\n[+1020.3s]  'volume': 0.1}\n[+1021.7s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261119677, 'order': 151334744808, 'volume': 0.1, 'price': 4493.19, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472898, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4493.13, 0.0, 4489.36, 4495.36, 10, 0, 0, 0, 0, '', 0, 0]}}"}
-[+1027.0s] ❌ Segnale non valido: , fallback BASE
-[+1027.2s] ───────S-I-G-N-A-L──────────
-[+1027.3s] 🔥 [2025-12-24 13:01:35] BUY signal per XAUUSD
-[+1027.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1032.8s] ❌ Segnale non valido: , fallback BASE
-[+1033.0s] ───────S-I-G-N-A-L──────────
-[+1033.1s] 🔥 [2025-12-24 13:01:41] BUY signal per XAUUSD
-[+1033.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1038.2s] ❌ Segnale non valido: , fallback BASE
-[+1040.1s] ───────S-I-G-N-A-L──────────
-[+1040.6s] 🔥 [2025-12-24 13:01:46] BUY signal per XAUUSD
-[+1040.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1046.2s] ❌ Segnale non valido: , fallback BASE
-[+1046.5s] ───────S-I-G-N-A-L──────────
-[+1046.5s] 🔥 [2025-12-24 13:01:54] BUY signal per XAUUSD
-[+1046.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1051.6s] ❌ Segnale non valido: , fallback BASE
-[+1051.8s] ───────S-I-G-N-A-L──────────
-[+1051.8s] 🔥 [2025-12-24 13:01:59] BUY signal per XAUUSD
-[+1051.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1057.9s] ❌ Segnale non valido: , fallback BASE
-[+1059.7s] ───────S-I-G-N-A-L──────────
-[+1060.0s] 🔥 [2025-12-24 13:02:06] BUY signal per XAUUSD
-[+1060.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1065.4s] ❌ Segnale non valido: , fallback BASE
-[+1065.7s] ───────S-I-G-N-A-L──────────
-[+1065.7s] 🔥 [2025-12-24 13:02:13] BUY signal per XAUUSD
-[+1065.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1070.9s] ❌ Segnale non valido: , fallback BASE
-[+1071.2s] ───────S-I-G-N-A-L──────────
-[+1071.3s] 🔥 [2025-12-24 13:02:19] BUY signal per XAUUSD
-[+1071.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1076.8s] ❌ Segnale non valido: , fallback BASE
-[+1077.4s] ───────S-I-G-N-A-L──────────
-[+1078.4s] 🔥 [2025-12-24 13:02:25] BUY signal per XAUUSD
-[+1078.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1084.6s] ❌ Segnale non valido: , fallback BASE
-[+1085.0s] ───────S-I-G-N-A-L──────────
-[+1085.4s] 🔥 [2025-12-24 13:02:33] BUY signal per XAUUSD
-[+1085.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1091.5s] ❌ Segnale non valido: , fallback BASE
-[+1098.7s] ───────S-I-G-N-A-L──────────
-[+1098.9s] 🔥 [2025-12-24 13:02:44] BUY signal per XAUUSD
-[+1099.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1106.6s] ❌ Segnale non valido: , fallback BASE
-[+1109.4s] ───────S-I-G-N-A-L──────────
-[+1109.7s] 🔥 [2025-12-24 13:02:55] BUY signal per XAUUSD
-[+1109.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1116.0s] ❌ Segnale non valido: , fallback BASE
-[+1117.0s] ───────S-I-G-N-A-L──────────
-[+1117.0s] 🔥 [2025-12-24 13:03:04] BUY signal per XAUUSD
-[+1117.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1123.0s] ❌ Segnale non valido: , fallback BASE
-[+1123.6s] ───────S-I-G-N-A-L──────────
-[+1124.7s] 🔥 [2025-12-24 13:03:11] BUY signal per XAUUSD
-[+1125.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1133.2s] ❌ Segnale non valido: , fallback BASE
-[+1133.5s] ───────S-I-G-N-A-L──────────
-[+1133.5s] 🔥 [2025-12-24 13:03:21] BUY signal per XAUUSD
-[+1133.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1138.9s] ❌ Segnale non valido: , fallback BASE
-[+1139.1s] ───────S-I-G-N-A-L──────────
-[+1139.2s] 🔥 [2025-12-24 13:03:27] BUY signal per XAUUSD
-[+1139.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1144.4s] ❌ Segnale non valido: , fallback BASE
-[+1145.2s] ───────S-I-G-N-A-L──────────
-[+1145.2s] 🔥 [2025-12-24 13:03:33] BUY signal per XAUUSD
-[+1145.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1151.7s] ❌ Segnale non valido: , fallback BASE
-[+1152.3s] ───────S-I-G-N-A-L──────────
-[+1152.3s] 🔥 [2025-12-24 13:03:40] BUY signal per XAUUSD
-[+1152.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1158.5s] ❌ Segnale non valido: , fallback BASE
-[+1161.4s] ───────S-I-G-N-A-L──────────
-[+1161.8s] 🔥 [2025-12-24 13:03:47] BUY signal per XAUUSD
-[+1161.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1168.0s] ❌ Segnale non valido: , fallback BASE
-[+1170.2s] ───────S-I-G-N-A-L──────────
-[+1170.5s] 🔥 [2025-12-24 13:03:57] BUY signal per XAUUSD
-[+1170.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1176.5s] ❌ Segnale non valido: , fallback BASE
-[+1177.3s] ───────S-I-G-N-A-L──────────
-[+1177.3s] 🔥 [2025-12-24 13:04:05] BUY signal per XAUUSD
-[+1177.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1182.7s] ❌ Segnale non valido: , fallback BASE
-[+1183.6s] ───────S-I-G-N-A-L──────────
-[+1184.1s] 🔥 [2025-12-24 13:04:11] BUY signal per XAUUSD
-[+1184.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1192.4s] ❌ Segnale non valido: , fallback BASE
-[+1192.9s] ───────S-I-G-N-A-L──────────
-[+1193.0s] 🔥 [2025-12-24 13:04:20] BUY signal per XAUUSD
-[+1193.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1198.4s] ❌ Segnale non valido: , fallback BASE
-[+1198.7s] ───────S-I-G-N-A-L──────────
-[+1198.7s] 🔥 [2025-12-24 13:04:26] BUY signal per XAUUSD
-[+1198.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1204.0s] ❌ Segnale non valido: , fallback BASE
-[+1204.5s] ───────S-I-G-N-A-L──────────
-[+1204.6s] 🔥 [2025-12-24 13:04:32] BUY signal per XAUUSD
-[+1204.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1210.2s] ❌ Segnale non valido: , fallback BASE
-[+1210.4s] ───────S-I-G-N-A-L──────────
-[+1210.4s] 🔥 [2025-12-24 13:04:38] BUY signal per XAUUSD
-[+1210.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1215.5s] ❌ Segnale non valido: , fallback BASE
-[+1215.8s] ───────S-I-G-N-A-L──────────
-[+1215.8s] 🔥 [2025-12-24 13:04:43] BUY signal per XAUUSD
-[+1215.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1221.1s] ❌ Segnale non valido: , fallback BASE
-[+1221.4s] ───────S-I-G-N-A-L──────────
-[+1221.4s] 🔥 [2025-12-24 13:04:49] BUY signal per XAUUSD
-[+1221.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1226.7s] ❌ Segnale non valido: , fallback BASE
-[+1228.6s] ───────S-I-G-N-A-L──────────
-[+1229.1s] 🔥 [2025-12-24 13:04:55] BUY signal per XAUUSD
-[+1229.3s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1234.7s] ❌ Segnale non valido: , fallback BASE
-[+1234.9s] ───────S-I-G-N-A-L──────────
-[+1235.0s] 🔥 [2025-12-24 13:05:03] BUY signal per XAUUSD
-[+1235.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1240.1s] ❌ Segnale non valido: , fallback BASE
-[+1240.8s] ───────S-I-G-N-A-L──────────
-[+1240.9s] 🔥 [2025-12-24 13:05:08] BUY signal per XAUUSD
-[+1241.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1248.4s] ❌ Segnale non valido: , fallback BASE
-[+1248.7s] ───────S-I-G-N-A-L──────────
-[+1248.8s] 🔥 [2025-12-24 13:05:16] BUY signal per XAUUSD
-[+1248.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1254.4s] ❌ Segnale non valido: , fallback BASE
-[+1256.9s] ───────S-I-G-N-A-L──────────
-[+1257.2s] 🔥 [2025-12-24 13:05:25] BUY signal per XAUUSD
-[+1257.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1262.6s] ❌ Segnale non valido: , fallback BASE
-[+1262.9s] ───────S-I-G-N-A-L──────────
-[+1263.0s] 🔥 [2025-12-24 13:05:31] BUY signal per XAUUSD
-[+1263.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1268.1s] ❌ Segnale non valido: , fallback BASE
-[+1269.4s] ───────S-I-G-N-A-L──────────
-[+1269.4s] 🔥 [2025-12-24 13:05:37] BUY signal per XAUUSD
-[+1269.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1275.4s] ❌ Segnale non valido: , fallback BASE
-[+1276.0s] ───────S-I-G-N-A-L──────────
-[+1276.1s] 🔥 [2025-12-24 13:05:44] BUY signal per XAUUSD
-[+1276.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1282.3s] ❌ Segnale non valido: , fallback BASE
-[+1282.9s] ───────S-I-G-N-A-L──────────
-[+1283.1s] 🔥 [2025-12-24 13:05:50] BUY signal per XAUUSD
-[+1283.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1288.5s] ❌ Segnale non valido: , fallback BASE
-[+1288.9s] ───────S-I-G-N-A-L──────────
-[+1288.9s] 🔥 [2025-12-24 13:05:56] BUY signal per XAUUSD
-[+1288.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1294.1s] ❌ Segnale non valido: , fallback BASE
-[+1294.3s] ───────S-I-G-N-A-L──────────
-[+1294.4s] 🔥 [2025-12-24 13:06:02] BUY signal per XAUUSD
-[+1294.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1299.5s] ❌ Segnale non valido: , fallback BASE
-[+1299.9s] ───────S-I-G-N-A-L──────────
-[+1299.9s] 🔥 [2025-12-24 13:06:07] BUY signal per XAUUSD
-[+1299.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+1305.1s] ❌ Segnale non valido: , fallback BASE
-[+1305.8s] ───────S-I-G-N-A-L──────────
-[+1306.0s] 🔥 [2025-12-24 13:06:13] BUY signal per XAUUSD
-[+1306.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+26.2s] 2
-[+26.3s] 📡 Segnale attivo: BASE
-[+26.4s] ⚠️ CHOSEN_TRADESIGNAL vuoto, forzo fallback a BASE
-[+26.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+27.0s] ───────S-I-G-N-A-L──────────
-[+27.3s] 🔥 [2025-12-24 13:06:50] BUY signal per XAUUSD
-[+27.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+28.3s] ▶️ Polling avviato manualmente dal frontend!
-[+30.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+30.4s] ───────S-I-G-N-A-L──────────
-[+30.4s] 🔥 [2025-12-24 13:06:54] BUY signal per XAUUSD
-[+30.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+32.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+32.9s] ───────S-I-G-N-A-L──────────
-[+33.0s] 🔥 [2025-12-24 13:06:56] BUY signal per XAUUSD
-[+33.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+35.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+35.8s] ───────S-I-G-N-A-L──────────
-[+35.9s] 🔥 [2025-12-24 13:06:59] BUY signal per XAUUSD
-[+35.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+38.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+38.3s] ───────S-I-G-N-A-L──────────
-[+38.4s] 🔥 [2025-12-24 13:07:01] BUY signal per XAUUSD
-[+38.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+40.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+41.0s] ───────S-I-G-N-A-L──────────
-[+41.0s] 🔥 [2025-12-24 13:07:04] BUY signal per XAUUSD
-[+41.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+43.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+44.3s] ───────S-I-G-N-A-L──────────
-[+44.6s] 🔥 [2025-12-24 13:07:07] BUY signal per XAUUSD
-[+44.6s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+48.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+48.7s] ───────S-I-G-N-A-L──────────
-[+48.9s] 🔥 [2025-12-24 13:07:11] BUY signal per XAUUSD
-[+49.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+51.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+51.9s] ───────S-I-G-N-A-L──────────
-[+51.9s] 🔥 [2025-12-24 13:07:15] BUY signal per XAUUSD
-[+52.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+30.7s] 10
-[+30.8s] 📡 Segnale attivo: BASE
-[+34.1s] 10
-[+34.1s] 📡 Segnale attivo: BASE
-[+52.3s] ⏹️ Polling fermato manualmente dal frontend!
-[+53.6s] 10
-[+53.7s] 📡 Segnale attivo: BASE
-[+30.7s] 10
-[+30.7s] 📡 Segnale attivo: BASE
-[+28.9s] 10
-[+28.9s] 📡 Segnale attivo: BASE
-[+39.2s] 5
-[+39.2s] 📡 Segnale attivo: BASE
-[+54.0s] 5
-[+54.0s] 📡 Segnale attivo: BASE
-[+70.4s] ⏹️ Polling fermato manualmente dal frontend!
-[+72.2s] 5
-[+73.1s] 📡 Segnale attivo: BASE
-[+28.4s] 6
-[+28.4s] 📡 Segnale attivo: BASE
-[+28.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+28.7s] ───────S-I-G-N-A-L──────────
-[+28.7s] 🔥 [2025-12-24 13:31:30] BUY signal per XAUUSD
-[+28.7s] 🚀 Invio BUY allo SLAVE
-[+29.2s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
-[+29.9s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+31.7s] ✅ Tick ricevuto per XAUUSD: bid=4493.03, ask=4493.19
-[+32.0s] SL = 4489.69, TP = 4495.69
-[+32.6s] 📤 Invio BUY [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave 
-[+32.8s] 🚀 Entrato in open_order_on_slave()
-[+32.8s] 🌐 Init MT5 slave: http://127.0.0.1:8001
-[+32.8s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
-[+32.9s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
-[+32.9s] 🔐 Login allo SLAVE...
-[+33.2s] ✅ Login SLAVE riuscito
-[+33.2s] Simbolo dal payload è: XAUUSD
-[+33.4s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
-[+33.6s] 📈 Tick ricevuto: BID=4492.96 ASK=4493.15
-[+33.6s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
-[+33.8s] 🧾 Dati inviati:{'price': 4493.15,
-[+33.8s]  'sl': 4489.69,
-[+33.8s]  'symbol': 'XAUUSD',
-[+33.8s]  'tp': 4495.69,
-[+33.8s]  'type': 'buy',
-[+33.8s]  'volume': 0.1}
-[+35.2s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261250210, 'order': 151334874407, 'volume': 0.1, 'price': 4493.19, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472899, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4493.15, 0.0, 4489.69, 4495.69, 10, 0, 0, 0, 0, '', 0, 0]}}
-[+35.2s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151334874407,"logs":"[+28.7s] ───────S-I-G-N-A-L──────────\n[+28.7s] 🔥 [2025-12-24 13:31:30] BUY signal per XAUUSD\n[+28.7s] 🚀 Invio BUY allo SLAVE\n[+29.2s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+29.9s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+31.7s] ✅ Tick ricevuto per XAUUSD: bid=4493.03, ask=4493.19\n[+32.0s] SL = 4489.69, TP = 4495.69\n[+32.6s] 📤 Invio BUY [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave \n[+32.8s] 🚀 Entrato in open_order_on_slave()\n[+32.8s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+32.8s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+32.9s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+32.9s] 🔐 Login allo SLAVE...\n[+33.2s] ✅ Login SLAVE riuscito\n[+33.2s] Simbolo dal payload è: XAUUSD\n[+33.4s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+33.6s] 📈 Tick ricevuto: BID=4492.96 ASK=4493.15\n[+33.6s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+33.8s] 🧾 Dati inviati:{'price': 4493.15,\n[+33.8s]  'sl': 4489.69,\n[+33.8s]  'symbol': 'XAUUSD',\n[+33.8s]  'tp': 4495.69,\n[+33.8s]  'type': 'buy',\n[+33.8s]  'volume': 0.1}\n[+35.2s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151261250210, 'order': 151334874407, 'volume': 0.1, 'price': 4493.19, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3239472899, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4493.15, 0.0, 4489.69, 4495.69, 10, 0, 0, 0, 0, '', 0, 0]}}"}
-[+35.4s] ▶️ Polling avviato manualmente dal frontend!
-[+41.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+41.6s] ───────S-I-G-N-A-L──────────
-[+41.7s] 🔥 [2025-12-24 13:31:43] BUY signal per XAUUSD
-[+41.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+47.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+48.7s] ───────S-I-G-N-A-L──────────
-[+48.8s] 🔥 [2025-12-24 13:31:50] BUY signal per XAUUSD
-[+49.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+55.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+56.8s] ───────S-I-G-N-A-L──────────
-[+57.1s] 🔥 [2025-12-24 13:31:58] BUY signal per XAUUSD
-[+57.4s] ⚠️ BUY su XAUUSD già aperto. Skip.
-[+64.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
-[+65.5s] ───────S-I-G-N-A-L──────────
-[+65.7s] 🔥 [2025-12-24 13:32:07] BUY signal per XAUUSD
-[+65.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+489.6s] 🔻 [2026-01-12 11:06:33] SELL signal per XAUUSD
+[+489.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+500.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+500.3s] ───────S-I-G-N-A-L──────────
+[+500.3s] 🔻 [2026-01-12 11:06:44] SELL signal per XAUUSD
+[+500.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+510.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+510.4s] ───────S-I-G-N-A-L──────────
+[+510.4s] 🔻 [2026-01-12 11:06:54] SELL signal per XAUUSD
+[+510.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+520.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+520.6s] ───────S-I-G-N-A-L──────────
+[+520.6s] 🔻 [2026-01-12 11:07:04] SELL signal per XAUUSD
+[+520.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+530.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+530.8s] ───────S-I-G-N-A-L──────────
+[+530.9s] 🔻 [2026-01-12 11:07:14] SELL signal per XAUUSD
+[+531.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+541.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+541.1s] ───────S-I-G-N-A-L──────────
+[+541.1s] 🔻 [2026-01-12 11:07:24] SELL signal per XAUUSD
+[+541.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+551.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+552.0s] ───────S-I-G-N-A-L──────────
+[+552.0s] 🔻 [2026-01-12 11:07:35] SELL signal per XAUUSD
+[+552.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+562.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+562.6s] ───────S-I-G-N-A-L──────────
+[+562.6s] 🔻 [2026-01-12 11:07:46] SELL signal per XAUUSD
+[+562.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+573.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+573.1s] ───────S-I-G-N-A-L──────────
+[+573.1s] 🔻 [2026-01-12 11:07:56] SELL signal per XAUUSD
+[+573.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+583.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+583.4s] ───────S-I-G-N-A-L──────────
+[+583.5s] 🔻 [2026-01-12 11:08:07] SELL signal per XAUUSD
+[+583.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+593.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+593.6s] ───────S-I-G-N-A-L──────────
+[+593.6s] ⚠️ [2026-01-12 11:08:17] HOLD per XAUUSD
+[+593.8s] 🔄 previous_signal=SELL, current=HOLD
+[+593.8s] ⚠️ SELL → HOLD: chiudo SELL XAUUSD
+[+604.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+605.1s] ───────S-I-G-N-A-L──────────
+[+605.1s] ⚠️ [2026-01-12 11:08:28] HOLD per XAUUSD
+[+605.2s] 🔄 previous_signal=HOLD, current=HOLD
+[+615.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+615.6s] ───────S-I-G-N-A-L──────────
+[+615.6s] ⚠️ [2026-01-12 11:08:39] HOLD per XAUUSD
+[+615.6s] 🔄 previous_signal=HOLD, current=HOLD
+[+625.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+625.8s] ───────S-I-G-N-A-L──────────
+[+625.8s] ⚠️ [2026-01-12 11:08:49] HOLD per XAUUSD
+[+625.8s] 🔄 previous_signal=HOLD, current=HOLD
+[+635.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+635.9s] ───────S-I-G-N-A-L──────────
+[+636.0s] ⚠️ [2026-01-12 11:08:59] HOLD per XAUUSD
+[+636.0s] 🔄 previous_signal=HOLD, current=HOLD
+[+646.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+646.2s] ───────S-I-G-N-A-L──────────
+[+646.2s] ⚠️ [2026-01-12 11:09:10] HOLD per XAUUSD
+[+646.2s] 🔄 previous_signal=HOLD, current=HOLD
+[+656.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+657.0s] ───────S-I-G-N-A-L──────────
+[+657.1s] ⚠️ [2026-01-12 11:09:20] HOLD per XAUUSD
+[+658.3s] 🔄 previous_signal=HOLD, current=HOLD
+[+669.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+670.5s] ───────S-I-G-N-A-L──────────
+[+670.6s] ⚠️ [2026-01-12 11:09:33] HOLD per XAUUSD
+[+670.7s] 🔄 previous_signal=HOLD, current=HOLD
+[+681.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+681.2s] ───────S-I-G-N-A-L──────────
+[+681.3s] ⚠️ [2026-01-12 11:09:45] HOLD per XAUUSD
+[+681.7s] 🔄 previous_signal=HOLD, current=HOLD
+[+692.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+694.6s] ───────S-I-G-N-A-L──────────
+[+694.8s] ⚠️ [2026-01-12 11:09:57] HOLD per XAUUSD
+[+695.0s] 🔄 previous_signal=HOLD, current=HOLD
+[+705.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+705.2s] ───────S-I-G-N-A-L──────────
+[+705.2s] 🔻 [2026-01-12 11:10:09] SELL signal per XAUUSD
+[+705.2s] 🚀 Invio SELL allo SLAVE
+[+705.3s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD
+[+705.3s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+705.4s] ✅ Tick ricevuto per XAUUSD: bid=4586.08, ask=4586.25
+[+705.5s] SL = None, TP = 4583.58
+[+705.5s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave
+[+705.7s] 🚀 Entrato in open_order_on_slave()
+[+706.6s] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[+706.6s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[+706.9s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)
+[+707.2s] 🔐 Login allo SLAVE...
+[+708.9s] ✅ Login SLAVE riuscito
+[+708.9s] Simbolo dal payload è: XAUUSD
+[+708.9s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[+709.1s] 📈 Tick ricevuto: BID=4587.1 ASK=4587.29
+[+709.1s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[+709.1s] 🧾 Dati inviati:{'price': 4587.1,
+[+709.1s]  'sl': None,
+[+709.1s]  'symbol': 'XAUUSD',
+[+709.1s]  'tp': 4583.58,
+[+709.1s]  'type': 'sell',
+[+709.1s]  'volume': 0.1}
+[+710.3s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323526376, 'order': 151396870790, 'volume': 0.1, 'price': 4587.16, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011533, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4587.1, 0.0, 0.0, 4583.58, 10, 1, 0, 0, 0, '', 0, 0]}}
+[+710.3s] 📥 Risposta SLAVE: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":151396870790,"logs":"[+705.2s] ───────S-I-G-N-A-L──────────\n[+705.2s] 🔻 [2026-01-12 11:10:09] SELL signal per XAUUSD\n[+705.2s] 🚀 Invio SELL allo SLAVE\n[+705.3s] 🔍 Richiedo info simbolo allo slave: http://127.0.0.1:8001/symbol_info/XAUUSD\n[+705.3s] 📡 Richiedo tick allo slave: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+705.4s] ✅ Tick ricevuto per XAUUSD: bid=4586.08, ask=4586.25\n[+705.5s] SL = None, TP = 4583.58\n[+705.5s] 📤 Invio SELL [symbol=XAUUSD] allo SLAVE → http://127.0.0.1:8080/db/traders/1/open_order_on_slave\n[+705.7s] 🚀 Entrato in open_order_on_slave()\n[+706.6s] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[+706.6s] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[+706.9s] ✅ MT5 attivo (versione 500.5488.19 Dec 2025)\n[+707.2s] 🔐 Login allo SLAVE...\n[+708.9s] ✅ Login SLAVE riuscito\n[+708.9s] Simbolo dal payload è: XAUUSD\n[+708.9s] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[+709.1s] 📈 Tick ricevuto: BID=4587.1 ASK=4587.29\n[+709.1s] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[+709.1s] 🧾 Dati inviati:{'price': 4587.1,\n[+709.1s]  'sl': None,\n[+709.1s]  'symbol': 'XAUUSD',\n[+709.1s]  'tp': 4583.58,\n[+709.1s]  'type': 'sell',\n[+709.1s]  'volume': 0.1}\n[+710.3s] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 151323526376, 'order': 151396870790, 'volume': 0.1, 'price': 4587.16, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 3154011533, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.1, 4587.1, 0.0, 0.0, 4583.58, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[+721.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+721.1s] ───────S-I-G-N-A-L──────────
+[+721.1s] 🔻 [2026-01-12 11:10:24] SELL signal per XAUUSD
+[+721.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+731.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+731.3s] ───────S-I-G-N-A-L──────────
+[+731.3s] 🔻 [2026-01-12 11:10:35] SELL signal per XAUUSD
+[+731.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+741.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+743.5s] ───────S-I-G-N-A-L──────────
+[+743.8s] 🔻 [2026-01-12 11:10:46] SELL signal per XAUUSD
+[+743.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+754.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+754.6s] ───────S-I-G-N-A-L──────────
+[+754.6s] 🔻 [2026-01-12 11:10:58] SELL signal per XAUUSD
+[+754.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+764.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+767.3s] ───────S-I-G-N-A-L──────────
+[+767.5s] 🔻 [2026-01-12 11:11:10] SELL signal per XAUUSD
+[+767.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+778.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+779.9s] ───────S-I-G-N-A-L──────────
+[+779.9s] 🔻 [2026-01-12 11:11:23] SELL signal per XAUUSD
+[+780.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+794.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+794.2s] ───────S-I-G-N-A-L──────────
+[+794.3s] 🔻 [2026-01-12 11:11:37] SELL signal per XAUUSD
+[+794.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+805.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+806.1s] ───────S-I-G-N-A-L──────────
+[+806.5s] 🔻 [2026-01-12 11:11:49] SELL signal per XAUUSD
+[+806.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+820.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+821.1s] ───────S-I-G-N-A-L──────────
+[+821.2s] 🔻 [2026-01-12 11:12:04] SELL signal per XAUUSD
+[+821.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+831.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+831.4s] ───────S-I-G-N-A-L──────────
+[+831.5s] 🔻 [2026-01-12 11:12:15] SELL signal per XAUUSD
+[+831.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+841.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+841.7s] ───────S-I-G-N-A-L──────────
+[+841.8s] 🔻 [2026-01-12 11:12:25] SELL signal per XAUUSD
+[+841.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+852.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+852.2s] ───────S-I-G-N-A-L──────────
+[+852.2s] 🔻 [2026-01-12 11:12:36] SELL signal per XAUUSD
+[+852.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+862.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+862.4s] ───────S-I-G-N-A-L──────────
+[+862.4s] 🔻 [2026-01-12 11:12:46] SELL signal per XAUUSD
+[+862.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+872.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+872.6s] ───────S-I-G-N-A-L──────────
+[+872.6s] 🔻 [2026-01-12 11:12:56] SELL signal per XAUUSD
+[+872.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+883.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+883.5s] ───────S-I-G-N-A-L──────────
+[+883.6s] 🔻 [2026-01-12 11:13:07] SELL signal per XAUUSD
+[+883.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+894.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+894.5s] ───────S-I-G-N-A-L──────────
+[+894.5s] 🔻 [2026-01-12 11:13:18] SELL signal per XAUUSD
+[+894.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+904.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+904.7s] ───────S-I-G-N-A-L──────────
+[+904.7s] 🔻 [2026-01-12 11:13:28] SELL signal per XAUUSD
+[+904.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+914.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+915.0s] ───────S-I-G-N-A-L──────────
+[+915.0s] 🔻 [2026-01-12 11:13:38] SELL signal per XAUUSD
+[+915.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+925.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+925.6s] ───────S-I-G-N-A-L──────────
+[+925.7s] 🔻 [2026-01-12 11:13:49] SELL signal per XAUUSD
+[+925.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+935.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+935.9s] ───────S-I-G-N-A-L──────────
+[+935.9s] 🔻 [2026-01-12 11:13:59] SELL signal per XAUUSD
+[+936.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+946.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+946.6s] ───────S-I-G-N-A-L──────────
+[+946.6s] 🔻 [2026-01-12 11:14:10] SELL signal per XAUUSD
+[+946.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+956.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+956.8s] ───────S-I-G-N-A-L──────────
+[+956.9s] 🔻 [2026-01-12 11:14:20] SELL signal per XAUUSD
+[+956.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+966.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+967.0s] ───────S-I-G-N-A-L──────────
+[+967.0s] 🔻 [2026-01-12 11:14:30] SELL signal per XAUUSD
+[+967.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+977.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+977.3s] ───────S-I-G-N-A-L──────────
+[+977.3s] 🔻 [2026-01-12 11:14:41] SELL signal per XAUUSD
+[+977.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+987.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+987.8s] ───────S-I-G-N-A-L──────────
+[+988.6s] 🔻 [2026-01-12 11:14:51] SELL signal per XAUUSD
+[+988.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+999.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+999.4s] ───────S-I-G-N-A-L──────────
+[+999.4s] 🔻 [2026-01-12 11:15:03] SELL signal per XAUUSD
+[+999.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1009.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1009.7s] ───────S-I-G-N-A-L──────────
+[+1009.7s] 🔻 [2026-01-12 11:15:13] SELL signal per XAUUSD
+[+1009.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1020.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1020.4s] ───────S-I-G-N-A-L──────────
+[+1020.5s] 🔻 [2026-01-12 11:15:24] SELL signal per XAUUSD
+[+1020.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1030.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1030.7s] ───────S-I-G-N-A-L──────────
+[+1030.8s] 🔻 [2026-01-12 11:15:34] SELL signal per XAUUSD
+[+1030.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1041.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1041.2s] ───────S-I-G-N-A-L──────────
+[+1041.2s] 🔻 [2026-01-12 11:15:45] SELL signal per XAUUSD
+[+1041.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1051.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1051.4s] ───────S-I-G-N-A-L──────────
+[+1051.4s] 🔻 [2026-01-12 11:15:55] SELL signal per XAUUSD
+[+1051.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1061.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1061.5s] ───────S-I-G-N-A-L──────────
+[+1061.6s] 🔻 [2026-01-12 11:16:05] SELL signal per XAUUSD
+[+1061.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1071.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1071.9s] ───────S-I-G-N-A-L──────────
+[+1071.9s] 🔻 [2026-01-12 11:16:15] SELL signal per XAUUSD
+[+1071.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1081.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1082.0s] ───────S-I-G-N-A-L──────────
+[+1082.0s] 🔻 [2026-01-12 11:16:25] SELL signal per XAUUSD
+[+1082.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1092.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1092.4s] ───────S-I-G-N-A-L──────────
+[+1092.5s] 🔻 [2026-01-12 11:16:36] SELL signal per XAUUSD
+[+1092.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1102.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1102.6s] ───────S-I-G-N-A-L──────────
+[+1103.0s] 🔻 [2026-01-12 11:16:46] SELL signal per XAUUSD
+[+1103.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1113.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1114.3s] ───────S-I-G-N-A-L──────────
+[+1114.3s] 🔻 [2026-01-12 11:16:57] SELL signal per XAUUSD
+[+1114.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1124.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1125.2s] ───────S-I-G-N-A-L──────────
+[+1125.3s] 🔻 [2026-01-12 11:17:08] SELL signal per XAUUSD
+[+1125.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1135.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1135.8s] ───────S-I-G-N-A-L──────────
+[+1135.8s] 🔻 [2026-01-12 11:17:19] SELL signal per XAUUSD
+[+1135.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1145.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1146.0s] ───────S-I-G-N-A-L──────────
+[+1146.0s] 🔻 [2026-01-12 11:17:29] SELL signal per XAUUSD
+[+1146.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1156.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1156.1s] ───────S-I-G-N-A-L──────────
+[+1156.1s] 🔻 [2026-01-12 11:17:40] SELL signal per XAUUSD
+[+1156.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1166.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1166.3s] ───────S-I-G-N-A-L──────────
+[+1166.3s] 🔻 [2026-01-12 11:17:50] SELL signal per XAUUSD
+[+1166.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1176.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1176.4s] ───────S-I-G-N-A-L──────────
+[+1176.4s] 🔻 [2026-01-12 11:18:00] SELL signal per XAUUSD
+[+1176.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1186.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1186.6s] ───────S-I-G-N-A-L──────────
+[+1186.7s] 🔻 [2026-01-12 11:18:10] SELL signal per XAUUSD
+[+1186.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1197.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1197.7s] ───────S-I-G-N-A-L──────────
+[+1197.7s] 🔻 [2026-01-12 11:18:21] SELL signal per XAUUSD
+[+1197.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1208.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1208.9s] ───────S-I-G-N-A-L──────────
+[+1209.4s] 🔻 [2026-01-12 11:18:32] SELL signal per XAUUSD
+[+1209.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1221.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1221.9s] ───────S-I-G-N-A-L──────────
+[+1221.9s] 🔻 [2026-01-12 11:18:45] SELL signal per XAUUSD
+[+1221.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1232.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1232.5s] ───────S-I-G-N-A-L──────────
+[+1232.5s] 🔻 [2026-01-12 11:18:56] SELL signal per XAUUSD
+[+1232.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1242.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1242.7s] ───────S-I-G-N-A-L──────────
+[+1242.8s] 🔻 [2026-01-12 11:19:06] SELL signal per XAUUSD
+[+1242.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1252.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1253.3s] ───────S-I-G-N-A-L──────────
+[+1253.4s] 🔻 [2026-01-12 11:19:16] SELL signal per XAUUSD
+[+1253.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1263.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1263.7s] ───────S-I-G-N-A-L──────────
+[+1263.8s] 🔻 [2026-01-12 11:19:27] SELL signal per XAUUSD
+[+1263.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1275.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1276.3s] ───────S-I-G-N-A-L──────────
+[+1276.3s] 🔻 [2026-01-12 11:19:39] SELL signal per XAUUSD
+[+1276.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1286.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1286.8s] ───────S-I-G-N-A-L──────────
+[+1286.8s] 🔻 [2026-01-12 11:19:50] SELL signal per XAUUSD
+[+1286.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1297.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1301.4s] ───────S-I-G-N-A-L──────────
+[+1301.5s] 🔻 [2026-01-12 11:20:03] SELL signal per XAUUSD
+[+1301.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1312.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1312.7s] ───────S-I-G-N-A-L──────────
+[+1312.7s] 🔻 [2026-01-12 11:20:16] SELL signal per XAUUSD
+[+1312.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1322.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1323.0s] ───────S-I-G-N-A-L──────────
+[+1323.0s] 🔻 [2026-01-12 11:20:26] SELL signal per XAUUSD
+[+1323.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1333.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1333.4s] ───────S-I-G-N-A-L──────────
+[+1333.4s] 🔻 [2026-01-12 11:20:37] SELL signal per XAUUSD
+[+1333.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1343.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1344.4s] ───────S-I-G-N-A-L──────────
+[+1344.4s] 🔻 [2026-01-12 11:20:47] SELL signal per XAUUSD
+[+1344.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1354.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1354.8s] ───────S-I-G-N-A-L──────────
+[+1354.8s] 🔻 [2026-01-12 11:20:58] SELL signal per XAUUSD
+[+1354.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1364.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1365.0s] ───────S-I-G-N-A-L──────────
+[+1365.0s] 🔻 [2026-01-12 11:21:08] SELL signal per XAUUSD
+[+1365.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1375.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1375.2s] ───────S-I-G-N-A-L──────────
+[+1375.2s] 🔻 [2026-01-12 11:21:19] SELL signal per XAUUSD
+[+1375.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1386.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1393.7s] ───────S-I-G-N-A-L──────────
+[+1394.2s] 🔻 [2026-01-12 11:21:34] SELL signal per XAUUSD
+[+1395.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1407.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1407.6s] ───────S-I-G-N-A-L──────────
+[+1407.6s] 🔻 [2026-01-12 11:21:51] SELL signal per XAUUSD
+[+1407.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1417.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1417.9s] ───────S-I-G-N-A-L──────────
+[+1418.1s] 🔻 [2026-01-12 11:22:01] SELL signal per XAUUSD
+[+1418.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1428.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1429.1s] ───────S-I-G-N-A-L──────────
+[+1429.4s] 🔻 [2026-01-12 11:22:12] SELL signal per XAUUSD
+[+1429.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1440.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1440.9s] ───────S-I-G-N-A-L──────────
+[+1441.0s] 🔻 [2026-01-12 11:22:24] SELL signal per XAUUSD
+[+1441.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1451.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1452.7s] ───────S-I-G-N-A-L──────────
+[+1453.4s] 🔻 [2026-01-12 11:22:35] SELL signal per XAUUSD
+[+1453.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1464.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1464.8s] ───────S-I-G-N-A-L──────────
+[+1464.8s] 🔻 [2026-01-12 11:22:48] SELL signal per XAUUSD
+[+1464.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1474.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1474.9s] ───────S-I-G-N-A-L──────────
+[+1474.9s] 🔻 [2026-01-12 11:22:58] SELL signal per XAUUSD
+[+1475.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1485.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1485.5s] ───────S-I-G-N-A-L──────────
+[+1486.0s] 🔻 [2026-01-12 11:23:08] SELL signal per XAUUSD
+[+1486.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1498.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1498.2s] ───────S-I-G-N-A-L──────────
+[+1498.4s] 🔻 [2026-01-12 11:23:22] SELL signal per XAUUSD
+[+1498.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1508.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1508.9s] ───────S-I-G-N-A-L──────────
+[+1509.0s] 🔻 [2026-01-12 11:23:32] SELL signal per XAUUSD
+[+1509.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1519.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1520.0s] ───────S-I-G-N-A-L──────────
+[+1520.0s] 🔻 [2026-01-12 11:23:43] SELL signal per XAUUSD
+[+1520.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1530.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1530.1s] ───────S-I-G-N-A-L──────────
+[+1530.1s] 🔻 [2026-01-12 11:23:54] SELL signal per XAUUSD
+[+1530.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1540.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1540.3s] ───────S-I-G-N-A-L──────────
+[+1540.4s] 🔻 [2026-01-12 11:24:04] SELL signal per XAUUSD
+[+1540.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1550.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1550.9s] ───────S-I-G-N-A-L──────────
+[+1551.1s] 🔻 [2026-01-12 11:24:14] SELL signal per XAUUSD
+[+1551.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1562.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1562.5s] ───────S-I-G-N-A-L──────────
+[+1562.5s] 🔻 [2026-01-12 11:24:26] SELL signal per XAUUSD
+[+1562.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1572.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1572.6s] ───────S-I-G-N-A-L──────────
+[+1572.7s] 🔻 [2026-01-12 11:24:36] SELL signal per XAUUSD
+[+1572.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1582.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1582.8s] ───────S-I-G-N-A-L──────────
+[+1582.8s] 🔻 [2026-01-12 11:24:46] SELL signal per XAUUSD
+[+1582.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1592.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1592.9s] ───────S-I-G-N-A-L──────────
+[+1592.9s] 🔻 [2026-01-12 11:24:56] SELL signal per XAUUSD
+[+1592.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1602.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1602.9s] ───────S-I-G-N-A-L──────────
+[+1602.9s] 🔻 [2026-01-12 11:25:06] SELL signal per XAUUSD
+[+1602.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1612.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1613.0s] ───────S-I-G-N-A-L──────────
+[+1613.0s] 🔻 [2026-01-12 11:25:16] SELL signal per XAUUSD
+[+1613.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1623.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1623.1s] ───────S-I-G-N-A-L──────────
+[+1623.1s] 🔻 [2026-01-12 11:25:26] SELL signal per XAUUSD
+[+1623.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1633.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1633.6s] ───────S-I-G-N-A-L──────────
+[+1633.6s] 🔻 [2026-01-12 11:25:37] SELL signal per XAUUSD
+[+1634.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1646.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1647.0s] ───────S-I-G-N-A-L──────────
+[+1647.0s] 🔻 [2026-01-12 11:25:50] SELL signal per XAUUSD
+[+1647.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1657.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1664.0s] ───────S-I-G-N-A-L──────────
+[+1665.0s] 🔻 [2026-01-12 11:26:04] SELL signal per XAUUSD
+[+1667.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1679.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1679.0s] ───────S-I-G-N-A-L──────────
+[+1679.0s] 🔻 [2026-01-12 11:26:22] SELL signal per XAUUSD
+[+1679.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1689.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1689.3s] ───────S-I-G-N-A-L──────────
+[+1689.4s] 🔻 [2026-01-12 11:26:33] SELL signal per XAUUSD
+[+1689.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1700.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1700.3s] ───────S-I-G-N-A-L──────────
+[+1700.3s] 🔻 [2026-01-12 11:26:44] SELL signal per XAUUSD
+[+1700.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1710.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1710.8s] ───────S-I-G-N-A-L──────────
+[+1710.9s] 🔻 [2026-01-12 11:26:54] SELL signal per XAUUSD
+[+1710.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1721.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1721.4s] ───────S-I-G-N-A-L──────────
+[+1721.4s] 🔻 [2026-01-12 11:27:05] SELL signal per XAUUSD
+[+1721.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1731.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1731.7s] ───────S-I-G-N-A-L──────────
+[+1731.7s] 🔻 [2026-01-12 11:27:15] SELL signal per XAUUSD
+[+1731.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1742.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1742.3s] ───────S-I-G-N-A-L──────────
+[+1742.3s] 🔻 [2026-01-12 11:27:26] SELL signal per XAUUSD
+[+1742.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1752.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1752.5s] ───────S-I-G-N-A-L──────────
+[+1752.5s] 🔥 [2026-01-12 11:27:36] BUY signal per XAUUSD
+[+1752.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1762.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1763.5s] ───────S-I-G-N-A-L──────────
+[+1763.5s] 🔻 [2026-01-12 11:27:47] SELL signal per XAUUSD
+[+1763.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1774.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1774.1s] ───────S-I-G-N-A-L──────────
+[+1774.1s] 🔻 [2026-01-12 11:27:58] SELL signal per XAUUSD
+[+1774.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1784.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1784.6s] ───────S-I-G-N-A-L──────────
+[+1784.6s] 🔻 [2026-01-12 11:28:08] SELL signal per XAUUSD
+[+1784.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1794.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1794.9s] ───────S-I-G-N-A-L──────────
+[+1795.0s] 🔥 [2026-01-12 11:28:18] BUY signal per XAUUSD
+[+1795.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1805.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1805.2s] ───────S-I-G-N-A-L──────────
+[+1805.2s] 🔥 [2026-01-12 11:28:29] BUY signal per XAUUSD
+[+1805.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1815.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1815.4s] ───────S-I-G-N-A-L──────────
+[+1815.4s] 🔥 [2026-01-12 11:28:39] BUY signal per XAUUSD
+[+1815.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1825.8s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1825.9s] ───────S-I-G-N-A-L──────────
+[+1825.9s] 🔥 [2026-01-12 11:28:49] BUY signal per XAUUSD
+[+1825.9s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1836.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1836.2s] ───────S-I-G-N-A-L──────────
+[+1836.2s] 🔥 [2026-01-12 11:29:00] BUY signal per XAUUSD
+[+1836.2s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1846.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1846.5s] ───────S-I-G-N-A-L──────────
+[+1846.5s] 🔥 [2026-01-12 11:29:10] BUY signal per XAUUSD
+[+1846.7s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1856.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1856.8s] ───────S-I-G-N-A-L──────────
+[+1856.8s] 🔥 [2026-01-12 11:29:20] BUY signal per XAUUSD
+[+1856.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1867.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1867.1s] ───────S-I-G-N-A-L──────────
+[+1867.1s] 🔥 [2026-01-12 11:29:30] BUY signal per XAUUSD
+[+1867.1s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1877.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1877.2s] ───────S-I-G-N-A-L──────────
+[+1877.2s] 🔻 [2026-01-12 11:29:41] SELL signal per XAUUSD
+[+1877.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1887.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1887.4s] ───────S-I-G-N-A-L──────────
+[+1887.4s] 🔻 [2026-01-12 11:29:51] SELL signal per XAUUSD
+[+1887.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1897.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1897.5s] ───────S-I-G-N-A-L──────────
+[+1897.5s] 🔥 [2026-01-12 11:30:01] BUY signal per XAUUSD
+[+1897.5s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1907.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1907.8s] ───────S-I-G-N-A-L──────────
+[+1907.8s] 🔥 [2026-01-12 11:30:11] BUY signal per XAUUSD
+[+1907.8s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1917.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1918.0s] ───────S-I-G-N-A-L──────────
+[+1918.0s] 🔥 [2026-01-12 11:30:21] BUY signal per XAUUSD
+[+1918.0s] ⚠️ BUY su XAUUSD già aperto. Skip.
+[+1928.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1928.6s] ───────S-I-G-N-A-L──────────
+[+1928.6s] 🔻 [2026-01-12 11:30:32] SELL signal per XAUUSD
+[+1928.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1939.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1939.2s] ───────S-I-G-N-A-L──────────
+[+1939.3s] 🔻 [2026-01-12 11:30:43] SELL signal per XAUUSD
+[+1939.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1949.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1949.4s] ───────S-I-G-N-A-L──────────
+[+1949.4s] 🔻 [2026-01-12 11:30:53] SELL signal per XAUUSD
+[+1949.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1959.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1959.8s] ───────S-I-G-N-A-L──────────
+[+1959.8s] 🔻 [2026-01-12 11:31:03] SELL signal per XAUUSD
+[+1959.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1969.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1970.0s] ───────S-I-G-N-A-L──────────
+[+1970.0s] 🔻 [2026-01-12 11:31:13] SELL signal per XAUUSD
+[+1970.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1980.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1981.8s] ───────S-I-G-N-A-L──────────
+[+1981.9s] 🔻 [2026-01-12 11:31:24] SELL signal per XAUUSD
+[+1982.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+1994.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+1994.7s] ───────S-I-G-N-A-L──────────
+[+1995.0s] 🔻 [2026-01-12 11:31:38] SELL signal per XAUUSD
+[+1995.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2005.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2005.3s] ───────S-I-G-N-A-L──────────
+[+2005.3s] 🔻 [2026-01-12 11:31:49] SELL signal per XAUUSD
+[+2005.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2015.5s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2015.8s] ───────S-I-G-N-A-L──────────
+[+2015.9s] 🔻 [2026-01-12 11:31:59] SELL signal per XAUUSD
+[+2016.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2026.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2026.5s] ───────S-I-G-N-A-L──────────
+[+2026.5s] 🔻 [2026-01-12 11:32:10] SELL signal per XAUUSD
+[+2026.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2036.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2037.4s] ───────S-I-G-N-A-L──────────
+[+2037.5s] 🔻 [2026-01-12 11:32:21] SELL signal per XAUUSD
+[+2037.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2048.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2048.2s] ───────S-I-G-N-A-L──────────
+[+2048.3s] 🔻 [2026-01-12 11:32:32] SELL signal per XAUUSD
+[+2048.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2058.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2058.3s] ───────S-I-G-N-A-L──────────
+[+2058.3s] 🔻 [2026-01-12 11:32:42] SELL signal per XAUUSD
+[+2058.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2068.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2068.5s] ───────S-I-G-N-A-L──────────
+[+2068.6s] 🔻 [2026-01-12 11:32:52] SELL signal per XAUUSD
+[+2068.6s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2078.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2079.0s] ───────S-I-G-N-A-L──────────
+[+2079.1s] 🔻 [2026-01-12 11:33:02] SELL signal per XAUUSD
+[+2079.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2089.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2089.9s] ───────S-I-G-N-A-L──────────
+[+2090.0s] 🔻 [2026-01-12 11:33:13] SELL signal per XAUUSD
+[+2090.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2099.0s] 10
+[+2099.0s] 📡 Segnale attivo: BASE
+[+2100.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2100.2s] ───────S-I-G-N-A-L──────────
+[+2100.2s] 🔻 [2026-01-12 11:33:24] SELL signal per XAUUSD
+[+2100.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2110.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2110.3s] ───────S-I-G-N-A-L──────────
+[+2110.3s] 🔻 [2026-01-12 11:33:34] SELL signal per XAUUSD
+[+2110.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2120.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2120.5s] ───────S-I-G-N-A-L──────────
+[+2120.5s] 🔻 [2026-01-12 11:33:44] SELL signal per XAUUSD
+[+2120.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2130.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2130.7s] ───────S-I-G-N-A-L──────────
+[+2130.8s] 🔻 [2026-01-12 11:33:54] SELL signal per XAUUSD
+[+2130.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2140.9s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2140.9s] ───────S-I-G-N-A-L──────────
+[+2140.9s] 🔻 [2026-01-12 11:34:04] SELL signal per XAUUSD
+[+2141.0s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2151.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2151.1s] ───────S-I-G-N-A-L──────────
+[+2151.1s] 🔻 [2026-01-12 11:34:14] SELL signal per XAUUSD
+[+2151.1s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2161.1s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2161.2s] ───────S-I-G-N-A-L──────────
+[+2161.2s] 🔻 [2026-01-12 11:34:25] SELL signal per XAUUSD
+[+2161.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2171.2s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2171.2s] ───────S-I-G-N-A-L──────────
+[+2171.2s] 🔻 [2026-01-12 11:34:35] SELL signal per XAUUSD
+[+2171.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2181.3s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2181.3s] ───────S-I-G-N-A-L──────────
+[+2181.3s] 🔻 [2026-01-12 11:34:45] SELL signal per XAUUSD
+[+2181.3s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2191.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2191.4s] ───────S-I-G-N-A-L──────────
+[+2191.4s] 🔻 [2026-01-12 11:34:55] SELL signal per XAUUSD
+[+2191.4s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2201.4s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2201.5s] ───────S-I-G-N-A-L──────────
+[+2201.5s] 🔻 [2026-01-12 11:35:05] SELL signal per XAUUSD
+[+2201.5s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2211.6s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2211.7s] ───────S-I-G-N-A-L──────────
+[+2211.7s] 🔻 [2026-01-12 11:35:15] SELL signal per XAUUSD
+[+2211.7s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2221.7s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2221.8s] ───────S-I-G-N-A-L──────────
+[+2221.8s] 🔻 [2026-01-12 11:35:25] SELL signal per XAUUSD
+[+2221.8s] ⚠️ SELL su XAUUSD già aperta. Skip.
+[+2232.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+2232.2s] ───────S-I-G-N-A-L──────────
+[+2232.2s] 🔻 [2026-01-12 11:35:35] SELL signal per XAUUSD
+[+2232.2s] ⚠️ SELL su XAUUSD già aperta. Skip.
