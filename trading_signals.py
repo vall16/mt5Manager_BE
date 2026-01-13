@@ -302,20 +302,41 @@ def check_signal():
         # ============================
         #   📈 BUY SIGNAL
         # ============================
+        # if buy_condition:
+        #     current_signal = "BUY"
+        #     log("───────S-I-G-N-A-L──────────")
+        #     log(f"🔥 [{now}] BUY signal per {SYMBOL}")
+
+        #     # Se lo SLAVE ha già BUY → skip
+        #     if slave_has_position(SYMBOL):
+        #         log(f"⚠️ BUY su {SYMBOL} già aperto. Skip.")
+        #         previous_signal = current_signal
+        #         return
+
+        #     # Non aprire BUY se una SELL è aperta (es. hedge vietato)
+        #     if any(p.get("type") == 1 and p.get("symbol") == SYMBOL for p in positions):
+        #         log(f"⚠️ Esiste SELL aperta su {SYMBOL}, skip BUY.")
+        #         previous_signal = current_signal
+        #         return
+
+        #     log("🚀 Invio BUY allo SLAVE")
+        #     send_buy_to_slave()
+        #     previous_signal = current_signal
+        #     return
+
         if buy_condition:
             current_signal = "BUY"
             log("───────S-I-G-N-A-L──────────")
             log(f"🔥 [{now}] BUY signal per {SYMBOL}")
 
-            # Se lo SLAVE ha già BUY → skip
-            if slave_has_position(SYMBOL):
-                log(f"⚠️ BUY su {SYMBOL} già aperto. Skip.")
-                previous_signal = current_signal
-                return
-
-            # Non aprire BUY se una SELL è aperta (es. hedge vietato)
+            # Chiudi SELL aperta se esiste (reverse: se arriva il segnale BUY, chiude il SELL)
             if any(p.get("type") == 1 and p.get("symbol") == SYMBOL for p in positions):
-                log(f"⚠️ Esiste SELL aperta su {SYMBOL}, skip BUY.")
+                log(f"⚠️ SELL aperta → chiudo SELL prima di aprire BUY")
+                close_slave_position()  # <-- chiusura reverse
+
+            # Se lo SLAVE ha già BUY → skip
+            if any(p.get("symbol") == SYMBOL and p.get("type") == 0 for p in positions):
+                log(f"⚠️ BUY su {SYMBOL} già aperto. Skip.")
                 previous_signal = current_signal
                 return
 
@@ -327,10 +348,37 @@ def check_signal():
         # ============================
         #   📉 SELL SIGNAL
         # ============================
+        # if sell_condition:
+        #     current_signal = "SELL"
+        #     log("───────S-I-G-N-A-L──────────")
+        #     log(f"🔻 [{now}] SELL signal per {SYMBOL}")
+
+        #     # Se lo SLAVE ha già SELL → skip
+        #     if any(p.get("symbol") == SYMBOL and p.get("type") == 1 for p in positions):
+        #         log(f"⚠️ SELL su {SYMBOL} già aperta. Skip.")
+        #         previous_signal = current_signal
+        #         return
+
+        #     # Non aprire SELL se un BUY è aperto
+        #     if any(p.get("type") == 0 and p.get("symbol") == SYMBOL for p in positions):
+        #         log(f"⚠️ BUY aperto su {SYMBOL}, skip SELL.")
+        #         previous_signal = current_signal
+        #         return
+
+        #     log("🚀 Invio SELL allo SLAVE")
+        #     send_sell_to_slave()   
+        #     previous_signal = current_signal
+        #     return
+
         if sell_condition:
             current_signal = "SELL"
             log("───────S-I-G-N-A-L──────────")
             log(f"🔻 [{now}] SELL signal per {SYMBOL}")
+
+            # Chiudi BUY aperta se esiste (reverse: se arriva il segnale SELL, chiude il BUY)
+            if any(p.get("type") == 0 and p.get("symbol") == SYMBOL for p in positions):
+                log(f"⚠️ BUY aperta → chiudo BUY prima di aprire SELL")
+                close_slave_position()  # <-- chiusura reverse
 
             # Se lo SLAVE ha già SELL → skip
             if any(p.get("symbol") == SYMBOL and p.get("type") == 1 for p in positions):
@@ -338,23 +386,18 @@ def check_signal():
                 previous_signal = current_signal
                 return
 
-            # Non aprire SELL se un BUY è aperto
-            if any(p.get("type") == 0 and p.get("symbol") == SYMBOL for p in positions):
-                log(f"⚠️ BUY aperto su {SYMBOL}, skip SELL.")
-                previous_signal = current_signal
-                return
-
             log("🚀 Invio SELL allo SLAVE")
-            send_sell_to_slave()   
+            send_sell_to_slave()
             previous_signal = current_signal
             return
+
 
         # ============================
         #   ⏸️ HOLD (nessun BUY / SELL)
         # ============================
         current_signal = "HOLD"
         log("───────S-I-G-N-A-L──────────")
-        log(f"⚠️ [{now}] HOLD per {SYMBOL}")
+        log(f"⚠️  [{now}] HOLD per {SYMBOL}")
 
         log(f"🔄 previous_signal={previous_signal}, current={current_signal}")
 
@@ -968,7 +1011,7 @@ def check_signal_super():
         # ============================
         current_signal = "HOLD"
         log("───────S-I-G-N-A-L──────────")
-        log(f"⚠️ [{now}] HOLD per {SYMBOL}")
+        log(f"⚠️  [{now}] HOLD per {SYMBOL}")
         log(f"🔄 previous_signal={previous_signal}, current_signal={current_signal}")
 
         # chiudi eventuali posizioni aperte se segnale HOLD
