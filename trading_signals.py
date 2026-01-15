@@ -1,11 +1,9 @@
-# backend/app.py
 from datetime import datetime
 import json
 import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-# import MetaTrader5 as mt5
 from logger import log, logs
 from logger import safe_get
 from db import get_trader, get_connection
@@ -52,27 +50,6 @@ polling_running = False
 polling_timer = None  # riferimento al Timer
 
 base_url_slave = "http://127.0.0.1:9001"
-
-
-# def normalize(d):
-#     return {k.lower(): v for k, v in d.items()}
-
-
-# =========================
-# Funzioni indicatori
-# =========================
-# def polling_loop_timer_origin():
-#     global polling_timer, polling_running
-#     if not polling_running:
-#         return  # stop se il polling è stato fermato
-
-#     check_signal()
-    
-#     # richiama se stesso dopo CHECK_INTERVAL secondi
-#     polling_timer = threading.Timer(CHECK_INTERVAL, polling_loop_timer)
-#     polling_timer.daemon = True
-#     polling_timer.start()
-
 
 
 def get_data(symbol, timeframe, n_candles, agent_url):
@@ -941,24 +918,47 @@ def check_signal_super():
         # ------------------------
         # Condizioni BUY
         # ------------------------
+        # buy_condition = (
+        #     ema_short.iloc[-1] > ema_long.iloc[-1] and
+        #     rsi.iloc[-1] < 65 and
+        #     macd.iloc[-1] > macd_signal.iloc[-1] and
+        #     hma.iloc[-1] > hma.iloc[-2] and
+        #     volume_ok and volatility_ok and strong_trend and big_trend_up
+        # )
         buy_condition = (
-            ema_short.iloc[-1] > ema_long.iloc[-1] and
-            rsi.iloc[-1] < 65 and
-            macd.iloc[-1] > macd_signal.iloc[-1] and
-            hma.iloc[-1] > hma.iloc[-2] and
-            volume_ok and volatility_ok and strong_trend and big_trend_up
+            (ema_short.iloc[-1] > ema_long.iloc[-1]) and
+            (rsi.iloc[-1] < 65) and
+            (macd.iloc[-1] > macd_signal.iloc[-1]) and
+            (hma.iloc[-1] > hma.iloc[-2]) and
+            volume_ok and
+            volatility_ok and
+            strong_trend and
+            big_trend_up
         )
+
 
         # ------------------------
         # Condizioni SELL
         # ------------------------
+        # sell_condition = (
+        #     ema_short.iloc[-1] < ema_long.iloc[-1] and
+        #     rsi.iloc[-1] > 35 and
+        #     macd.iloc[-1] < macd_signal.iloc[-1] and
+        #     hma.iloc[-1] < hma.iloc[-2] and
+        #     volume_ok and volatility_ok and strong_trend and big_trend_down
+        # )
+
         sell_condition = (
-            ema_short.iloc[-1] < ema_long.iloc[-1] and
-            rsi.iloc[-1] > 35 and
-            macd.iloc[-1] < macd_signal.iloc[-1] and
-            hma.iloc[-1] < hma.iloc[-2] and
-            volume_ok and volatility_ok and strong_trend and big_trend_down
+            (ema_short.iloc[-1] < ema_long.iloc[-1]) and
+            (rsi.iloc[-1] > 35) and
+            (macd.iloc[-1] < macd_signal.iloc[-1]) and
+            (hma.iloc[-1] < hma.iloc[-2]) and
+            volume_ok and
+            volatility_ok and
+            strong_trend and
+            big_trend_down
         )
+
 
         # ============================
         # BUY
