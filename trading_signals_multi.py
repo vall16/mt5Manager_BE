@@ -40,6 +40,9 @@ TIMEFRAME = 5
 N_CANDLES = 50
 CHECK_INTERVAL = 10  # secondi
 PARAMETERS = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14}
+
+# 1. Definisci SYMBOL in alto
+SYMBOL = "XAUUSD"
 # =========================
 # Multi-instance polling
 # =========================
@@ -206,3 +209,176 @@ def check_signal_super_multi(trader: Trader, symbol: str, base_url_slave: str, p
     current_signal = "HOLD"
     previous_signal = current_signal
     log(f"[{now}] HOLD per trader {trader.id} ({symbol})")
+
+def send_buy_to_slave():
+
+    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
+    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+    
+    resp = safe_get(info_url, timeout=10)
+
+    sym_info = resp.json()
+
+    # Prendi lo stop loss dal trader, se presente
+     # 🔹 2️⃣ Recupero tick dal server slave via API
+    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
+    log(f"📡 Richiedo tick allo slave: {tick_url}")
+
+            
+    resp_tick = safe_get(tick_url, timeout=10)
+    if resp_tick.status_code != 200:
+        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave: {resp_tick.text}")
+        # continue
+
+    tick = resp_tick.json()
+    if not tick or "bid" not in tick or "ask" not in tick:
+        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
+        # continue
+
+    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
+
+            # --- CALCOLO SL IN PIP ---
+    sl_pips =  CURRENT_TRADER.sl
+    # valore pip inserito dal trader nell'app (es. 10)
+
+    if sl_pips and float(sl_pips) > 0:
+        pip_value = float(sym_info.get("point"))  # valore del singolo punto del simbolo
+        sl_distance = float(sl_pips) * pip_value
+
+        # if order_type == "buy":
+            # SL sotto il prezzo ask
+        calculated_sl = tick["ask"] - sl_distance
+        # else:
+        #     # SL sopra il prezzo bid (per SELL)
+        #     calculated_sl = tick["bid"] + sl_distance
+    else:
+        calculated_sl = None  # se sl=0 non imposta SL
+
+    tp_pips = CURRENT_TRADER.tp  # pips inseriti dall'app
+    pip_value = float(sym_info.get("point"))
+
+    if tp_pips and float(tp_pips) > 0:
+        tp_distance = float(tp_pips) * pip_value
+        # if order_type == "buy":
+        calculated_tp = tick["ask"] + tp_distance
+        # else:
+        #     calculated_tp = tick["bid"] - tp_distance
+    else:
+        calculated_tp = None  # se TP=0 non impostare TP
+
+
+    sl_value = calculated_sl
+    tp_value = calculated_tp
+    trader_id = CURRENT_TRADER.id
+
+    log(f"SL = {sl_value}, TP = {tp_value}")
+
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+    payload = {
+         "trader_id": trader_id,
+        "order_type": "buy",
+        "volume": 0.10,
+        "symbol": SYMBOL,
+        "sl":sl_value,
+        "tp": tp_value,
+
+    }
+
+    log(f"📤 Invio BUY [symbol={SYMBOL}] allo SLAVE → {url} ")
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Risposta SLAVE: {resp.text}")
+
+        if resp.status_code != 200:
+            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
+            return False
+
+        return True
+
+    except requests.RequestException as e:
+        log(f"❌ Errore invio ordine: {e}")
+        return False
+
+
+def send_sell_to_slave():
+
+    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
+    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+    
+    resp = safe_get(info_url, timeout=10)
+    if resp is None:
+        log("❌ Impossibile ottenere symbol_info dallo slave")
+        return False
+
+    sym_info = resp.json()
+
+    # 🔹 Tick request
+    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
+    log(f"📡 Richiedo tick allo slave: {tick_url}")
+
+    resp_tick = safe_get(tick_url, timeout=10)
+    if resp_tick is None or resp_tick.status_code != 200:
+        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave")
+        return False
+
+    tick = resp_tick.json()
+    if not tick or "bid" not in tick or "ask" not in tick:
+        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
+        return False
+
+    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
+
+    # --- CALCOLO SL / TP PER SELL ---
+    sl_pips = CURRENT_TRADER.sl
+    tp_pips = CURRENT_TRADER.tp
+
+    pip_value = float(sym_info.get("point"))
+
+    # SL SOPRA IL PREZZO BID (per SELL)
+    if sl_pips and float(sl_pips) > 0:
+        sl_distance = float(sl_pips) * pip_value
+        calculated_sl = tick["bid"] + sl_distance
+    else:
+        calculated_sl = None
+
+    # TP SOTTO IL PREZZO BID (per SELL)
+    if tp_pips and float(tp_pips) > 0:
+        tp_distance = float(tp_pips) * pip_value
+        calculated_tp = tick["bid"] - tp_distance
+    else:
+        calculated_tp = None
+
+    sl_value = calculated_sl
+    tp_value = calculated_tp
+    trader_id = CURRENT_TRADER.id
+
+    log(f"SL = {sl_value}, TP = {tp_value}")
+
+    # Endpoint Manager che invia allo slave
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+
+    payload = {
+        "trader_id": trader_id,
+        "order_type": "sell",
+        "volume": 0.10,
+        "symbol": SYMBOL,
+        "sl": sl_value,
+        "tp": tp_value,
+    }
+
+    log(f"📤 Invio SELL [symbol={SYMBOL}] allo SLAVE → {url}")
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Risposta SLAVE: {resp.text}")
+
+        if resp.status_code != 200:
+            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
+            return False
+
+        return True
+
+    except requests.RequestException as e:
+        log(f"❌ Errore invio ordine SELL: {e}")
+        return False

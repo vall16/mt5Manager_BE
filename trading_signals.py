@@ -963,13 +963,27 @@ def check_signal_super():
         # ---------------------------------------------------------
         # 📈 LOGICA BUY (SUPER-SIGNAL)
         # ---------------------------------------------------------
-        buy_condition = (
-            v_ema_s > v_ema_l and
-            v_rsi < 65 and
-            v_macd_v > v_macd_s and
-            v_hma_0 > v_hma_1 and
-            f_vol and f_vola and f_strong and f_big_up
-        )
+        # LOG DI DEBUG PER CAPIRE COSA BLOCCA IL SEGNALE
+        log(f"🔍 DEBUG XAUUSD: EMA_UP={v_ema_s > v_ema_l} | RSI={v_rsi:.1f} | ADX={v_adx_now:.1f} | BIG_UP={f_big_up} | VOL_OK={f_volume_ok}")
+        
+        # buy_condition = (
+        #     v_ema_s > v_ema_l and
+        #     v_rsi < 65 and
+        #     v_macd_v > v_macd_s and
+        #     v_hma_0 > v_hma_1 and
+        #     f_vol and f_vola and f_strong and f_big_up
+        # )
+
+        # ---------------------------------------------------------
+        # 📈 LOGICA BUY (PIÙ APERTA)
+        # ---------------------------------------------------------
+        # CORE: Trend, Momentum e RSI devono essere OK
+        core_buy = (v_ema_s > v_ema_l and v_macd_v > v_macd_s and v_hma_0 > v_hma_1 and v_rsi < 68)
+        
+        # EXTRA: Almeno due tra BigTrend, Volume e ADX devono confermare
+        confirmations_buy = sum([f_big_up, f_vol, f_strong]) >= 1 # Basta 1 conferma invece di 3!
+
+        buy_condition = core_buy and confirmations_buy
 
 
 
@@ -1007,6 +1021,16 @@ def check_signal_super():
             f_vol and f_vola and f_strong and f_big_down
         )
 
+        # ---------------------------------------------------------
+        # 📉 LOGICA SELL (PIÙ APERTA)
+        # ---------------------------------------------------------
+        # CORE: Trend, Momentum e RSI devono essere OK
+        core_sell = (v_ema_s < v_ema_l and v_macd_v < v_macd_s and v_hma_0 < v_hma_1 and v_rsi > 32)
+        
+        # EXTRA: Almeno una conferma (o rimuoviamo del tutto f_vol se vuoi entrare sempre)
+        confirmations_sell = sum([f_big_down, f_vol, f_strong]) >= 1 
+
+        sell_condition = core_sell and confirmations_sell
 
 
         # ============================
