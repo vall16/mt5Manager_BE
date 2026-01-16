@@ -10,7 +10,7 @@ from db import get_trader, get_connection
 from models import (
     Trader
 )
-from indicators import (
+from indicators.ta import (
     compute_ema,
     compute_rsi,
     compute_macd,
@@ -875,12 +875,23 @@ def check_signal_super():
         big_trend_down = not big_trend_up
 
         # Volatilità e volume
-        vol_mean = df['tick_volume'].rolling(20).mean().iloc[-1]
-        vol_now  = df['tick_volume'].iloc[-1]
-        volume_ok = vol_now > vol_mean * 1.3 if vol_mean else True
 
-        volatility_ok = atr.iloc[-1] > atr.iloc[-5] if len(atr) >= 5 else True
-        strong_trend = adx_val > 20
+        # 1. Volume
+        v_vol_mean = float(df['tick_volume'].rolling(20).mean().iloc[-1]) if not df.empty else 0
+        v_vol_now  = float(df['tick_volume'].iloc[-1])
+        f_volume_ok = bool(v_vol_now > (v_vol_mean * 1.3)) if v_vol_mean > 0 else True
+
+        # 2. Volatilità (ATR)
+        f_volatility_ok = bool(float(atr.iloc[-1]) > float(atr.iloc[-5])) if len(atr) >= 5 else True
+
+        # 3. Strong Trend (ADX) - ATTENZIONE: prendiamo solo la colonna 'ADX'
+        adx_df = compute_adx(df)
+        v_adx_now = float(adx_df['ADX'].iloc[-1]) 
+        f_strong_trend = bool(v_adx_now > 20)
+
+        # 4. Big Trend (da timeframe superiore)
+        f_big_up = bool(big_trend_up) 
+        f_big_down = bool(big_trend_down)
 
         # Gap detection
         gap = abs(df['open'].iloc[-1] - df['close'].iloc[-2]) > (df['close'].iloc[-2]*0.001)
@@ -938,9 +949,9 @@ def check_signal_super():
             v_hma_1  = float(hma.iloc[-2])
 
             # Filtri (cast a bool per sicurezza)
-            f_vol      = bool(volume_ok)
-            f_vola     = bool(volatility_ok)
-            f_strong   = bool(strong_trend)
+            f_vol      = bool(f_volume_ok)
+            f_vola     = bool(f_volatility_ok)
+            f_strong   = bool(f_strong_trend)
             f_big_up   = bool(big_trend_up)
             f_big_down = bool(big_trend_down)
 
@@ -977,9 +988,9 @@ def check_signal_super():
             v_hma_1  = float(hma.iloc[-2])
 
             # Cast esplicito dei filtri per evitare l'errore "truth value of a Series"
-            f_vol      = bool(volume_ok)
-            f_vola     = bool(volatility_ok)
-            f_strong   = bool(strong_trend)
+            f_vol      = bool(f_volume_ok)
+            f_vola     = bool(f_volatility_ok)
+            f_strong   = bool(f_strong_trend)
             f_big_down = bool(big_trend_down)
             
         except Exception as e:
