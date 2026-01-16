@@ -925,16 +925,41 @@ def check_signal_super():
         #     hma.iloc[-1] > hma.iloc[-2] and
         #     volume_ok and volatility_ok and strong_trend and big_trend_up
         # )
+        # buy_condition = (
+        #     (ema_short.iloc[-1] > ema_long.iloc[-1]) and
+        #     (rsi.iloc[-1] < 65) and
+        #     (macd.iloc[-1] > macd_signal.iloc[-1]) and
+        #     (hma.iloc[-1] > hma.iloc[-2]) and
+        #     volume_ok and
+        #     volatility_ok and
+        #     strong_trend and
+        #     big_trend_up
+        # )
+
+        try:
+            ema_s = float(ema_short.iloc[-1])
+            ema_l = float(ema_long.iloc[-1])
+            rsi_v = float(rsi.iloc[-1])
+            macd_v = float(macd.iloc[-1])
+            macd_s = float(macd_signal.iloc[-1])
+            hma_0 = float(hma.iloc[-1])
+            hma_1 = float(hma.iloc[-2])
+        except Exception as e:
+            log(f"❌ Indicator data invalid → HOLD ({e})")
+            current_signal = "HOLD"
+            return
+
         buy_condition = (
-            (ema_short.iloc[-1] > ema_long.iloc[-1]) and
-            (rsi.iloc[-1] < 65) and
-            (macd.iloc[-1] > macd_signal.iloc[-1]) and
-            (hma.iloc[-1] > hma.iloc[-2]) and
+            (ema_s > ema_l) and
+            (rsi_v < 65) and
+            (macd_v > macd_s) and
+            (hma_0 > hma_1) and
             volume_ok and
             volatility_ok and
             strong_trend and
             big_trend_up
         )
+
 
 
         # ------------------------
@@ -948,16 +973,41 @@ def check_signal_super():
         #     volume_ok and volatility_ok and strong_trend and big_trend_down
         # )
 
+        # sell_condition = (
+        #     (ema_short.iloc[-1] < ema_long.iloc[-1]) and
+        #     (rsi.iloc[-1] > 35) and
+        #     (macd.iloc[-1] < macd_signal.iloc[-1]) and
+        #     (hma.iloc[-1] < hma.iloc[-2]) and
+        #     volume_ok and
+        #     volatility_ok and
+        #     strong_trend and
+        #     big_trend_down
+        # )
+
+        try:
+            ema_s = float(ema_short.iloc[-1])
+            ema_l = float(ema_long.iloc[-1])
+            rsi_v = float(rsi.iloc[-1])
+            macd_v = float(macd.iloc[-1])
+            macd_s = float(macd_signal.iloc[-1])
+            hma_0 = float(hma.iloc[-1])
+            hma_1 = float(hma.iloc[-2])
+        except Exception as e:
+            log(f"❌ Indicator data invalid → HOLD ({e})")
+            current_signal = "HOLD"
+            return
+
         sell_condition = (
-            (ema_short.iloc[-1] < ema_long.iloc[-1]) and
-            (rsi.iloc[-1] > 35) and
-            (macd.iloc[-1] < macd_signal.iloc[-1]) and
-            (hma.iloc[-1] < hma.iloc[-2]) and
+            (ema_s < ema_l) and
+            (rsi_v > 35) and
+            (macd_v < macd_s) and
+            (hma_0 < hma_1) and
             volume_ok and
             volatility_ok and
             strong_trend and
             big_trend_down
         )
+
 
 
         # ============================
