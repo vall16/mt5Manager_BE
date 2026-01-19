@@ -118,7 +118,7 @@ def run_signal_logic(trader_id):
         # check_trendguard_xau_signal(trader_id)
         check_signal(trader_id)
     else:
-        # Il tuo check_signal originale
+        # Il tuo check_signal originale di base
         check_signal(trader_id)
     
 @router.post("/start_polling")
@@ -221,6 +221,160 @@ def check_signal(trader_id):
              close_slave_position(trader_id)
 
     # 7. Aggiornamento Segnale Precedente nella sessione corretta
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["prev_signal"] = new_signal
+
+def check_signal_super(trader_id):
+    """
+    🔹 Versione SUPER per singolo trader
+    - Indicatori avanzati
+    - Filtri trend / volatilità
+    - Gestione sessione per-trader
+    """
+
+    logs.clear()
+
+    # =========================
+    # 1. Recupero sessione
+    # =========================
+    with sessions_lock:
+        if trader_id not in sessions:
+            return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        prev_signal = session.get("prev_signal", "HOLD")
+
+    symbol = trader.selectedSymbol
+    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # =========================
+    # 2. Parametri indicatori
+    # =========================
+    params = {
+        "EMA_short": 5,
+        "EMA_long": 15,
+        "RSI_period": 14
+    }
+
+    # =========================
+    # 3. Dati mercato
+    # =========================
+    df = get_data(symbol, 5, 50, slave_url)
+    if df is None or df.empty:
+        return
+
+    # =========================
+    # 4. Indicatori
+    # =========================
+    ema_short = compute_ema(df, params["EMA_short"])
+    ema_long  = compute_ema(df, params["EMA_long"])
+    rsi       = compute_rsi(df, params["RSI_period"])
+    macd, macd_signal = compute_macd(df)
+    atr       = compute_atr(df)
+    hma       = compute_hma(df)
+
+    adx_df = compute_adx(df)
+    v_adx = float(adx_df["ADX"].iloc[-1])
+
+    # =========================
+    # 5. Trend superiore (M15)
+    # =========================
+    df15 = get_data(symbol, 15, 50, slave_url)
+    big_trend_up = (
+        compute_ema(df15, 20).iloc[-1] >
+        compute_ema(df15, 50).iloc[-1]
+    ) if df15 is not None else True
+
+    big_trend_down = not big_trend_up
+
+    # =========================
+    # 6. Filtri volume / volatilità
+    # =========================
+    v_mean = float(df["tick_volume"].rolling(20).mean().iloc[-1])
+    v_now  = float(df["tick_volume"].iloc[-1])
+
+    f_volume_ok     = v_now > (v_mean * 1.3) if v_mean > 0 else True
+    f_volatility_ok = float(atr.iloc[-1]) > float(atr.iloc[-5]) if len(atr) >= 5 else True
+    f_strong_trend  = v_adx > 20
+
+    # =========================
+    # 7. GAP filter
+    # =========================
+    gap = abs(df["open"].iloc[-1] - df["close"].iloc[-2]) > (df["close"].iloc[-2] * 0.001)
+    if gap:
+        log(f"⚠️ Trader {trader_id}: GAP → HOLD")
+        return
+
+    # =========================
+    # 8. Posizioni slave
+    # =========================
+    try:
+        resp = requests.get(f"{slave_url}/positions", timeout=5)
+        if resp.status_code != 200:
+            return
+        positions = resp.json()
+    except:
+        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+        return
+
+    has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+    # =========================
+    # 9. Condizioni CORE
+    # =========================
+    core_buy = (
+        ema_short.iloc[-1] > ema_long.iloc[-1] and
+        macd.iloc[-1] > macd_signal.iloc[-1] and
+        hma.iloc[-1] > hma.iloc[-2] and
+        rsi.iloc[-1] < 68
+    )
+
+    core_sell = (
+        ema_short.iloc[-1] < ema_long.iloc[-1] and
+        macd.iloc[-1] < macd_signal.iloc[-1] and
+        hma.iloc[-1] < hma.iloc[-2] and
+        rsi.iloc[-1] > 32
+    )
+
+    conf_buy  = sum([big_trend_up, f_volume_ok, f_strong_trend]) >= 1
+    conf_sell = sum([big_trend_down, f_volume_ok, f_strong_trend]) >= 1
+
+    buy_cond  = core_buy  and conf_buy
+    sell_cond = core_sell and conf_sell
+
+    # =========================
+    # 10. Decisione
+    # =========================
+    new_signal = "HOLD"
+
+    if buy_cond:
+        new_signal = "BUY"
+        if not has_buy:
+            if has_sell:
+                close_slave_position(trader_id)
+            send_buy_to_slave(trader_id)
+            log(f"🔥 Trader {trader_id}: BUY inviato")
+
+    elif sell_cond:
+        new_signal = "SELL"
+        if not has_sell:
+            if has_buy:
+                close_slave_position(trader_id)
+            send_sell_to_slave(trader_id)
+            log(f"🔻 Trader {trader_id}: SELL inviato")
+
+    else:
+        if prev_signal == "BUY" and has_buy:
+            close_slave_position(trader_id)
+        elif prev_signal == "SELL" and has_sell:
+            close_slave_position(trader_id)
+
+    # =========================
+    # 11. Update sessione
+    # =========================
     with sessions_lock:
         if trader_id in sessions:
             sessions[trader_id]["prev_signal"] = new_signal
