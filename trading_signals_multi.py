@@ -1,20 +1,15 @@
+# --- STATO MULTI-SESSIONE ---
+# Struttura: { trader_id: { "trader": Trader, "prev_signal": str, "timer": Timer } }
 from datetime import datetime
-import json
 import os
-from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import threading
 from logger import log, logs
-from logger import safe_get
-from db import get_trader, get_connection
+from dotenv import load_dotenv
+from fastapi import APIRouter
 from models import (
     Trader
 )
-import pandas as pd
-import threading
-import time
-import requests
-from indicators import (
+from indicators.ta import (
     compute_ema,
     compute_rsi,
     compute_macd,
@@ -23,31 +18,17 @@ from indicators import (
     compute_hma,
     compute_adx
 )
+import pandas as pd
+import threading
+import time
+import requests
 
+sessions = {}
+sessions_lock = threading.Lock()
 
-HOST = os.getenv("API_HOST")  # default localhost
-PORT = int(os.getenv("API_PORT"))    # default 8080
+router = APIRouter()
 
-BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
-TRADER_ID = 1
-CURRENT_TRADER: Trader | None = None
-CHOSEN_TRADESIGNAL = ""
-SIGNAL_HANDLERS = {}  # Inizializza vuoto
-
-BASE_URL_SLAVE =""
-# TIMEFRAME = mt5.TIMEFRAME_M5
-TIMEFRAME = 5
-N_CANDLES = 50
-CHECK_INTERVAL = 10  # secondi
-PARAMETERS = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14}
-
-# 1. Definisci SYMBOL in alto
-SYMBOL = "XAUUSD"
-# =========================
-# Multi-instance polling
-# =========================
-active_pollings: dict[int, threading.Thread] = {}
-polling_flags: dict[int, bool] = {}  # True = running, False = stopped
+load_dotenv()  # legge il file .env
 
 def get_data(symbol, timeframe, n_candles, agent_url):
     """
@@ -99,286 +80,267 @@ def get_data(symbol, timeframe, n_candles, agent_url):
         return None
 
 
-def polling_worker(trader: Trader):
-    trader_id = trader.id
-    log(f"▶️ Polling worker avviato per trader {trader_id}")
+# Quando dal tuo Frontend chiami this.http.post(..., trader), il backend riceve l'oggetto con il suo ID (es. Trader ID 1). Crea la sessione 1. Se dopo un secondo clicchi sul Trader ID 2, il backend crea la sessione 2 senza toccare la 1.
+# Ogni trader avrà la sua copia privata di parametri e stato del segnale.
+def polling_loop_timer(trader_id):
+    """Ciclo di polling specifico per ogni trader"""
+    with sessions_lock:
+        if trader_id not in sessions:
+            return # Il polling è stato fermato
+        
+        session = sessions[trader_id]
+        trader = session["trader"]
+        
+    # Esegue l'analisi passandogli i dati specifici di QUESTO trader
+    run_signal_logic(trader_id)
 
-    # Thread-local variables
+    # Re-schedula il prossimo controllo basandosi sul customSignalInterval del trader
+    interval = int(trader.customSignalInterval or 5)
+    
+    with sessions_lock:
+        if trader_id in sessions:
+            t = threading.Timer(interval, polling_loop_timer, args=[trader_id])
+            sessions[trader_id]["timer"] = t
+            t.start()
+
+
+def run_signal_logic(trader_id):
+    with sessions_lock:
+        if trader_id not in sessions: return
+        trader = sessions[trader_id]["trader"]
+    
+    # Leggiamo quale segnale ha scelto l'utente nel FE
+    chosen_signal = trader.selectedSignal or "BASE"
+
+    if chosen_signal == "SUPER":
+        check_signal_super(trader_id)
+    elif chosen_signal == "TRENDGUARD":
+        # check_trendguard_xau_signal(trader_id)
+        check_signal(trader_id)
+    else:
+        # Il tuo check_signal originale
+        check_signal(trader_id)
+    
+@router.post("/start_polling")
+def start_polling(trader: Trader):
+    global sessions
+    tid = trader.id
+
+    with sessions_lock:
+        # Se esiste già un polling per questo trader, lo fermiamo per aggiornarlo
+        if tid in sessions and sessions[tid]["timer"]:
+            sessions[tid]["timer"].cancel()
+
+        # Inizializziamo la sessione dedicata
+        sessions[tid] = {
+            "trader": trader,
+            "prev_signal": "HOLD",
+            "timer": None
+        }
+    
+    # Avviamo il primo ciclo: l' ID DEL TRADER !
+    polling_loop_timer(tid)
+    
+    log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selectedSymbol}")
+    return {"status": "started", "trader_id": tid}
+
+@router.post("/stop_polling")
+def stop_polling(trader_id: int):
+    with sessions_lock:
+        if trader_id in sessions:
+            if sessions[trader_id]["timer"]:
+                sessions[trader_id]["timer"].cancel()
+            del sessions[trader_id]
+            return {"status": "stopped", "trader_id": trader_id}
+    return {"status": "error", "message": "Trader non attivo"}
+
+
+def check_signal(trader_id):
+    # 1. Recupero dati sessione
+    with sessions_lock:
+        if trader_id not in sessions: return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        prev_signal = session["prev_signal"]
+
+    # 2. Setup variabili locali dai dati del trader
     symbol = trader.selectedSymbol
-    interval = int(trader.customSignalInterval or 2)
-    base_url_slave = f"http://{trader.slave_ip}:{trader.slave_port}"
-    previous_signal = "HOLD"
-    current_signal = "HOLD"
-
-    while polling_flags.get(trader_id, False):
-        # Qui usiamo check_signal_super ma isolato per questo trader
-        try:
-            check_signal_super_multi(trader, symbol, base_url_slave, previous_signal, current_signal)
-        except Exception as e:
-            log(f"❌ Errore polling trader {trader_id}: {e}")
-        time.sleep(interval)
-
-    log(f"⏹️ Polling worker fermato per trader {trader_id}")
-
-def start_polling_multi(trader: Trader):
-    trader_id = trader.id
-
-    if polling_flags.get(trader_id):
-        return {"status": "already_running", "message": f"Polling già attivo per trader {trader_id}"}
-
-    polling_flags[trader_id] = True
-    thread = threading.Thread(target=polling_worker, args=(trader,), daemon=True)
-    thread.start()
-    active_pollings[trader_id] = thread
-
-    log(f"▶️ Polling multi avviato per trader {trader_id}")
-    return {"status": "started", "trader_id": trader_id}
-
-def stop_polling_multi(trader_id: int):
-    if not polling_flags.get(trader_id):
-        return {"status": "not_running", "message": f"Nessun polling attivo per trader {trader_id}"}
-
-    polling_flags[trader_id] = False
-    log(f"⏹️ Richiesta stop polling per trader {trader_id}")
-    return {"status": "stopped", "trader_id": trader_id}
-
-
-# =========================
-# check_signal_super adattato al multi
-# =========================
-def check_signal_super_multi(trader: Trader, symbol: str, base_url_slave: str, previous_signal: str, current_signal: str):
-    """
-    Versione isolata di check_signal_super per singolo trader.
-    Tutte le variabili globali sono passate come parametro.
-    """
-    logs.clear()
+    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Parametri indicatori (usiamo quelli nel trader o default)
+    params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
 
-    df = get_data(symbol, TIMEFRAME, N_CANDLES, base_url_slave)
-    if df is None:
-        return
+    # 3. Download dati dal suo slave specifico
+    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5, 50 candele
+    if df is None: return
 
-    ema_short = compute_ema(df, PARAMETERS["EMA_short"])
-    ema_long  = compute_ema(df, PARAMETERS["EMA_long"])
-    rsi       = compute_rsi(df, PARAMETERS["RSI_period"])
+    # 4. Calcolo Indicatori
+    ema_short = compute_ema(df, params["EMA_short"])
+    ema_long = compute_ema(df, params["EMA_long"])
+    rsi = compute_rsi(df, params["RSI_period"])
 
-    buy_condition  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 65
-    sell_condition = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 35
+    buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
 
+    # 5. Controllo posizioni attive sullo slave
     positions = []
     try:
-        resp = safe_get(f"{base_url_slave}/positions", timeout=10)
-        if resp is None:
-            log(f"❌ Trader {trader.id} slave offline")
-            return
-        resp.raise_for_status()
-        positions = resp.json()
-    except Exception as e:
-        log(f"❌ Errore posizioni slave trader {trader.id}: {e}")
+        resp = requests.get(f"{slave_url}/positions", timeout=5)
+        if resp.status_code == 200:
+            positions = resp.json()
+    except:
+        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
         return
 
-    def slave_has_position(order_type=None):
-        return any(
-            p.get("symbol") == symbol and (order_type is None or p.get("type") == order_type)
-            for p in positions
-        )
+    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
 
-    # =========================
-    # BUY
-    # =========================
-    if buy_condition:
-        current_signal = "BUY"
-        if not slave_has_position(0) and not slave_has_position(1):
-            send_buy_to_slave()
-        previous_signal = current_signal
-        return
+    # 6. Logica Decisionale
+    new_signal = "HOLD"
 
-    # =========================
-    # SELL
-    # =========================
-    if sell_condition:
-        current_signal = "SELL"
-        if not slave_has_position(1) and not slave_has_position(0):
-            send_sell_to_slave()
-        previous_signal = current_signal
-        return
+    if buy_cond:
+        new_signal = "BUY"
+        if not has_buy:
+            if has_sell: close_slave_position(trader_id) # Reverse
+            send_buy_to_slave(trader_id)
+            log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
 
-    # =========================
-    # HOLD
-    # =========================
-    current_signal = "HOLD"
-    previous_signal = current_signal
-    log(f"[{now}] HOLD per trader {trader.id} ({symbol})")
+    elif sell_cond:
+        new_signal = "SELL"
+        if not has_sell:
+            if has_buy: close_slave_position(trader_id) # Reverse
+            send_sell_to_slave(trader_id)
+            log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
 
-def send_buy_to_slave():
+    else:
+        # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
+        if prev_signal == "BUY" and has_buy:
+             close_slave_position(trader_id)
+        elif prev_signal == "SELL" and has_sell:
+             close_slave_position(trader_id)
 
-    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
-    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
+    # 7. Aggiornamento Segnale Precedente nella sessione corretta
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["prev_signal"] = new_signal
+
+
+def send_buy_to_slave(trader_id):
+    with sessions_lock:
+        if trader_id not in sessions: return
+        trader = sessions[trader_id]["trader"]
     
-    resp = safe_get(info_url, timeout=10)
+    symbol = trader.selectedSymbol
+    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    manager_url = os.getenv("MANAGER_URL") # Il tuo BASE_URL del manager
 
-    sym_info = resp.json()
-
-    # Prendi lo stop loss dal trader, se presente
-     # 🔹 2️⃣ Recupero tick dal server slave via API
-    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
-    log(f"📡 Richiedo tick allo slave: {tick_url}")
-
-            
-    resp_tick = safe_get(tick_url, timeout=10)
-    if resp_tick.status_code != 200:
-        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave: {resp_tick.text}")
-        # continue
-
-    tick = resp_tick.json()
-    if not tick or "bid" not in tick or "ask" not in tick:
-        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
-        # continue
-
-    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
-
-            # --- CALCOLO SL IN PIP ---
-    sl_pips =  CURRENT_TRADER.sl
-    # valore pip inserito dal trader nell'app (es. 10)
-
-    if sl_pips and float(sl_pips) > 0:
-        pip_value = float(sym_info.get("point"))  # valore del singolo punto del simbolo
-        sl_distance = float(sl_pips) * pip_value
-
-        # if order_type == "buy":
-            # SL sotto il prezzo ask
-        calculated_sl = tick["ask"] - sl_distance
-        # else:
-        #     # SL sopra il prezzo bid (per SELL)
-        #     calculated_sl = tick["bid"] + sl_distance
-    else:
-        calculated_sl = None  # se sl=0 non imposta SL
-
-    tp_pips = CURRENT_TRADER.tp  # pips inseriti dall'app
-    pip_value = float(sym_info.get("point"))
-
-    if tp_pips and float(tp_pips) > 0:
-        tp_distance = float(tp_pips) * pip_value
-        # if order_type == "buy":
-        calculated_tp = tick["ask"] + tp_distance
-        # else:
-        #     calculated_tp = tick["bid"] - tp_distance
-    else:
-        calculated_tp = None  # se TP=0 non impostare TP
-
-
-    sl_value = calculated_sl
-    tp_value = calculated_tp
-    trader_id = CURRENT_TRADER.id
-
-    log(f"SL = {sl_value}, TP = {tp_value}")
-
-    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
-    payload = {
-         "trader_id": trader_id,
-        "order_type": "buy",
-        "volume": 0.10,
-        "symbol": SYMBOL,
-        "sl":sl_value,
-        "tp": tp_value,
-
-    }
-
-    log(f"📤 Invio BUY [symbol={SYMBOL}] allo SLAVE → {url} ")
-
+    # 1. Recupero info simbolo e tick dallo slave specifico
     try:
-        resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Risposta SLAVE: {resp.text}")
+        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+        
+        if info_resp.status_code != 200 or tick_resp.status_code != 200:
+            log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
+            return
 
-        if resp.status_code != 200:
-            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
-            return False
+        sym_info = info_resp.json()
+        tick = tick_resp.json()
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
+        return
 
-        return True
+    # 2. Calcolo SL e TP dinamici
+    pip_value = float(sym_info.get("point", 0.00001))
+    sl_value = tick["ask"] - (float(trader.sl) * pip_value) if trader.sl > 0 else None
+    tp_value = tick["ask"] + (float(trader.tp) * pip_value) if trader.tp > 0 else None
 
-    except requests.RequestException as e:
-        log(f"❌ Errore invio ordine: {e}")
-        return False
-
-
-def send_sell_to_slave():
-
-    info_url = f"{BASE_URL_SLAVE}/symbol_info/{SYMBOL}"
-    log(f"🔍 Richiedo info simbolo allo slave: {info_url}")
-    
-    resp = safe_get(info_url, timeout=10)
-    if resp is None:
-        log("❌ Impossibile ottenere symbol_info dallo slave")
-        return False
-
-    sym_info = resp.json()
-
-    # 🔹 Tick request
-    tick_url = f"{BASE_URL_SLAVE}/symbol_tick/{SYMBOL}"
-    log(f"📡 Richiedo tick allo slave: {tick_url}")
-
-    resp_tick = safe_get(tick_url, timeout=10)
-    if resp_tick is None or resp_tick.status_code != 200:
-        log(f"⚠️ Nessun tick disponibile per {SYMBOL} dallo slave")
-        return False
-
-    tick = resp_tick.json()
-    if not tick or "bid" not in tick or "ask" not in tick:
-        log(f"⚠️ Tick incompleto o non valido per {SYMBOL}: {tick}")
-        return False
-
-    log(f"✅ Tick ricevuto per {SYMBOL}: bid={tick['bid']}, ask={tick['ask']}")
-
-    # --- CALCOLO SL / TP PER SELL ---
-    sl_pips = CURRENT_TRADER.sl
-    tp_pips = CURRENT_TRADER.tp
-
-    pip_value = float(sym_info.get("point"))
-
-    # SL SOPRA IL PREZZO BID (per SELL)
-    if sl_pips and float(sl_pips) > 0:
-        sl_distance = float(sl_pips) * pip_value
-        calculated_sl = tick["bid"] + sl_distance
-    else:
-        calculated_sl = None
-
-    # TP SOTTO IL PREZZO BID (per SELL)
-    if tp_pips and float(tp_pips) > 0:
-        tp_distance = float(tp_pips) * pip_value
-        calculated_tp = tick["bid"] - tp_distance
-    else:
-        calculated_tp = None
-
-    sl_value = calculated_sl
-    tp_value = calculated_tp
-    trader_id = CURRENT_TRADER.id
-
-    log(f"SL = {sl_value}, TP = {tp_value}")
-
-    # Endpoint Manager che invia allo slave
-    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
-
+    # 3. Invio ordine tramite l'endpoint del Manager che comunica con lo Slave
+    url = f"{manager_url}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
         "trader_id": trader_id,
-        "order_type": "sell",
-        "volume": 0.10,
-        "symbol": SYMBOL,
+        "order_type": "buy",
+        "volume": 0.10, # O trader.defaultVolume se lo hai
+        "symbol": symbol,
         "sl": sl_value,
         "tp": tp_value,
     }
 
-    log(f"📤 Invio SELL [symbol={SYMBOL}] allo SLAVE → {url}")
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Trader {trader_id} BUY Response: {resp.text}")
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: Errore invio ordine: {e}")
+
+def close_slave_position(trader_id):
+    with sessions_lock:
+        if trader_id not in sessions: return
+        trader = sessions[trader_id]["trader"]
+
+    manager_url = os.getenv("MANAGER_URL")
+    url = f"{manager_url}/db/traders/{trader_id}/close_order_on_slave"
+    payload = {
+        "symbol": trader.selectedSymbol,
+        "trader_id": trader_id
+    }
 
     try:
         resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Risposta SLAVE: {resp.text}")
+        log(f"📥 Trader {trader_id} CLOSE Response: {resp.text}")
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: Errore chiusura: {e}")
 
-        if resp.status_code != 200:
-            log(f"❌ Errore dallo slave: HTTP {resp.status_code}")
-            return False
 
-        return True
+def send_sell_to_slave(trader_id):
+    with sessions_lock:
+        if trader_id not in sessions:
+            return
+        trader = sessions[trader_id]["trader"]
 
-    except requests.RequestException as e:
-        log(f"❌ Errore invio ordine SELL: {e}")
-        return False
+    symbol = trader.selectedSymbol
+    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    manager_url = os.getenv("MANAGER_URL")
+
+    # 1️⃣ Recupero info simbolo e tick dallo slave
+    try:
+        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+
+        if info_resp.status_code != 200 or tick_resp.status_code != 200:
+            log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
+            return
+
+        sym_info = info_resp.json()
+        tick = tick_resp.json()
+
+        if not tick or "bid" not in tick or "ask" not in tick:
+            log(f"⚠️ Trader {trader_id}: Tick incompleto o non valido per {symbol}")
+            return
+
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
+        return
+
+    # 2️⃣ Calcolo SL e TP dinamici (SELL)
+    pip_value = float(sym_info.get("point", 0.00001))
+    sl_value = tick["bid"] + (float(trader.sl) * pip_value) if trader.sl > 0 else None
+    tp_value = tick["bid"] - (float(trader.tp) * pip_value) if trader.tp > 0 else None
+
+    log(f"Trader {trader_id} SELL: SL={sl_value}, TP={tp_value}")
+
+    # 3️⃣ Invio ordine tramite Manager
+    url = f"{manager_url}/db/traders/{trader_id}/open_order_on_slave"
+    payload = {
+        "trader_id": trader_id,
+        "order_type": "sell",
+        "volume": 0.10,  # o trader.defaultVolume se lo hai
+        "symbol": symbol,
+        "sl": sl_value,
+        "tp": tp_value,
+    }
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Trader {trader_id} SELL Response: {resp.text}")
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: Errore invio ordine SELL: {e}")
