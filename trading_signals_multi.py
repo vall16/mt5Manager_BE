@@ -513,7 +513,7 @@ def close_slave_position(trader_id):
         trader = sessions[trader_id]["trader"]
 
     manager_url = os.getenv("MANAGER_URL")
-    url = f"{manager_url}/db/traders/{trader_id}/close_order_on_slave"
+    url = f"{BASE_URL}/db/traders/{trader_id}/close_order_on_slave"
     payload = {
         "symbol": trader.selectedSymbol,
         "trader_id": trader_id
