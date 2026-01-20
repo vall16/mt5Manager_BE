@@ -33,6 +33,11 @@ router = APIRouter()
 
 load_dotenv()  # legge il file .env
 
+HOST = os.getenv("API_HOST")  # default localhost
+PORT = int(os.getenv("API_PORT"))    # default 8080
+
+BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
+
 def get_data(symbol, timeframe, n_candles, agent_url):
     """
     Recupera i dati storici chiamando l'API remota mt5_api.
@@ -486,7 +491,7 @@ def send_buy_to_slave(trader_id):
     tp_value = tick["ask"] + (float(trader.tp) * pip_value) if trader.tp > 0 else None
 
     # 3. Invio ordine tramite l'endpoint del Manager che comunica con lo Slave
-    url = f"{manager_url}/db/traders/{trader_id}/open_order_on_slave"
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
         "trader_id": trader_id,
         "order_type": "buy",
@@ -562,7 +567,7 @@ def send_sell_to_slave(trader_id):
     log(f"Trader {trader_id} SELL: SL={sl_value}, TP={tp_value}")
 
     # 3️⃣ Invio ordine tramite Manager
-    url = f"{manager_url}/db/traders/{trader_id}/open_order_on_slave"
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
         "trader_id": trader_id,
         "order_type": "sell",
