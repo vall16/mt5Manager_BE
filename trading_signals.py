@@ -529,6 +529,7 @@ def stop_polling():
 
 
 
+
 # Endpoint per il frontend
 @router.get("/signal")
 def get_signal():

@@ -36814,3 +36814,1175 @@ almente dal frontend!
 [+73965.9s] 🔻 [2026-01-13 11:58:23] SELL signal per XAUUSD
 [+73965.9s] ⚠️ SELL su XAUUSD già aperta. Skip.
 [+73969.0s] ⏱️ Polling loop → CHOSEN_TRADESIGNAL = 'BASE'
+[+19.9s] 📋 Trader ricevuto:
+[+19.9s]    - id: 1
+[+19.9s]    - name: Trader_Alphaa
+[+19.9s]    - status: active
+[+19.9s]    - master_server_id: 43
+[+19.9s]    - slave_server_id: 42
+[+19.9s]    - sl: 300.0
+[+20.0s]    - tp: 600.0
+[+20.0s]    - tsl: 23.0
+[+20.0s]    - moltiplicatore: 5.0
+[+20.0s]    - fix_lot: None
+[+20.0s]    - created_at: 2025-10-17T17:52:31
+[+20.0s]    - updated_at: 2026-01-20T11:05:38
+[+20.0s]    - customSignalInterval: 2
+[+20.0s]    - selectedSymbol: XAUUSD
+[+20.0s]    - selectedSignal: BASE
+[+22.0s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su XAUUSD
+[+61.2s] 📋 Trader ricevuto:
+[+61.2s]    - id: 10
+[+61.2s]    - name: Trader_Test2
+[+61.2s]    - status: active
+[+61.2s]    - master_server_id: 43
+[+61.3s]    - slave_server_id: 42
+[+61.3s]    - sl: 400.0
+[+61.3s]    - tp: 200.0
+[+61.3s]    - tsl: None
+[+61.3s]    - moltiplicatore: 1.0
+[+61.3s]    - fix_lot: None
+[+61.3s]    - created_at: 2026-01-15T12:58:08
+[+61.3s]    - updated_at: 2026-01-20T12:04:04
+[+61.3s]    - customSignalInterval: 2
+[+61.3s]    - selectedSymbol: XAUUSD
+[+61.3s]    - selectedSignal: BASE
+[+61.4s] 🚀 Trading avviato per Trader 10 (Trader_Test2) su XAUUSD
+[+92.9s] 📋 Trader ricevuto:
+[+92.9s]    - id: 1
+[+92.9s]    - name: Trader_Alphaa
+[+92.9s]    - status: active
+[+92.9s]    - master_server_id: 43
+[+92.9s]    - slave_server_id: 42
+[+92.9s]    - sl: 300.0
+[+92.9s]    - tp: 600.0
+[+92.9s]    - tsl: 23.0
+[+92.9s]    - moltiplicatore: 5.0
+[+92.9s]    - fix_lot: None
+[+92.9s]    - created_at: 2025-10-17T17:52:31
+[+92.9s]    - updated_at: 2026-01-20T11:05:38
+[+92.9s]    - customSignalInterval: 20
+[+92.9s]    - selectedSymbol: XAUUSD
+[+92.9s]    - selectedSignal: BASE
+[+93.1s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su XAUUSD
+[+229.9s] 📋 Trader ricevuto:
+[+230.0s]    - id: 1
+[+230.0s]    - name: Trader_Alphaa
+[+230.0s]    - status: active
+[+230.0s]    - master_server_id: 43
+[+230.0s]    - slave_server_id: 42
+[+230.0s]    - sl: 300.0
+[+230.0s]    - tp: 600.0
+[+230.0s]    - tsl: 23.0
+[+230.0s]    - moltiplicatore: 5.0
+[+230.0s]    - fix_lot: None
+[+230.0s]    - created_at: 2025-10-17T17:52:31
+[+230.0s]    - updated_at: 2026-01-20T11:05:38
+[+230.0s]    - customSignalInterval: 10
+[+230.0s]    - selectedSymbol: XAUUSD
+[+230.0s]    - selectedSignal: BASE
+[+230.3s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su XAUUSD
+[+261.0s] 📋 Trader ricevuto:
+[+261.0s]    - id: 1
+[+261.0s]    - name: Trader_Alphaa
+[+261.0s]    - status: active
+[+261.0s]    - master_server_id: 43
+[+261.0s]    - slave_server_id: 42
+[+261.0s]    - sl: 300.0
+[+261.0s]    - tp: 600.0
+[+261.0s]    - tsl: 23.0
+[+261.0s]    - moltiplicatore: 5.0
+[+261.0s]    - fix_lot: None
+[+261.1s]    - created_at: 2025-10-17T17:52:31
+[+261.1s]    - updated_at: 2026-01-20T11:05:38
+[+261.1s]    - customSignalInterval: 2
+[+261.2s]    - selectedSymbol: XAUUSD
+[+261.2s]    - selectedSignal: BASE
+[+5927.9s] 📋 Trader ricevuto:
+[+5927.9s]    - id: 1
+[+5927.9s]    - name: Trader_Alphaa
+[+5928.0s]    - status: active
+[+5928.0s]    - master_server_id: 43
+[+5928.5s]    - slave_server_id: 42
+[+5928.7s]    - sl: 300.0
+[+5929.0s]    - tp: 600.0
+[+5929.2s]    - tsl: 23.0
+[+5929.3s]    - moltiplicatore: 5.0
+[+5933.8s]    - fix_lot: None
+[+5935.6s]    - created_at: 2025-10-17T17:52:31
+[+5935.8s]    - updated_at: 2026-01-20T11:05:38
+[+5935.9s]    - customSignalInterval: 2
+[+5936.2s]    - selectedSymbol: USDCHF
+[+5936.2s]    - selectedSignal: BASE
+[+29.3s] 📋 Trader ricevuto:
+[+29.5s]    - id: 1
+[+29.6s]    - name: Trader_Alphaa
+[+29.7s]    - status: active
+[+29.7s]    - master_server_id: 43
+[+32.0s]    - slave_server_id: 42
+[+32.4s]    - sl: 300.0
+[+32.5s]    - tp: 600.0
+[+32.6s]    - tsl: 23.0
+[+32.7s]    - moltiplicatore: 5.0
+[+32.9s]    - fix_lot: None
+[+33.0s]    - created_at: 2025-10-17T17:52:31
+[+33.5s]    - updated_at: 2026-01-20T11:05:38
+[+35.7s]    - customSignalInterval: 2
+[+36.3s]    - selectedSymbol: XAUUSD
+[+36.4s]    - selectedSignal: BASE
+[+37.2s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su XAUUSD
+[+68.3s] 📋 Trader ricevuto:
+[+68.3s]    - id: 10
+[+68.3s]    - name: Trader_Test2
+[+68.3s]    - status: active
+[+68.3s]    - master_server_id: 43
+[+68.4s]    - slave_server_id: 42
+[+68.5s]    - sl: 400.0
+[+68.6s]    - tp: 200.0
+[+69.0s]    - tsl: None
+[+69.4s]    - moltiplicatore: 1.0
+[+70.0s]    - fix_lot: None
+[+71.0s]    - created_at: 2026-01-15T12:58:08
+[+71.3s]    - updated_at: 2026-01-20T12:04:04
+[+72.5s]    - customSignalInterval: 2
+[+72.5s]    - selectedSymbol: EURSEK
+[+72.8s]    - selectedSignal: BASE
+[+74.1s] Trader 10 SELL: SL=10.70441, TP=10.698409999999999
+[+74.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+74.2s] 🔻 Trader 10: Segnale SELL inviato
+[+74.5s] 🚀 Trading avviato per Trader 10 (Trader_Test2) su EURSEK
+[+76.7s] Trader 10 SELL: SL=10.70482, TP=10.69882
+[+76.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+76.7s] 🔻 Trader 10: Segnale SELL inviato
+[+78.8s] Trader 10 SELL: SL=10.70507, TP=10.699069999999999
+[+78.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+78.8s] 🔻 Trader 10: Segnale SELL inviato
+[+81.0s] Trader 10 SELL: SL=10.70504, TP=10.69904
+[+81.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+81.0s] 🔻 Trader 10: Segnale SELL inviato
+[+83.3s] Trader 10 SELL: SL=10.70502, TP=10.699019999999999
+[+83.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+83.3s] 🔻 Trader 10: Segnale SELL inviato
+[+85.6s] Trader 10 SELL: SL=10.70502, TP=10.699019999999999
+[+85.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+85.6s] 🔻 Trader 10: Segnale SELL inviato
+[+87.7s] Trader 10 SELL: SL=10.70478, TP=10.69878
+[+87.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+87.7s] 🔻 Trader 10: Segnale SELL inviato
+[+90.1s] Trader 10 SELL: SL=10.704799999999999, TP=10.698799999999999
+[+90.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+90.2s] 🔻 Trader 10: Segnale SELL inviato
+[+92.7s] Trader 10 SELL: SL=10.704799999999999, TP=10.698799999999999
+[+92.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+92.8s] 🔻 Trader 10: Segnale SELL inviato
+[+95.2s] Trader 10 SELL: SL=10.70521, TP=10.699209999999999
+[+95.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+95.2s] 🔻 Trader 10: Segnale SELL inviato
+[+97.4s] Trader 10 SELL: SL=10.7051, TP=10.6991
+[+97.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+97.4s] 🔻 Trader 10: Segnale SELL inviato
+[+100.2s] Trader 10 SELL: SL=10.705079999999999, TP=10.699079999999999
+[+100.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+100.9s] 🔻 Trader 10: Segnale SELL inviato
+[+103.4s] Trader 10 SELL: SL=10.70497, TP=10.69897
+[+103.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+103.6s] 🔻 Trader 10: Segnale SELL inviato
+[+106.1s] Trader 10 SELL: SL=10.70505, TP=10.69905
+[+106.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+106.2s] 🔻 Trader 10: Segnale SELL inviato
+[+108.5s] Trader 10 SELL: SL=10.70506, TP=10.69906
+[+108.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+108.6s] 🔻 Trader 10: Segnale SELL inviato
+[+111.4s] Trader 10 SELL: SL=10.705079999999999, TP=10.699079999999999
+[+111.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+111.5s] 🔻 Trader 10: Segnale SELL inviato
+[+114.4s] Trader 10 SELL: SL=10.70549, TP=10.699489999999999
+[+114.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+114.5s] 🔻 Trader 10: Segnale SELL inviato
+[+117.1s] Trader 10 SELL: SL=10.70566, TP=10.69966
+[+117.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+117.1s] 🔻 Trader 10: Segnale SELL inviato
+[+119.6s] Trader 10 SELL: SL=10.7058, TP=10.6998
+[+119.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+119.6s] 🔻 Trader 10: Segnale SELL inviato
+[+121.9s] Trader 10 SELL: SL=10.705639999999999, TP=10.699639999999999
+[+121.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+121.9s] 🔻 Trader 10: Segnale SELL inviato
+[+124.7s] Trader 10 SELL: SL=10.705589999999999, TP=10.699589999999999
+[+124.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+124.7s] 🔻 Trader 10: Segnale SELL inviato
+[+127.0s] Trader 10 SELL: SL=10.70575, TP=10.69975
+[+127.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+127.0s] 🔻 Trader 10: Segnale SELL inviato
+[+129.2s] Trader 10 SELL: SL=10.70589, TP=10.69989
+[+129.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+129.2s] 🔻 Trader 10: Segnale SELL inviato
+[+131.4s] Trader 10 SELL: SL=10.70589, TP=10.69989
+[+131.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+131.4s] 🔻 Trader 10: Segnale SELL inviato
+[+133.6s] Trader 10 SELL: SL=10.70615, TP=10.700149999999999
+[+133.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+133.6s] 🔻 Trader 10: Segnale SELL inviato
+[+135.9s] Trader 10 SELL: SL=10.70615, TP=10.700149999999999
+[+135.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+136.0s] 🔻 Trader 10: Segnale SELL inviato
+[+138.4s] Trader 10 SELL: SL=10.70615, TP=10.700149999999999
+[+138.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+138.4s] 🔻 Trader 10: Segnale SELL inviato
+[+140.5s] Trader 10 SELL: SL=10.70615, TP=10.700149999999999
+[+140.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+140.5s] 🔻 Trader 10: Segnale SELL inviato
+[+142.7s] Trader 10 SELL: SL=10.70615, TP=10.700149999999999
+[+142.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+142.7s] 🔻 Trader 10: Segnale SELL inviato
+[+145.2s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+145.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+145.2s] 🔻 Trader 10: Segnale SELL inviato
+[+147.3s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+147.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+147.3s] 🔻 Trader 10: Segnale SELL inviato
+[+149.4s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+149.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+149.4s] 🔻 Trader 10: Segnale SELL inviato
+[+151.6s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+151.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+151.6s] 🔻 Trader 10: Segnale SELL inviato
+[+153.7s] Trader 10 SELL: SL=10.70617, TP=10.70017
+[+153.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+153.8s] 🔻 Trader 10: Segnale SELL inviato
+[+155.8s] Trader 10 SELL: SL=10.70595, TP=10.69995
+[+155.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+156.0s] 🔻 Trader 10: Segnale SELL inviato
+[+158.3s] Trader 10 SELL: SL=10.70575, TP=10.69975
+[+158.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+158.3s] 🔻 Trader 10: Segnale SELL inviato
+[+160.4s] Trader 10 SELL: SL=10.70575, TP=10.69975
+[+160.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+160.4s] 🔻 Trader 10: Segnale SELL inviato
+[+162.8s] Trader 10 SELL: SL=10.70575, TP=10.69975
+[+162.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+162.9s] 🔻 Trader 10: Segnale SELL inviato
+[+166.0s] Trader 10 SELL: SL=10.7064, TP=10.7004
+[+166.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+166.2s] 🔻 Trader 10: Segnale SELL inviato
+[+168.6s] Trader 10 SELL: SL=10.7064, TP=10.7004
+[+168.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+168.7s] 🔻 Trader 10: Segnale SELL inviato
+[+171.5s] Trader 10 SELL: SL=10.7064, TP=10.7004
+[+171.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+171.5s] 🔻 Trader 10: Segnale SELL inviato
+[+175.7s] Trader 10 SELL: SL=10.7064, TP=10.7004
+[+175.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+175.7s] 🔻 Trader 10: Segnale SELL inviato
+[+178.2s] Trader 10 SELL: SL=10.706529999999999, TP=10.700529999999999
+[+178.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+178.2s] 🔻 Trader 10: Segnale SELL inviato
+[+180.5s] Trader 10 SELL: SL=10.706529999999999, TP=10.700529999999999
+[+180.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+180.6s] 🔻 Trader 10: Segnale SELL inviato
+[+182.9s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+183.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+183.0s] 🔻 Trader 10: Segnale SELL inviato
+[+186.2s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+186.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+186.2s] 🔻 Trader 10: Segnale SELL inviato
+[+189.5s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+189.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+189.8s] 🔻 Trader 10: Segnale SELL inviato
+[+192.5s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+192.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+192.5s] 🔻 Trader 10: Segnale SELL inviato
+[+195.5s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+195.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+195.5s] 🔻 Trader 10: Segnale SELL inviato
+[+198.0s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+198.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+198.0s] 🔻 Trader 10: Segnale SELL inviato
+[+200.3s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+200.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+200.3s] 🔻 Trader 10: Segnale SELL inviato
+[+202.4s] Trader 10 SELL: SL=10.70638, TP=10.70038
+[+202.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+202.4s] 🔻 Trader 10: Segnale SELL inviato
+[+204.7s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+204.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+204.7s] 🔻 Trader 10: Segnale SELL inviato
+[+207.1s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+207.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+207.1s] 🔻 Trader 10: Segnale SELL inviato
+[+209.2s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+209.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+209.2s] 🔻 Trader 10: Segnale SELL inviato
+[+211.5s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+211.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+211.7s] 🔻 Trader 10: Segnale SELL inviato
+[+214.6s] Trader 10 SELL: SL=10.70631, TP=10.70031
+[+214.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+214.6s] 🔻 Trader 10: Segnale SELL inviato
+[+216.9s] Trader 10 SELL: SL=10.70652, TP=10.70052
+[+216.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+217.0s] 🔻 Trader 10: Segnale SELL inviato
+[+219.2s] Trader 10 SELL: SL=10.706719999999999, TP=10.700719999999999
+[+219.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+219.2s] 🔻 Trader 10: Segnale SELL inviato
+[+221.5s] Trader 10 SELL: SL=10.706719999999999, TP=10.700719999999999
+[+221.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+221.5s] 🔻 Trader 10: Segnale SELL inviato
+[+223.7s] Trader 10 SELL: SL=10.706719999999999, TP=10.700719999999999
+[+223.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+223.8s] 🔻 Trader 10: Segnale SELL inviato
+[+226.2s] Trader 10 SELL: SL=10.70735, TP=10.70135
+[+226.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+226.6s] 🔻 Trader 10: Segnale SELL inviato
+[+229.2s] Trader 10 SELL: SL=10.707559999999999, TP=10.701559999999999
+[+229.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+229.2s] 🔻 Trader 10: Segnale SELL inviato
+[+232.0s] Trader 10 SELL: SL=10.707559999999999, TP=10.701559999999999
+[+232.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+232.1s] 🔻 Trader 10: Segnale SELL inviato
+[+237.2s] Trader 10 SELL: SL=10.70774, TP=10.70174
+[+237.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+237.6s] 🔻 Trader 10: Segnale SELL inviato
+[+241.7s] Trader 10 SELL: SL=10.70774, TP=10.70174
+[+241.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+242.0s] 🔻 Trader 10: Segnale SELL inviato
+[+246.3s] Trader 10 SELL: SL=10.70748, TP=10.70148
+[+246.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+246.5s] 🔻 Trader 10: Segnale SELL inviato
+[+249.5s] Trader 10 SELL: SL=10.70717, TP=10.70117
+[+249.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+249.6s] 🔻 Trader 10: Segnale SELL inviato
+[+252.4s] Trader 10 SELL: SL=10.70717, TP=10.70117
+[+252.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+252.5s] 🔻 Trader 10: Segnale SELL inviato
+[+255.2s] Trader 10 SELL: SL=10.70717, TP=10.70117
+[+255.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+255.3s] 🔻 Trader 10: Segnale SELL inviato
+[+257.6s] Trader 10 SELL: SL=10.70717, TP=10.70117
+[+257.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+257.7s] 🔻 Trader 10: Segnale SELL inviato
+[+260.9s] Trader 10 SELL: SL=10.70711, TP=10.70111
+[+261.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+261.0s] 🔻 Trader 10: Segnale SELL inviato
+[+263.8s] Trader 10 SELL: SL=10.70711, TP=10.70111
+[+263.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+263.9s] 🔻 Trader 10: Segnale SELL inviato
+[+267.2s] Trader 10 SELL: SL=10.70711, TP=10.70111
+[+267.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+267.4s] 🔻 Trader 10: Segnale SELL inviato
+[+271.2s] Trader 10 SELL: SL=10.7069, TP=10.700899999999999
+[+271.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+271.4s] 🔻 Trader 10: Segnale SELL inviato
+[+274.0s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+274.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+274.0s] 🔻 Trader 10: Segnale SELL inviato
+[+276.1s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+276.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+276.1s] 🔻 Trader 10: Segnale SELL inviato
+[+278.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+278.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+278.2s] 🔻 Trader 10: Segnale SELL inviato
+[+281.0s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+281.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+281.0s] 🔻 Trader 10: Segnale SELL inviato
+[+283.1s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+283.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+283.1s] 🔻 Trader 10: Segnale SELL inviato
+[+285.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+285.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+285.2s] 🔻 Trader 10: Segnale SELL inviato
+[+287.3s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+287.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+287.3s] 🔻 Trader 10: Segnale SELL inviato
+[+289.4s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+289.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+289.4s] 🔻 Trader 10: Segnale SELL inviato
+[+291.8s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+291.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+291.9s] 🔻 Trader 10: Segnale SELL inviato
+[+294.0s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+294.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+294.1s] 🔻 Trader 10: Segnale SELL inviato
+[+296.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+296.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+296.2s] 🔻 Trader 10: Segnale SELL inviato
+[+298.5s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+298.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+298.5s] 🔻 Trader 10: Segnale SELL inviato
+[+301.0s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+301.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+301.0s] 🔻 Trader 10: Segnale SELL inviato
+[+303.1s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+303.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+303.1s] 🔻 Trader 10: Segnale SELL inviato
+[+305.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+305.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+305.2s] 🔻 Trader 10: Segnale SELL inviato
+[+307.3s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+307.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+307.3s] 🔻 Trader 10: Segnale SELL inviato
+[+309.4s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+309.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+309.4s] 🔻 Trader 10: Segnale SELL inviato
+[+311.5s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+311.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+311.5s] 🔻 Trader 10: Segnale SELL inviato
+[+313.6s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+313.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+313.6s] 🔻 Trader 10: Segnale SELL inviato
+[+315.8s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+315.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+315.8s] 🔻 Trader 10: Segnale SELL inviato
+[+318.0s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+318.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+318.0s] 🔻 Trader 10: Segnale SELL inviato
+[+320.1s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+320.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+320.1s] 🔻 Trader 10: Segnale SELL inviato
+[+322.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+322.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+322.3s] 🔻 Trader 10: Segnale SELL inviato
+[+324.4s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+324.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+324.4s] 🔻 Trader 10: Segnale SELL inviato
+[+326.5s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+326.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+326.5s] 🔻 Trader 10: Segnale SELL inviato
+[+328.6s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+328.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+328.7s] 🔻 Trader 10: Segnale SELL inviato
+[+330.8s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+330.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+330.8s] 🔻 Trader 10: Segnale SELL inviato
+[+332.9s] Trader 10 SELL: SL=10.70731, TP=10.70131
+[+332.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+332.9s] 🔻 Trader 10: Segnale SELL inviato
+[+335.1s] Trader 10 SELL: SL=10.70731, TP=10.70131
+[+335.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+335.1s] 🔻 Trader 10: Segnale SELL inviato
+[+337.2s] Trader 10 SELL: SL=10.70731, TP=10.70131
+[+337.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+337.2s] 🔻 Trader 10: Segnale SELL inviato
+[+339.5s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+339.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+339.5s] 🔻 Trader 10: Segnale SELL inviato
+[+341.8s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+341.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+341.8s] 🔻 Trader 10: Segnale SELL inviato
+[+343.9s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+343.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+344.0s] 🔻 Trader 10: Segnale SELL inviato
+[+346.1s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+346.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+346.1s] 🔻 Trader 10: Segnale SELL inviato
+[+348.5s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+348.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+348.7s] 🔻 Trader 10: Segnale SELL inviato
+[+351.1s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+351.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+351.2s] 🔻 Trader 10: Segnale SELL inviato
+[+353.5s] Trader 10 SELL: SL=10.707519999999999, TP=10.701519999999999
+[+353.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+353.5s] 🔻 Trader 10: Segnale SELL inviato
+[+355.6s] Trader 10 SELL: SL=10.7072, TP=10.7012
+[+355.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+355.6s] 🔻 Trader 10: Segnale SELL inviato
+[+357.7s] Trader 10 SELL: SL=10.7072, TP=10.7012
+[+357.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+357.7s] 🔻 Trader 10: Segnale SELL inviato
+[+359.8s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+359.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+359.8s] 🔻 Trader 10: Segnale SELL inviato
+[+361.9s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+361.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+362.0s] 🔻 Trader 10: Segnale SELL inviato
+[+364.1s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+364.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+364.2s] 🔻 Trader 10: Segnale SELL inviato
+[+366.2s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+366.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+366.2s] 🔻 Trader 10: Segnale SELL inviato
+[+368.3s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+368.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+368.3s] 🔻 Trader 10: Segnale SELL inviato
+[+370.4s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+370.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+370.4s] 🔻 Trader 10: Segnale SELL inviato
+[+372.5s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+372.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+372.6s] 🔻 Trader 10: Segnale SELL inviato
+[+374.6s] Trader 10 SELL: SL=10.70712, TP=10.70112
+[+374.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+374.6s] 🔻 Trader 10: Segnale SELL inviato
+[+376.8s] Trader 10 SELL: SL=10.70732, TP=10.701319999999999
+[+376.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+376.9s] 🔻 Trader 10: Segnale SELL inviato
+[+379.1s] Trader 10 SELL: SL=10.70732, TP=10.701319999999999
+[+379.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+379.1s] 🔻 Trader 10: Segnale SELL inviato
+[+381.3s] Trader 10 SELL: SL=10.707089999999999, TP=10.701089999999999
+[+381.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+381.3s] 🔻 Trader 10: Segnale SELL inviato
+[+383.4s] Trader 10 SELL: SL=10.707089999999999, TP=10.701089999999999
+[+383.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+383.4s] 🔻 Trader 10: Segnale SELL inviato
+[+385.5s] Trader 10 SELL: SL=10.707089999999999, TP=10.701089999999999
+[+385.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+385.5s] 🔻 Trader 10: Segnale SELL inviato
+[+387.6s] Trader 10 SELL: SL=10.70694, TP=10.70094
+[+387.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+387.6s] 🔻 Trader 10: Segnale SELL inviato
+[+389.6s] Trader 10 SELL: SL=10.70694, TP=10.70094
+[+389.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+389.6s] 🔻 Trader 10: Segnale SELL inviato
+[+391.7s] Trader 10 SELL: SL=10.70696, TP=10.70096
+[+391.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+391.8s] 🔻 Trader 10: Segnale SELL inviato
+[+393.8s] Trader 10 SELL: SL=10.707189999999999, TP=10.701189999999999
+[+393.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+393.8s] 🔻 Trader 10: Segnale SELL inviato
+[+395.9s] Trader 10 SELL: SL=10.70745, TP=10.70145
+[+395.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+395.9s] 🔻 Trader 10: Segnale SELL inviato
+[+398.0s] Trader 10 SELL: SL=10.70745, TP=10.70145
+[+398.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+398.0s] 🔻 Trader 10: Segnale SELL inviato
+[+400.1s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+400.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+400.1s] 🔻 Trader 10: Segnale SELL inviato
+[+402.2s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+402.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+402.2s] 🔻 Trader 10: Segnale SELL inviato
+[+404.7s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+404.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+404.7s] 🔻 Trader 10: Segnale SELL inviato
+[+407.3s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+407.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+407.4s] 🔻 Trader 10: Segnale SELL inviato
+[+411.0s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+411.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+411.3s] 🔻 Trader 10: Segnale SELL inviato
+[+414.4s] Trader 10 SELL: SL=10.70758, TP=10.70158
+[+414.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+414.9s] 🔻 Trader 10: Segnale SELL inviato
+[+417.8s] Trader 10 SELL: SL=10.70758, TP=10.70158
+[+417.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+417.8s] 🔻 Trader 10: Segnale SELL inviato
+[+419.9s] Trader 10 SELL: SL=10.707699999999999, TP=10.701699999999999
+[+419.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+419.9s] 🔻 Trader 10: Segnale SELL inviato
+[+421.9s] Trader 10 SELL: SL=10.707699999999999, TP=10.701699999999999
+[+422.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+422.0s] 🔻 Trader 10: Segnale SELL inviato
+[+424.0s] Trader 10 SELL: SL=10.707699999999999, TP=10.701699999999999
+[+424.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+424.0s] 🔻 Trader 10: Segnale SELL inviato
+[+426.6s] Trader 10 SELL: SL=10.707699999999999, TP=10.701699999999999
+[+426.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+427.0s] 🔻 Trader 10: Segnale SELL inviato
+[+429.5s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+429.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+429.5s] 🔻 Trader 10: Segnale SELL inviato
+[+431.7s] Trader 10 SELL: SL=10.70762, TP=10.70162
+[+431.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+431.7s] 🔻 Trader 10: Segnale SELL inviato
+[+433.9s] Trader 10 SELL: SL=10.70762, TP=10.70162
+[+433.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+434.0s] 🔻 Trader 10: Segnale SELL inviato
+[+436.1s] Trader 10 SELL: SL=10.70783, TP=10.70183
+[+436.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+436.1s] 🔻 Trader 10: Segnale SELL inviato
+[+438.6s] Trader 10 SELL: SL=10.70783, TP=10.70183
+[+438.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+438.9s] 🔻 Trader 10: Segnale SELL inviato
+[+441.9s] Trader 10 SELL: SL=10.70796, TP=10.70196
+[+441.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+441.9s] 🔻 Trader 10: Segnale SELL inviato
+[+444.1s] Trader 10 SELL: SL=10.70906, TP=10.703059999999999
+[+444.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+444.2s] 🔻 Trader 10: Segnale SELL inviato
+[+446.9s] Trader 10 SELL: SL=10.70906, TP=10.703059999999999
+[+446.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+446.9s] 🔻 Trader 10: Segnale SELL inviato
+[+449.0s] Trader 10 SELL: SL=10.708459999999999, TP=10.702459999999999
+[+449.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+449.0s] 🔻 Trader 10: Segnale SELL inviato
+[+451.1s] Trader 10 SELL: SL=10.70865, TP=10.70265
+[+451.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+451.1s] 🔻 Trader 10: Segnale SELL inviato
+[+453.1s] Trader 10 SELL: SL=10.708459999999999, TP=10.702459999999999
+[+453.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+453.2s] 🔻 Trader 10: Segnale SELL inviato
+[+455.3s] Trader 10 SELL: SL=10.70814, TP=10.70214
+[+455.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+455.4s] 🔻 Trader 10: Segnale SELL inviato
+[+460.4s] Trader 10 SELL: SL=10.70814, TP=10.70214
+[+460.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+460.6s] 🔻 Trader 10: Segnale SELL inviato
+[+464.0s] Trader 10 SELL: SL=10.70814, TP=10.70214
+[+464.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+464.3s] 🔻 Trader 10: Segnale SELL inviato
+[+470.4s] Trader 10 SELL: SL=10.70814, TP=10.70214
+[+470.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+470.8s] 🔻 Trader 10: Segnale SELL inviato
+[+475.5s] Trader 10 SELL: SL=10.70814, TP=10.70214
+[+475.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+475.7s] 🔻 Trader 10: Segnale SELL inviato
+[+479.3s] Trader 10 SELL: SL=10.70885, TP=10.70285
+[+479.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+479.5s] 🔻 Trader 10: Segnale SELL inviato
+[+482.2s] Trader 10 SELL: SL=10.70894, TP=10.70294
+[+482.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+483.0s] 🔻 Trader 10: Segnale SELL inviato
+[+487.1s] Trader 10 SELL: SL=10.707889999999999, TP=10.701889999999999
+[+487.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+487.2s] 🔻 Trader 10: Segnale SELL inviato
+[+489.5s] Trader 10 SELL: SL=10.70768, TP=10.70168
+[+489.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+489.6s] 🔻 Trader 10: Segnale SELL inviato
+[+492.1s] Trader 10 SELL: SL=10.70721, TP=10.70121
+[+492.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+492.3s] 🔻 Trader 10: Segnale SELL inviato
+[+495.9s] Trader 10 SELL: SL=10.70721, TP=10.70121
+[+496.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+496.0s] 🔻 Trader 10: Segnale SELL inviato
+[+498.2s] Trader 10 SELL: SL=10.7074, TP=10.7014
+[+498.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+498.2s] 🔻 Trader 10: Segnale SELL inviato
+[+500.6s] Trader 10 SELL: SL=10.707189999999999, TP=10.701189999999999
+[+500.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+500.7s] 🔻 Trader 10: Segnale SELL inviato
+[+503.7s] Trader 10 SELL: SL=10.707279999999999, TP=10.701279999999999
+[+503.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+503.7s] 🔻 Trader 10: Segnale SELL inviato
+[+506.2s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+506.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+506.2s] 🔻 Trader 10: Segnale SELL inviato
+[+508.3s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+508.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+508.3s] 🔻 Trader 10: Segnale SELL inviato
+[+510.7s] Trader 10 SELL: SL=10.70764, TP=10.70164
+[+510.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+510.7s] 🔻 Trader 10: Segnale SELL inviato
+[+513.1s] Trader 10 SELL: SL=10.70788, TP=10.70188
+[+513.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+513.1s] 🔻 Trader 10: Segnale SELL inviato
+[+515.1s] Trader 10 SELL: SL=10.70694, TP=10.70094
+[+515.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+515.2s] 🔻 Trader 10: Segnale SELL inviato
+[+517.3s] Trader 10 SELL: SL=10.70673, TP=10.70073
+[+517.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+517.4s] 🔻 Trader 10: Segnale SELL inviato
+[+519.5s] Trader 10 SELL: SL=10.70673, TP=10.70073
+[+519.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+519.6s] 🔻 Trader 10: Segnale SELL inviato
+[+521.7s] Trader 10 SELL: SL=10.70673, TP=10.70073
+[+521.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+521.7s] 🔻 Trader 10: Segnale SELL inviato
+[+524.2s] Trader 10 SELL: SL=10.70673, TP=10.70073
+[+524.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+524.5s] 🔻 Trader 10: Segnale SELL inviato
+[+527.0s] Trader 10 SELL: SL=10.70651, TP=10.70051
+[+527.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+527.0s] 🔻 Trader 10: Segnale SELL inviato
+[+528.9s] Trader 1 SELL: SL=4724.71, TP=4715.71
+[+528.9s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+528.9s] 🔻 Trader 1: Segnale SELL inviato
+[+529.1s] Trader 10 SELL: SL=10.70651, TP=10.70051
+[+529.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+529.1s] 🔻 Trader 10: Segnale SELL inviato
+[+531.3s] Trader 10 SELL: SL=10.70651, TP=10.70051
+[+531.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+531.4s] 🔻 Trader 10: Segnale SELL inviato
+[+534.7s] Trader 10 SELL: SL=10.70651, TP=10.70051
+[+534.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+534.7s] 🔻 Trader 10: Segnale SELL inviato
+[+536.8s] Trader 10 SELL: SL=10.70675, TP=10.70075
+[+536.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+536.8s] 🔻 Trader 10: Segnale SELL inviato
+[+538.9s] Trader 10 SELL: SL=10.70675, TP=10.70075
+[+539.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+539.0s] 🔻 Trader 10: Segnale SELL inviato
+[+541.3s] Trader 10 SELL: SL=10.70675, TP=10.70075
+[+541.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+541.4s] 🔻 Trader 10: Segnale SELL inviato
+[+543.4s] Trader 10 SELL: SL=10.70696, TP=10.70096
+[+543.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+543.4s] 🔻 Trader 10: Segnale SELL inviato
+[+545.5s] Trader 10 SELL: SL=10.70718, TP=10.701179999999999
+[+545.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+545.5s] 🔻 Trader 10: Segnale SELL inviato
+[+547.6s] Trader 10 SELL: SL=10.70898, TP=10.70298
+[+547.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+547.6s] 🔻 Trader 10: Segnale SELL inviato
+[+549.8s] Trader 10 SELL: SL=10.70898, TP=10.70298
+[+549.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+549.9s] 🔻 Trader 10: Segnale SELL inviato
+[+552.4s] Trader 10 SELL: SL=10.70898, TP=10.70298
+[+552.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+552.4s] 🔻 Trader 10: Segnale SELL inviato
+[+554.5s] Trader 10 SELL: SL=10.70898, TP=10.70298
+[+554.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+554.5s] 🔻 Trader 10: Segnale SELL inviato
+[+556.6s] Trader 10 SELL: SL=10.70895, TP=10.70295
+[+556.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+556.7s] 🔻 Trader 10: Segnale SELL inviato
+[+558.8s] Trader 10 SELL: SL=10.70895, TP=10.70295
+[+558.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+558.8s] 🔻 Trader 10: Segnale SELL inviato
+[+560.9s] Trader 10 SELL: SL=10.70895, TP=10.70295
+[+560.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+560.9s] 🔻 Trader 10: Segnale SELL inviato
+[+563.0s] Trader 10 SELL: SL=10.70895, TP=10.70295
+[+563.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+563.1s] 🔻 Trader 10: Segnale SELL inviato
+[+565.4s] Trader 10 SELL: SL=10.70895, TP=10.70295
+[+565.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+565.5s] 🔻 Trader 10: Segnale SELL inviato
+[+567.6s] Trader 10 SELL: SL=10.70896, TP=10.70296
+[+567.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+567.6s] 🔻 Trader 10: Segnale SELL inviato
+[+569.8s] Trader 10 SELL: SL=10.70896, TP=10.70296
+[+569.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+569.8s] 🔻 Trader 10: Segnale SELL inviato
+[+571.9s] Trader 10 SELL: SL=10.70896, TP=10.70296
+[+571.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+571.9s] 🔻 Trader 10: Segnale SELL inviato
+[+574.1s] Trader 10 SELL: SL=10.70896, TP=10.70296
+[+574.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+574.1s] 🔻 Trader 10: Segnale SELL inviato
+[+576.3s] Trader 10 SELL: SL=10.70843, TP=10.70243
+[+576.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+576.3s] 🔻 Trader 10: Segnale SELL inviato
+[+578.4s] Trader 10 SELL: SL=10.70823, TP=10.70223
+[+578.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+578.4s] 🔻 Trader 10: Segnale SELL inviato
+[+580.6s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+580.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+580.6s] 🔻 Trader 10: Segnale SELL inviato
+[+582.7s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+582.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+582.7s] 🔻 Trader 10: Segnale SELL inviato
+[+585.3s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+585.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+585.4s] 🔻 Trader 10: Segnale SELL inviato
+[+588.1s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+588.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+588.1s] 🔻 Trader 10: Segnale SELL inviato
+[+590.4s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+590.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+590.5s] 🔻 Trader 10: Segnale SELL inviato
+[+591.6s] Trader 1 SELL: SL=4724.7, TP=4715.7
+[+591.6s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+591.6s] 🔻 Trader 1: Segnale SELL inviato
+[+592.7s] Trader 10 SELL: SL=10.707939999999999, TP=10.701939999999999
+[+592.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+592.7s] 🔻 Trader 10: Segnale SELL inviato
+[+593.7s] Trader 1 SELL: SL=4724.68, TP=4715.68
+[+593.7s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+593.7s] 🔻 Trader 1: Segnale SELL inviato
+[+595.1s] Trader 10 SELL: SL=10.70798, TP=10.701979999999999
+[+595.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+595.2s] 🔻 Trader 10: Segnale SELL inviato
+[+596.2s] Trader 1 SELL: SL=4725.1, TP=4716.1
+[+596.2s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+596.3s] 🔻 Trader 1: Segnale SELL inviato
+[+597.4s] Trader 10 SELL: SL=10.707709999999999, TP=10.701709999999999
+[+597.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+597.4s] 🔻 Trader 10: Segnale SELL inviato
+[+598.6s] Trader 1 SELL: SL=4724.84, TP=4715.84
+[+598.6s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+598.6s] 🔻 Trader 1: Segnale SELL inviato
+[+600.2s] Trader 10 SELL: SL=10.708509999999999, TP=10.702509999999998
+[+600.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+600.4s] 🔻 Trader 10: Segnale SELL inviato
+[+603.1s] Trader 10 SELL: SL=10.70858, TP=10.70258
+[+603.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+603.1s] 🔻 Trader 10: Segnale SELL inviato
+[+605.5s] Trader 10 SELL: SL=10.70858, TP=10.70258
+[+605.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+605.5s] 🔻 Trader 10: Segnale SELL inviato
+[+608.0s] Trader 10 SELL: SL=10.70858, TP=10.70258
+[+608.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+608.2s] 🔻 Trader 10: Segnale SELL inviato
+[+611.0s] Trader 10 SELL: SL=10.708509999999999, TP=10.702509999999998
+[+611.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+611.0s] 🔻 Trader 10: Segnale SELL inviato
+[+613.2s] Trader 10 SELL: SL=10.708509999999999, TP=10.702509999999998
+[+613.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+613.2s] 🔻 Trader 10: Segnale SELL inviato
+[+615.4s] Trader 10 SELL: SL=10.708509999999999, TP=10.702509999999998
+[+615.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+615.5s] 🔻 Trader 10: Segnale SELL inviato
+[+621.1s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+621.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+621.2s] 🔻 Trader 10: Segnale SELL inviato
+[+627.3s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+627.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+627.3s] 🔻 Trader 10: Segnale SELL inviato
+[+629.6s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+629.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+629.7s] 🔻 Trader 10: Segnale SELL inviato
+[+631.9s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+631.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+631.9s] 🔻 Trader 10: Segnale SELL inviato
+[+634.3s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+634.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+634.7s] 🔻 Trader 10: Segnale SELL inviato
+[+638.7s] Trader 10 SELL: SL=10.70812, TP=10.702119999999999
+[+638.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+639.2s] 🔻 Trader 10: Segnale SELL inviato
+[+645.2s] Trader 10 SELL: SL=10.70873, TP=10.702729999999999
+[+645.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+645.2s] 🔻 Trader 10: Segnale SELL inviato
+[+648.0s] Trader 10 SELL: SL=10.70876, TP=10.70276
+[+648.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+648.1s] 🔻 Trader 10: Segnale SELL inviato
+[+650.4s] Trader 10 SELL: SL=10.70876, TP=10.70276
+[+650.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+650.4s] 🔻 Trader 10: Segnale SELL inviato
+[+652.6s] Trader 10 SELL: SL=10.70857, TP=10.70257
+[+652.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+652.7s] 🔻 Trader 10: Segnale SELL inviato
+[+654.9s] Trader 10 SELL: SL=10.708309999999999, TP=10.702309999999999
+[+654.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+655.2s] 🔻 Trader 10: Segnale SELL inviato
+[+657.5s] Trader 10 SELL: SL=10.708309999999999, TP=10.702309999999999
+[+657.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+657.5s] 🔻 Trader 10: Segnale SELL inviato
+[+659.5s] Trader 10 SELL: SL=10.708309999999999, TP=10.702309999999999
+[+659.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+659.6s] 🔻 Trader 10: Segnale SELL inviato
+[+661.7s] Trader 10 SELL: SL=10.708309999999999, TP=10.702309999999999
+[+661.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+661.7s] 🔻 Trader 10: Segnale SELL inviato
+[+664.0s] Trader 10 SELL: SL=10.70818, TP=10.70218
+[+664.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+664.1s] 🔻 Trader 10: Segnale SELL inviato
+[+666.7s] Trader 10 SELL: SL=10.70818, TP=10.70218
+[+666.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+666.7s] 🔻 Trader 10: Segnale SELL inviato
+[+668.8s] Trader 10 SELL: SL=10.707749999999999, TP=10.701749999999999
+[+668.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+668.8s] 🔻 Trader 10: Segnale SELL inviato
+[+671.5s] Trader 10 SELL: SL=10.70759, TP=10.70159
+[+671.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+671.5s] 🔻 Trader 10: Segnale SELL inviato
+[+674.7s] Trader 10 SELL: SL=10.70759, TP=10.70159
+[+674.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+674.7s] 🔻 Trader 10: Segnale SELL inviato
+[+677.0s] Trader 10 SELL: SL=10.70778, TP=10.70178
+[+677.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+677.0s] 🔻 Trader 10: Segnale SELL inviato
+[+679.1s] Trader 10 SELL: SL=10.70778, TP=10.70178
+[+679.1s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+679.2s] 🔻 Trader 10: Segnale SELL inviato
+[+681.4s] Trader 10 SELL: SL=10.70778, TP=10.70178
+[+681.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+681.4s] 🔻 Trader 10: Segnale SELL inviato
+[+683.5s] Trader 10 SELL: SL=10.707989999999999, TP=10.701989999999999
+[+683.5s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+683.5s] 🔻 Trader 10: Segnale SELL inviato
+[+685.6s] Trader 10 SELL: SL=10.707989999999999, TP=10.701989999999999
+[+685.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+685.6s] 🔻 Trader 10: Segnale SELL inviato
+[+689.1s] Trader 10 SELL: SL=10.707989999999999, TP=10.701989999999999
+[+689.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+689.4s] 🔻 Trader 10: Segnale SELL inviato
+[+692.4s] Trader 10 SELL: SL=10.707989999999999, TP=10.701989999999999
+[+692.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+692.6s] 🔻 Trader 10: Segnale SELL inviato
+[+695.7s] Trader 10 SELL: SL=10.707989999999999, TP=10.701989999999999
+[+695.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+695.8s] 🔻 Trader 10: Segnale SELL inviato
+[+698.3s] Trader 10 SELL: SL=10.70818, TP=10.70218
+[+698.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+698.5s] 🔻 Trader 10: Segnale SELL inviato
+[+701.4s] Trader 10 SELL: SL=10.70818, TP=10.70218
+[+701.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+701.6s] 🔻 Trader 10: Segnale SELL inviato
+[+704.4s] Trader 10 SELL: SL=10.70818, TP=10.70218
+[+704.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+704.4s] 🔻 Trader 10: Segnale SELL inviato
+[+706.7s] Trader 10 SELL: SL=10.70825, TP=10.70225
+[+706.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+706.8s] 🔻 Trader 10: Segnale SELL inviato
+[+709.6s] Trader 10 SELL: SL=10.70825, TP=10.70225
+[+709.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+709.7s] 🔻 Trader 10: Segnale SELL inviato
+[+712.0s] Trader 10 SELL: SL=10.70825, TP=10.70225
+[+712.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+712.0s] 🔻 Trader 10: Segnale SELL inviato
+[+714.2s] Trader 10 SELL: SL=10.70845, TP=10.702449999999999
+[+714.2s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+714.2s] 🔻 Trader 10: Segnale SELL inviato
+[+716.3s] Trader 10 SELL: SL=10.70845, TP=10.702449999999999
+[+716.3s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+716.3s] 🔻 Trader 10: Segnale SELL inviato
+[+718.4s] Trader 10 SELL: SL=10.70912, TP=10.70312
+[+718.4s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+718.4s] 🔻 Trader 10: Segnale SELL inviato
+[+720.6s] Trader 10 SELL: SL=10.70912, TP=10.70312
+[+720.6s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+720.6s] 🔻 Trader 10: Segnale SELL inviato
+[+722.7s] Trader 10 SELL: SL=10.7115, TP=10.705499999999999
+[+722.7s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+722.7s] 🔻 Trader 10: Segnale SELL inviato
+[+724.8s] Trader 10 SELL: SL=10.711409999999999, TP=10.705409999999999
+[+724.8s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+724.8s] 🔻 Trader 10: Segnale SELL inviato
+[+726.9s] Trader 10 SELL: SL=10.711409999999999, TP=10.705409999999999
+[+726.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+726.9s] 🔻 Trader 10: Segnale SELL inviato
+[+728.9s] Trader 10 SELL: SL=10.71162, TP=10.70562
+[+728.9s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+728.9s] 🔻 Trader 10: Segnale SELL inviato
+[+731.0s] Trader 10 SELL: SL=10.71162, TP=10.70562
+[+731.0s] ❌ Trader 10: Errore invio ordine SELL: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+731.0s] 🔻 Trader 10: Segnale SELL inviato
+[+395.2s] 📋 Trader ricevuto:
+[+395.2s]    - id: 1
+[+395.2s]    - name: Trader_Alphaa
+[+395.2s]    - status: active
+[+395.2s]    - master_server_id: 43
+[+395.2s]    - slave_server_id: 42
+[+395.3s]    - sl: 300.0
+[+395.3s]    - tp: 600.0
+[+395.3s]    - tsl: 23.0
+[+395.3s]    - moltiplicatore: 5.0
+[+395.3s]    - fix_lot: None
+[+395.4s]    - created_at: 2025-10-17T17:52:31
+[+395.4s]    - updated_at: 2026-01-20T11:05:38
+[+395.4s]    - customSignalInterval: 2
+[+395.4s]    - selectedSymbol: AUDCAD
+[+395.4s]    - selectedSignal: BASE
+[+398.1s] Trader 1 SELL: SL=0.93346, TP=0.92446
+[+398.1s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+398.2s] 🔻 Trader 1: Segnale SELL inviato
+[+399.0s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su AUDCAD
+[+401.1s] Trader 1 SELL: SL=0.9334, TP=0.9244
+[+401.1s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+401.1s] 🔻 Trader 1: Segnale SELL inviato
+[+403.3s] Trader 1 SELL: SL=0.9334, TP=0.9244
+[+403.4s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+403.5s] 🔻 Trader 1: Segnale SELL inviato
+[+406.1s] Trader 1 SELL: SL=0.93337, TP=0.92437
+[+406.1s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+406.2s] 🔻 Trader 1: Segnale SELL inviato
+[+408.3s] Trader 1 SELL: SL=0.93338, TP=0.92438
+[+408.3s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+408.3s] 🔻 Trader 1: Segnale SELL inviato
+[+409.5s] 📋 Trader ricevuto:
+[+409.5s]    - id: 10
+[+409.5s]    - name: Trader_Test2
+[+409.5s]    - status: active
+[+409.5s]    - master_server_id: 43
+[+409.5s]    - slave_server_id: 42
+[+409.5s]    - sl: 400.0
+[+409.5s]    - tp: 200.0
+[+409.6s]    - tsl: None
+[+409.6s]    - moltiplicatore: 1.0
+[+409.7s]    - fix_lot: None
+[+409.7s]    - created_at: 2026-01-15T12:58:08
+[+409.8s]    - updated_at: 2026-01-20T12:04:04
+[+409.9s]    - customSignalInterval: 2
+[+410.3s]    - selectedSymbol: EURSEK
+[+410.4s]    - selectedSignal: BASE
+[+410.5s] Trader 1 SELL: SL=0.9334, TP=0.9244
+[+410.6s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+410.6s] 🔻 Trader 1: Segnale SELL inviato
+[+410.7s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+410.7s] 🔥 Trader 10: Segnale BUY inviato
+[+410.9s] 🚀 Trading avviato per Trader 10 (Trader_Test2) su EURSEK
+[+413.5s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+413.4s] Trader 1 SELL: SL=0.93342, TP=0.92442
+[+413.5s] 🔥 Trader 10: Segnale BUY inviato
+[+413.5s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+413.5s] 🔻 Trader 1: Segnale SELL inviato
+[+415.6s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+415.7s] 🔥 Trader 10: Segnale BUY inviato
+[+416.0s] Trader 1 SELL: SL=0.93338, TP=0.92438
+[+416.0s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+416.0s] 🔻 Trader 1: Segnale SELL inviato
+[+417.7s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+417.7s] 🔥 Trader 10: Segnale BUY inviato
+[+418.0s] Trader 1 SELL: SL=0.93339, TP=0.92439
+[+418.0s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+418.0s] 🔻 Trader 1: Segnale SELL inviato
+[+419.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+419.9s] 🔥 Trader 10: Segnale BUY inviato
+[+420.3s] Trader 1 SELL: SL=0.93337, TP=0.92437
+[+420.3s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+420.3s] 🔻 Trader 1: Segnale SELL inviato
+[+422.0s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+422.0s] 🔥 Trader 10: Segnale BUY inviato
+[+422.4s] Trader 1 SELL: SL=0.93336, TP=0.92436
+[+422.4s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+422.4s] 🔻 Trader 1: Segnale SELL inviato
+[+424.0s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+424.0s] 🔥 Trader 10: Segnale BUY inviato
+[+424.6s] Trader 1 SELL: SL=0.93337, TP=0.92437
+[+424.7s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+424.7s] 🔻 Trader 1: Segnale SELL inviato
+[+426.2s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+426.2s] 🔥 Trader 10: Segnale BUY inviato
+[+427.0s] Trader 1 SELL: SL=0.93335, TP=0.92435
+[+427.0s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+427.0s] 🔻 Trader 1: Segnale SELL inviato
+[+428.2s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+428.2s] 🔥 Trader 10: Segnale BUY inviato
+[+429.1s] Trader 1 SELL: SL=0.93335, TP=0.92435
+[+429.2s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+429.2s] 🔻 Trader 1: Segnale SELL inviato
+[+430.4s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+430.4s] 🔥 Trader 10: Segnale BUY inviato
+[+431.4s] Trader 1 SELL: SL=0.93332, TP=0.92432
+[+431.4s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+431.4s] 🔻 Trader 1: Segnale SELL inviato
+[+435.6s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+435.6s] 🔥 Trader 10: Segnale BUY inviato
+[+435.7s] Trader 1 SELL: SL=0.93341, TP=0.92441
+[+435.7s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+435.7s] 🔻 Trader 1: Segnale SELL inviato
+[+437.9s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+437.9s] 🔥 Trader 10: Segnale BUY inviato
+[+438.3s] Trader 1 SELL: SL=0.93339, TP=0.92439
+[+438.3s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+438.3s] 🔻 Trader 1: Segnale SELL inviato
+[+440.1s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+440.1s] 🔥 Trader 10: Segnale BUY inviato
+[+440.6s] Trader 1 SELL: SL=0.93331, TP=0.92431
+[+440.6s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+440.6s] 🔻 Trader 1: Segnale SELL inviato
+[+442.4s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+442.4s] 🔥 Trader 10: Segnale BUY inviato
+[+442.8s] Trader 1 SELL: SL=0.93333, TP=0.92433
+[+442.9s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+442.9s] 🔻 Trader 1: Segnale SELL inviato
+[+444.6s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+444.7s] 🔥 Trader 10: Segnale BUY inviato
+[+445.0s] Trader 1 SELL: SL=0.93349, TP=0.92449
+[+445.0s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+445.0s] 🔻 Trader 1: Segnale SELL inviato
+[+446.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+446.8s] 🔥 Trader 10: Segnale BUY inviato
+[+447.1s] Trader 1 SELL: SL=0.9335, TP=0.9245
+[+447.1s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+447.2s] 🔻 Trader 1: Segnale SELL inviato
+[+449.2s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+449.2s] 🔥 Trader 10: Segnale BUY inviato
+[+450.6s] Trader 1 SELL: SL=0.9335, TP=0.9245
+[+450.7s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+450.7s] 🔻 Trader 1: Segnale SELL inviato
+[+452.4s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+452.5s] 🔥 Trader 10: Segnale BUY inviato
+[+453.5s] Trader 1 SELL: SL=0.93352, TP=0.92452
+[+453.5s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+453.5s] 🔻 Trader 1: Segnale SELL inviato
+[+455.0s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+455.0s] 🔥 Trader 10: Segnale BUY inviato
+[+455.6s] Trader 1 SELL: SL=0.93354, TP=0.92454
+[+455.6s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+455.6s] 🔻 Trader 1: Segnale SELL inviato
+[+457.2s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+457.2s] 🔥 Trader 10: Segnale BUY inviato
+[+457.8s] Trader 1 SELL: SL=0.93355, TP=0.92455
+[+457.8s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+457.8s] 🔻 Trader 1: Segnale SELL inviato
+[+459.3s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+459.3s] 🔥 Trader 10: Segnale BUY inviato
+[+459.9s] Trader 1 SELL: SL=0.93353, TP=0.92453
+[+459.9s] ❌ Trader 1: Errore invio ordine SELL: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+459.9s] 🔻 Trader 1: Segnale SELL inviato
+[+17.4s] 📋 Trader ricevuto:
+[+17.4s]    - id: 1
+[+17.4s]    - name: Trader_Alphaa
+[+17.5s]    - status: active
+[+17.5s]    - master_server_id: 43
+[+17.5s]    - slave_server_id: 42
+[+17.5s]    - sl: 300.0
+[+17.5s]    - tp: 600.0
+[+17.5s]    - tsl: 23.0
+[+17.5s]    - moltiplicatore: 5.0
+[+17.6s]    - fix_lot: None
+[+17.7s]    - created_at: 2025-10-17T17:52:31
+[+17.7s]    - updated_at: 2026-01-20T11:05:38
+[+17.7s]    - customSignalInterval: 2
+[+17.7s]    - selectedSymbol: EURSEK
+[+17.7s]    - selectedSignal: BASE
+[+19.7s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+19.7s] 🔥 Trader 1: Segnale BUY inviato
+[+19.8s] 🚀 Trading avviato per Trader 1 (Trader_Alphaa) su EURSEK
+[+21.9s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+21.9s] 🔥 Trader 1: Segnale BUY inviato
+[+23.7s] 📋 Trader ricevuto:
+[+23.7s]    - id: 10
+[+23.7s]    - name: Trader_Test2
+[+23.7s]    - status: active
+[+23.7s]    - master_server_id: 43
+[+23.7s]    - slave_server_id: 42
+[+23.7s]    - sl: 400.0
+[+23.7s]    - tp: 200.0
+[+23.7s]    - tsl: None
+[+23.7s]    - moltiplicatore: 1.0
+[+23.7s]    - fix_lot: None
+[+23.7s]    - created_at: 2026-01-15T12:58:08
+[+23.7s]    - updated_at: 2026-01-20T12:04:04
+[+23.8s]    - customSignalInterval: 2
+[+23.9s]    - selectedSymbol: EURMXN
+[+24.1s]    - selectedSignal: BASE
+[+25.4s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+25.4s] 🔥 Trader 1: Segnale BUY inviato
+[+25.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+25.8s] 🔥 Trader 10: Segnale BUY inviato
+[+25.8s] 🚀 Trading avviato per Trader 10 (Trader_Test2) su EURMXN
+[+27.7s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+27.7s] 🔥 Trader 1: Segnale BUY inviato
+[+27.9s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+28.0s] 🔥 Trader 10: Segnale BUY inviato
+[+31.0s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+31.0s] 🔥 Trader 1: Segnale BUY inviato
+[+31.1s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+31.1s] 🔥 Trader 10: Segnale BUY inviato
+[+33.1s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+33.1s] 🔥 Trader 1: Segnale BUY inviato
+[+33.5s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+33.5s] 🔥 Trader 10: Segnale BUY inviato
+[+35.2s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+35.2s] 🔥 Trader 1: Segnale BUY inviato
+[+35.6s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+35.6s] 🔥 Trader 10: Segnale BUY inviato
+[+37.3s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+37.3s] 🔥 Trader 1: Segnale BUY inviato
+[+37.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+37.9s] 🔥 Trader 10: Segnale BUY inviato
+[+39.4s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+39.4s] 🔥 Trader 1: Segnale BUY inviato
+[+40.7s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+40.7s] 🔥 Trader 10: Segnale BUY inviato
+[+41.5s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+41.8s] 🔥 Trader 1: Segnale BUY inviato
+[+42.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+42.9s] 🔥 Trader 10: Segnale BUY inviato
+[+44.4s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+44.5s] 🔥 Trader 1: Segnale BUY inviato
+[+45.3s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+45.3s] 🔥 Trader 10: Segnale BUY inviato
+[+47.0s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+47.1s] 🔥 Trader 1: Segnale BUY inviato
+[+47.6s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+47.6s] 🔥 Trader 10: Segnale BUY inviato
+[+49.2s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+49.2s] 🔥 Trader 1: Segnale BUY inviato
+[+49.8s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+49.8s] 🔥 Trader 10: Segnale BUY inviato
+[+51.4s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+51.4s] 🔥 Trader 1: Segnale BUY inviato
+[+51.9s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+51.9s] 🔥 Trader 10: Segnale BUY inviato
+[+53.6s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+53.6s] 🔥 Trader 1: Segnale BUY inviato
+[+54.1s] ❌ Trader 10: Errore invio ordine: Invalid URL 'None/db/traders/10/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/10/open_order_on_slave?
+[+54.2s] 🔥 Trader 10: Segnale BUY inviato
+[+55.8s] ❌ Trader 1: Errore invio ordine: Invalid URL 'None/db/traders/1/open_order_on_slave': No scheme supplied. Perhaps you meant https://None/db/traders/1/open_order_on_slave?
+[+55.8s] 🔥 Trader 1: Segnale BUY inviato

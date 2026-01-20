@@ -3,9 +3,12 @@
 from datetime import datetime
 import os
 import threading
+
+from pydantic import BaseModel
 from logger import log, logs
 from dotenv import load_dotenv
 from fastapi import APIRouter
+from db import get_trader, get_connection
 from models import (
     Trader
 )
@@ -121,51 +124,112 @@ def run_signal_logic(trader_id):
         # Il tuo check_signal originale di base
         check_signal(trader_id)
     
+# @router.post("/start_polling")
+# def start_polling(trader: Trader):
+#     global sessions
+#     tid = trader.id
+
+#     log("📋 Trader ricevuto:")
+#     for k, v in trader.model_dump().items():
+#         log(f"   - {k}: {v}")
+
+
+#     with sessions_lock:
+#         # Se esiste già un polling per questo trader, lo fermiamo per aggiornarlo
+#         if tid in sessions and sessions[tid]["timer"]:
+#             sessions[tid]["timer"].cancel()
+
+#         # Inizializziamo la sessione dedicata
+#         sessions[tid] = {
+#             "trader": trader,
+#             "prev_signal": "HOLD",
+#             "timer": None
+#         }
+    
+#     # Avviamo il primo ciclo: l' ID DEL TRADER !
+#     polling_loop_timer(tid)
+    
+#     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selectedSymbol}")
+#     return {"status": "started", "trader_id": tid}
+
 @router.post("/start_polling")
 def start_polling(trader: Trader):
     global sessions
     tid = trader.id
 
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    trader_data = get_trader(cursor, tid)
+    if not trader_data:
+        log("❌ Trader non trovato nel DB.")
+        return {"status": "error"}
+
+    log("📋 Trader ricevuto:")
+    for k, v in trader.model_dump().items():
+        log(f"   - {k}: {v}")
+    
     with sessions_lock:
-        # Se esiste già un polling per questo trader, lo fermiamo per aggiornarlo
         if tid in sessions and sessions[tid]["timer"]:
             sessions[tid]["timer"].cancel()
 
-        # Inizializziamo la sessione dedicata
+        # Salviamo sia l'oggetto Pydantic sia i dati DB fissi
         sessions[tid] = {
             "trader": trader,
+            "trader_data": trader_data,  # <--- qui
             "prev_signal": "HOLD",
             "timer": None
         }
-    
-    # Avviamo il primo ciclo: l' ID DEL TRADER !
+
     polling_loop_timer(tid)
     
     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selectedSymbol}")
     return {"status": "started", "trader_id": tid}
 
+# originale
+# @router.post("/stop_polling")
+# def stop_polling(trader_id: int):
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             if sessions[trader_id]["timer"]:
+#                 sessions[trader_id]["timer"].cancel()
+#             del sessions[trader_id]
+#             return {"status": "stopped", "trader_id": trader_id}
+        
+#     return {"status": "error", "message": "Trader non attivo"}
+
+class StopPollingRequest(BaseModel):
+    trader_id: int
+
 @router.post("/stop_polling")
-def stop_polling(trader_id: int):
+def stop_polling(req: StopPollingRequest):
+    trader_id = req.trader_id
     with sessions_lock:
         if trader_id in sessions:
-            if sessions[trader_id]["timer"]:
-                sessions[trader_id]["timer"].cancel()
+            timer = sessions[trader_id].get("timer")
+            if timer:
+                timer.cancel()
             del sessions[trader_id]
+            log(f"⏹️ Polling fermato manualmente per Trader {trader_id}")
             return {"status": "stopped", "trader_id": trader_id}
-    return {"status": "error", "message": "Trader non attivo"}
+
+    return {"status": "not_running", "message": f"Trader {trader_id} non attivo"}
 
 
 def check_signal(trader_id):
-    # 1. Recupero dati sessione
+
+    
+    # session
     with sessions_lock:
         if trader_id not in sessions: return
         session = sessions[trader_id]
         trader = session["trader"]
+        trader_data = session["trader_data"]  # <--- qui
         prev_signal = session["prev_signal"]
 
-    # 2. Setup variabili locali dai dati del trader
-    symbol = trader.selectedSymbol
-    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+    # variabili locali
+    symbol = session["trader"].selectedSymbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # Parametri indicatori (usiamo quelli nel trader o default)
@@ -381,12 +445,24 @@ def check_signal_super(trader_id):
 
 
 def send_buy_to_slave(trader_id):
-    with sessions_lock:
-        if trader_id not in sessions: return
-        trader = sessions[trader_id]["trader"]
+
+    # with sessions_lock:
+    #     if trader_id not in sessions: return
+    #     trader = sessions[trader_id]["trader"]
     
+    # symbol = trader.selectedSymbol
+    # slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+
+    with sessions_lock:
+        if trader_id not in sessions: 
+            return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        trader_data = session["trader_data"]  # <-- dati completi DB già presi nello start_polling
+
     symbol = trader.selectedSymbol
-    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
     manager_url = os.getenv("MANAGER_URL") # Il tuo BASE_URL del manager
 
     # 1. Recupero info simbolo e tick dallo slave specifico
@@ -449,10 +525,13 @@ def send_sell_to_slave(trader_id):
     with sessions_lock:
         if trader_id not in sessions:
             return
-        trader = sessions[trader_id]["trader"]
+        session = sessions[trader_id]
+        trader = session["trader"]
+        trader_data = session["trader_data"]  # <-- dati DB master/slave
 
     symbol = trader.selectedSymbol
-    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
     manager_url = os.getenv("MANAGER_URL")
 
     # 1️⃣ Recupero info simbolo e tick dallo slave
