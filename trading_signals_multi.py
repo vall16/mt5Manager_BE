@@ -222,7 +222,7 @@ def stop_polling(req: StopPollingRequest):
 
 def check_signal(trader_id):
 
-    
+    logs.clear()
     # session
     with sessions_lock:
         if trader_id not in sessions: return
@@ -267,9 +267,12 @@ def check_signal(trader_id):
 
     # 6. Logica Decisionale
     new_signal = "HOLD"
+    
 
     if buy_cond:
         new_signal = "BUY"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] BUY signal per {symbol}")
         if not has_buy:
             if has_sell: close_slave_position(trader_id) # Reverse
             send_buy_to_slave(trader_id)
@@ -277,6 +280,8 @@ def check_signal(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] SELL signal per {symbol}")
         if not has_sell:
             if has_buy: close_slave_position(trader_id) # Reverse
             send_sell_to_slave(trader_id)
@@ -284,6 +289,9 @@ def check_signal(trader_id):
 
     else:
         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] HOLD signal per {symbol}")
+
         if prev_signal == "BUY" and has_buy:
              close_slave_position(trader_id)
         elif prev_signal == "SELL" and has_sell:
