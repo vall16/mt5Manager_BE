@@ -130,3 +130,9 @@ class TraderServersUpdate(BaseModel):
     tsl:Optional[int] = None
     moltiplicatore:Optional[int] = None
 
+    # 🆕 campi custom signal
+    selected_signal: str | None = None
+    custom_signal_interval: int | None = None
+    selected_symbol: str | None = None
+
+

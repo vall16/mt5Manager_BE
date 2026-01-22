@@ -611,6 +611,21 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     if update.moltiplicatore is not None:
         fields.append("moltiplicatore = %s")
         values.append(update.moltiplicatore)
+    
+    # 🆕 CUSTOM SIGNAL
+    if update.selected_signal is not None:
+        fields.append("selected_signal = %s")
+        values.append(update.selected_signal)
+
+    if update.custom_signal_interval is not None:
+        fields.append("custom_signal_interval = %s")
+        values.append(update.custom_signal_interval)
+
+    if update.selected_symbol is not None:
+        fields.append("selected_symbol = %s")
+        values.append(update.selected_symbol)
+
+
 
     # 🔹 Se non c’è nulla da aggiornare, ritorna il trader com’è
     if not fields:
