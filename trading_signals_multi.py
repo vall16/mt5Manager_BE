@@ -103,7 +103,7 @@ def polling_loop_timer(trader_id):
     run_signal_logic(trader_id)
 
     # Re-schedula il prossimo controllo basandosi sul customSignalInterval del trader
-    interval = int(trader.customSignalInterval or 5)
+    interval = int(trader.custom_signal_interval or 5)
     
     with sessions_lock:
         if trader_id in sessions:

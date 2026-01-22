@@ -485,7 +485,7 @@ def start_polling(trader:Trader):
     CURRENT_TRADER = trader
 
     try:
-        CHECK_INTERVAL = int(trader.customSignalInterval)
+        CHECK_INTERVAL = int(trader.custom_signal_interval)
     except:
         CHECK_INTERVAL = 2
 
