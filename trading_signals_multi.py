@@ -118,7 +118,7 @@ def run_signal_logic(trader_id):
         trader = sessions[trader_id]["trader"]
     
     # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selectedSignal or "BASE"
+    chosen_signal = trader.selected_signal or "BASE"
 
     if chosen_signal == "SUPER":
         check_signal_super(trader_id)
@@ -154,7 +154,7 @@ def run_signal_logic(trader_id):
 #     # Avviamo il primo ciclo: l' ID DEL TRADER !
 #     polling_loop_timer(tid)
     
-#     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selectedSymbol}")
+#     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
 #     return {"status": "started", "trader_id": tid}
 
 @router.post("/start_polling")
@@ -187,7 +187,7 @@ def start_polling(trader: Trader):
 
     polling_loop_timer(tid)
     
-    log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selectedSymbol}")
+    log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
     return {"status": "started", "trader_id": tid}
 
 # originale
@@ -234,7 +234,7 @@ def check_signal(trader_id):
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
     # variabili locali
-    symbol = session["trader"].selectedSymbol  # da Pydantic
+    symbol = session["trader"].selected_symbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # Parametri indicatori (usiamo quelli nel trader o default)
@@ -322,7 +322,7 @@ def check_signal_super(trader_id):
         trader = session["trader"]
         prev_signal = session.get("prev_signal", "HOLD")
 
-    symbol = trader.selectedSymbol
+    symbol = trader.selected_symbol
     slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -463,7 +463,7 @@ def send_buy_to_slave(trader_id):
     #     if trader_id not in sessions: return
     #     trader = sessions[trader_id]["trader"]
     
-    # symbol = trader.selectedSymbol
+    # symbol = trader.selected_symbol
     # slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
 
     with sessions_lock:
@@ -473,7 +473,7 @@ def send_buy_to_slave(trader_id):
         trader = session["trader"]
         trader_data = session["trader_data"]  # <-- dati completi DB già presi nello start_polling
 
-    symbol = trader.selectedSymbol
+    symbol = trader.selected_symbol
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
     manager_url = os.getenv("MANAGER_URL") # Il tuo BASE_URL del manager
@@ -523,7 +523,7 @@ def close_slave_position(trader_id):
     manager_url = os.getenv("MANAGER_URL")
     url = f"{BASE_URL}/db/traders/{trader_id}/close_order_on_slave"
     payload = {
-        "symbol": trader.selectedSymbol,
+        "symbol": trader.selected_symbol,
         "trader_id": trader_id
     }
 
@@ -542,7 +542,7 @@ def send_sell_to_slave(trader_id):
         trader = session["trader"]
         trader_data = session["trader_data"]  # <-- dati DB master/slave
 
-    symbol = trader.selectedSymbol
+    symbol = trader.selected_symbol
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
     manager_url = os.getenv("MANAGER_URL")

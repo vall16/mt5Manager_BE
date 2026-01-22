@@ -492,6 +492,9 @@ def get_traders():
             "tsl": row.get("tsl"),
             "moltiplicatore": row.get("moltiplicatore"),
             "fix_lot": row.get("fix_lot"),
+            "selected_signal": row.get("selected_signal"),
+            "custom_signal_interval": row.get("custom_signal_interval"),
+            "selected_symbol": row.get("selected_symbol"),
             "created_at": row.get("created_at").isoformat() if row.get("created_at") else None,
             "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else None,
         })

@@ -70,9 +70,9 @@ class Trader(BaseModel):
     fix_lot: Optional[float] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
-    customSignalInterval:Optional[int] =None
-    selectedSymbol: Optional[str] = None
-    selectedSignal: Optional[str] = None
+    custom_signal_interval:Optional[int] =None
+    selected_symbol: Optional[str] = None
+    selected_signal: Optional[str] = None
 
 
 class Newtrader(BaseModel):

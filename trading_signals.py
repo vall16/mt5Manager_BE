@@ -496,7 +496,7 @@ def start_polling(trader:Trader):
     SYMBOL = trader.selectedSymbol
 
     with signal_lock:
-        CHOSEN_TRADESIGNAL = trader.selectedSignal or "BASE"
+        CHOSEN_TRADESIGNAL = trader.selected_signal or "BASE"
 
     log(f"📡 Segnale attivo: {CHOSEN_TRADESIGNAL}")
 
