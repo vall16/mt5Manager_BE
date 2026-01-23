@@ -125,6 +125,9 @@ def run_signal_logic(trader_id):
     elif chosen_signal == "TRENDGUARD":
         # check_trendguard_xau_signal(trader_id)
         check_signal(trader_id)
+    elif chosen_signal == "BASE_NOHOLD":
+        
+        check_signal_nohold(trader_id)
     else:
         # Il tuo check_signal originale di base
         check_signal(trader_id)
@@ -301,6 +304,91 @@ def check_signal(trader_id):
     with sessions_lock:
         if trader_id in sessions:
             sessions[trader_id]["prev_signal"] = new_signal
+
+# //chiude solo buy --> sell e sell --> buy
+def check_signal_nohold(trader_id):
+
+    logs.clear()
+    # session
+    with sessions_lock:
+        if trader_id not in sessions: return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        trader_data = session["trader_data"]  # <--- qui
+        prev_signal = session["prev_signal"]
+
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+    # variabili locali
+    symbol = session["trader"].selected_symbol  # da Pydantic
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Parametri indicatori (usiamo quelli nel trader o default)
+    params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
+
+    # 3. Download dati dal suo slave specifico
+    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5, 50 candele
+    if df is None: return
+
+    # 4. Calcolo Indicatori
+    ema_short = compute_ema(df, params["EMA_short"])
+    ema_long = compute_ema(df, params["EMA_long"])
+    rsi = compute_rsi(df, params["RSI_period"])
+
+    buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+
+    # 5. Controllo posizioni attive sullo slave
+    positions = []
+    try:
+        resp = requests.get(f"{slave_url}/positions", timeout=5)
+        if resp.status_code == 200:
+            positions = resp.json()
+    except:
+        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+        return
+
+    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+    # 6. Logica Decisionale
+    new_signal = "HOLD"
+    
+
+    if buy_cond:
+        new_signal = "BUY"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] BUY signal per {symbol}")
+        if not has_buy:
+            if has_sell: close_slave_position(trader_id) # Reverse
+            send_buy_to_slave(trader_id)
+            log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
+
+    elif sell_cond:
+        new_signal = "SELL"
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] SELL signal per {symbol}")
+        if not has_sell:
+            if has_buy: close_slave_position(trader_id) # Reverse
+            send_sell_to_slave(trader_id)
+            log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
+
+    else:
+        # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+        # CON HOLD NON CHIUDE !
+        # if prev_signal == "BUY" and has_buy:
+        #     #  close_slave_position(trader_id)
+        # elif prev_signal == "SELL" and has_sell:
+        #     #  close_slave_position(trader_id)
+
+    # 7. Aggiornamento Segnale Precedente nella sessione corretta
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["prev_signal"] = new_signal
+
 
 def check_signal_super(trader_id):
     """
