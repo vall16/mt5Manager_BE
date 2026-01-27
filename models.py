@@ -129,6 +129,7 @@ class TraderServersUpdate(BaseModel):
     tp:Optional[int] = None
     tsl:Optional[int] = None
     moltiplicatore:Optional[int] = None
+    fix_lot:Optional[float] = None
 
     # 🆕 campi custom signal
     selected_signal: str | None = None

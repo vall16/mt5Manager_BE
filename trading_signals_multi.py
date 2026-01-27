@@ -579,6 +579,8 @@ def send_buy_to_slave(trader_id):
     sl_value = tick["ask"] - (float(trader.sl) * pip_value) if trader.sl > 0 else None
     tp_value = tick["ask"] + (float(trader.tp) * pip_value) if trader.tp > 0 else None
 
+    volume = trader.fix_lot
+
     # 3. Invio ordine tramite l'endpoint del Manager che comunica con lo Slave
     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
     payload = {
@@ -654,6 +656,8 @@ def send_sell_to_slave(trader_id):
     tp_value = tick["bid"] - (float(trader.tp) * pip_value) if trader.tp > 0 else None
 
     log(f"Trader {trader_id} SELL: SL={sl_value}, TP={tp_value}")
+
+    volume = trader.fix_lot
 
     # 3️⃣ Invio ordine tramite Manager
     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"

@@ -614,7 +614,11 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     if update.moltiplicatore is not None:
         fields.append("moltiplicatore = %s")
         values.append(update.moltiplicatore)
+    if update.fix_lot is not None:
+        fields.append("fix_lot = %s")
+        values.append(update.fix_lot)
     
+
     # 🆕 CUSTOM SIGNAL
     if update.selected_signal is not None:
         fields.append("selected_signal = %s")
