@@ -586,7 +586,8 @@ def send_buy_to_slave(trader_id):
     payload = {
         "trader_id": trader_id,
         "order_type": "buy",
-        "volume": 0.10, # O trader.defaultVolume se lo hai
+        # "volume": 0.10, # O trader.defaultVolume se lo hai
+        "volume": volume, 
         "symbol": symbol,
         "sl": sl_value,
         "tp": tp_value,
@@ -664,7 +665,8 @@ def send_sell_to_slave(trader_id):
     payload = {
         "trader_id": trader_id,
         "order_type": "sell",
-        "volume": 0.10,  # o trader.defaultVolume se lo hai
+        # "volume": 0.10,  # o trader.defaultVolume se lo hai
+        "volume": volume,
         "symbol": symbol,
         "sl": sl_value,
         "tp": tp_value,
