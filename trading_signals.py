@@ -740,9 +740,6 @@ def check_signal_super():
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         positions = []
 
-        # if not mt5.initialize():
-        #     log(f"❌ Errore MT5: {mt5.last_error()}")
-        #     return
 
         df = get_data(SYMBOL, TIMEFRAME, N_CANDLES,BASE_URL_SLAVE)
         if df is None:

@@ -222,7 +222,7 @@ def stop_polling(req: StopPollingRequest):
 
     return {"status": "not_running", "message": f"Trader {trader_id} non attivo"}
 
-
+# chiude ad ogni cambio di segnale (!)
 def check_signal(trader_id):
 
     logs.clear()
@@ -546,13 +546,6 @@ def check_signal_super(trader_id):
 
 
 def send_buy_to_slave(trader_id):
-
-    # with sessions_lock:
-    #     if trader_id not in sessions: return
-    #     trader = sessions[trader_id]["trader"]
-    
-    # symbol = trader.selected_symbol
-    # slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
 
     with sessions_lock:
         if trader_id not in sessions: 
