@@ -327,7 +327,7 @@ def check_signal_nohold(trader_id):
     params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
 
     # 3. Download dati dal suo slave specifico
-    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5, 50 candele
+    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5 min, 50 candele
     if df is None: return
 
     # 4. Calcolo Indicatori
@@ -404,14 +404,14 @@ def check_signal_super(trader_id):
     # 1. Recupero sessione
     # =========================
     with sessions_lock:
-        if trader_id not in sessions:
-            return
         session = sessions[trader_id]
         trader = session["trader"]
+        trader_data = session["trader_data"]
         prev_signal = session.get("prev_signal", "HOLD")
 
-    symbol = trader.selected_symbol
-    slave_url = f"http://{trader.slave_ip}:{trader.slave_port}"
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+    symbol = session["trader"].selected_symbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # =========================

@@ -33,12 +33,16 @@ def log(message):
     elif not isinstance(message, str):
         message = str(message)
 
-    elapsed = (datetime.now() - start_time).total_seconds()
-    timestamp = f"[+{elapsed:.1f}s]"
+    # elapsed = (datetime.now() - start_time).total_seconds()
+    # timestamp = f"[+{elapsed:.1f}s]"
+
+    # 📅 timestamp stile italiano SENZA secondi
+    timestamp = datetime.now().strftime("[%d/%m/%Y %H:%M]")
+
 
     for line in message.splitlines():
         line_to_print = f"{timestamp} {line}"
-        # 1. Salva in memoria
+        # 1. Salva in memoriaa
         logs.append(line_to_print)
         # 2. Stampa a video
         print(line_to_print, flush=True)
