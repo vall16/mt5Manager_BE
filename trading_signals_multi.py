@@ -532,17 +532,18 @@ def check_signal_super(trader_id):
             log(f"🔻 Trader {trader_id}: SELL inviato")
 
     else:
-        if prev_signal == "BUY" and has_buy:
-            close_slave_position(trader_id)
-        elif prev_signal == "SELL" and has_sell:
-            close_slave_position(trader_id)
+        # hold --> buy e sell --> buy non chiude...
+        # if prev_signal == "BUY" and has_buy:
+        #     # close_slave_position(trader_id)
+        # elif prev_signal == "SELL" and has_sell:
+        #     # close_slave_position(trader_id)
 
     # =========================
     # 11. Update sessione
     # =========================
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
+        with sessions_lock:
+            if trader_id in sessions:
+                sessions[trader_id]["prev_signal"] = new_signal
 
 
 def send_buy_to_slave(trader_id):
