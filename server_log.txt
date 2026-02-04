@@ -3398,3 +3398,83 @@ LL inviato
 [04/02/2026 15:12]  'volume': 0.1}
 [04/02/2026 15:12] 📥 Trader 1 SELL Response: {"status":"ko","message":"Errore invio ordine: {\"detail\":\"Trade failed: AutoTrading disabled by client\"}","logs":"[04/02/2026 15:12] Trader 1 SELL: SL=5041.57, TP=5036.07\n[04/02/2026 15:12] 🚀 Entrato in open_order_on_slave()\n[04/02/2026 15:12] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[04/02/2026 15:12] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[04/02/2026 15:12] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)\n[04/02/2026 15:12] 🔐 Login allo SLAVE...\n[04/02/2026 15:12] ✅ Login SLAVE riuscito\n[04/02/2026 15:12] Simbolo dal payload è: XAUUSD\n[04/02/2026 15:12] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[04/02/2026 15:12] 📈 Tick ricevuto: BID=5040.62 ASK=5040.78\n[04/02/2026 15:12] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[04/02/2026 15:12] 🧾 Dati inviati:{'price': 5040.62,\n[04/02/2026 15:12]  'sl': 5041.57,\n[04/02/2026 15:12]  'symbol': 'XAUUSD',\n[04/02/2026 15:12]  'tp': 5036.07,\n[04/02/2026 15:12]  'type': 'sell',\n[04/02/2026 15:12]  'volume': 0.1}"}
 [04/02/2026 15:12] 🔻 Trader 1: SELL inviato
+[04/02/2026 15:13] ───────S-I-G-N-A-L──────────
+[04/02/2026 15:13] 🔥 [2026-02-04 15:13:43] HOLD signal per XAUUSD
+[04/02/2026 15:14] Trader 1 SELL: SL=5047.69, TP=5042.19
+[04/02/2026 15:14] 🚀 Entrato in open_order_on_slave()
+[04/02/2026 15:14] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[04/02/2026 15:14] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[04/02/2026 15:14] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)
+[04/02/2026 15:14] 🔐 Login allo SLAVE...
+[04/02/2026 15:14] ✅ Login SLAVE riuscito
+[04/02/2026 15:14] Simbolo dal payload è: XAUUSD
+[04/02/2026 15:14] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[04/02/2026 15:14] 📈 Tick ricevuto: BID=5046.53 ASK=5046.69
+[04/02/2026 15:14] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[04/02/2026 15:14] 🧾 Dati inviati:{'price': 5046.53,
+[04/02/2026 15:14]  'sl': 5047.69,
+[04/02/2026 15:14]  'symbol': 'XAUUSD',
+[04/02/2026 15:14]  'tp': 5042.19,
+[04/02/2026 15:14]  'type': 'sell',
+[04/02/2026 15:14]  'volume': 0.1}
+[04/02/2026 15:14] 📥 Trader 1 SELL Response: {"status":"ko","message":"Errore invio ordine: {\"detail\":\"Trade failed: AutoTrading disabled by client\"}","logs":"[04/02/2026 15:14] Trader 1 SELL: SL=5047.69, TP=5042.19\n[04/02/2026 15:14] 🚀 Entrato in open_order_on_slave()\n[04/02/2026 15:14] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[04/02/2026 15:14] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[04/02/2026 15:14] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)\n[04/02/2026 15:14] 🔐 Login allo SLAVE...\n[04/02/2026 15:14] ✅ Login SLAVE riuscito\n[04/02/2026 15:14] Simbolo dal payload è: XAUUSD\n[04/02/2026 15:14] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[04/02/2026 15:14] 📈 Tick ricevuto: BID=5046.53 ASK=5046.69\n[04/02/2026 15:14] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[04/02/2026 15:14] 🧾 Dati inviati:{'price': 5046.53,\n[04/02/2026 15:14]  'sl': 5047.69,\n[04/02/2026 15:14]  'symbol': 'XAUUSD',\n[04/02/2026 15:14]  'tp': 5042.19,\n[04/02/2026 15:14]  'type': 'sell',\n[04/02/2026 15:14]  'volume': 0.1}"}
+[04/02/2026 15:14] 🔻 Trader 1: SELL inviato
+[04/02/2026 15:15] Trader 1 SELL: SL=5046.99, TP=5041.49
+[04/02/2026 15:15] 🚀 Entrato in open_order_on_slave()
+[04/02/2026 15:15] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[04/02/2026 15:15] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[04/02/2026 15:15] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)
+[04/02/2026 15:15] 🔐 Login allo SLAVE...
+[04/02/2026 15:15] ✅ Login SLAVE riuscito
+[04/02/2026 15:15] Simbolo dal payload è: XAUUSD
+[04/02/2026 15:15] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[04/02/2026 15:15] 📈 Tick ricevuto: BID=5047.17 ASK=5047.35
+[04/02/2026 15:15] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[04/02/2026 15:15] 🧾 Dati inviati:{'price': 5047.17,
+[04/02/2026 15:15]  'sl': 5046.99,
+[04/02/2026 15:15]  'symbol': 'XAUUSD',
+[04/02/2026 15:15]  'tp': 5041.49,
+[04/02/2026 15:15]  'type': 'sell',
+[04/02/2026 15:15]  'volume': 0.1}
+[04/02/2026 15:15] 📥 Trader 1 SELL Response: {"status":"ko","message":"Errore invio ordine: {\"detail\":\"Trade failed: AutoTrading disabled by client\"}","logs":"[04/02/2026 15:15] Trader 1 SELL: SL=5046.99, TP=5041.49\n[04/02/2026 15:15] 🚀 Entrato in open_order_on_slave()\n[04/02/2026 15:15] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[04/02/2026 15:15] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[04/02/2026 15:15] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)\n[04/02/2026 15:15] 🔐 Login allo SLAVE...\n[04/02/2026 15:15] ✅ Login SLAVE riuscito\n[04/02/2026 15:15] Simbolo dal payload è: XAUUSD\n[04/02/2026 15:15] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[04/02/2026 15:15] 📈 Tick ricevuto: BID=5047.17 ASK=5047.35\n[04/02/2026 15:15] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[04/02/2026 15:15] 🧾 Dati inviati:{'price': 5047.17,\n[04/02/2026 15:15]  'sl': 5046.99,\n[04/02/2026 15:15]  'symbol': 'XAUUSD',\n[04/02/2026 15:15]  'tp': 5041.49,\n[04/02/2026 15:15]  'type': 'sell',\n[04/02/2026 15:15]  'volume': 0.1}"}
+[04/02/2026 15:15] 🔻 Trader 1: SELL inviato
+[04/02/2026 15:16] Trader 1 SELL: SL=5046.35, TP=5040.85
+[04/02/2026 15:16] 🚀 Entrato in open_order_on_slave()
+[04/02/2026 15:16] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[04/02/2026 15:16] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[04/02/2026 15:16] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)
+[04/02/2026 15:16] 🔐 Login allo SLAVE...
+[04/02/2026 15:16] ✅ Login SLAVE riuscito
+[04/02/2026 15:16] Simbolo dal payload è: XAUUSD
+[04/02/2026 15:16] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[04/02/2026 15:16] 📈 Tick ricevuto: BID=5045.35 ASK=5045.53
+[04/02/2026 15:16] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[04/02/2026 15:16] 🧾 Dati inviati:{'price': 5045.35,
+[04/02/2026 15:16]  'sl': 5046.35,
+[04/02/2026 15:16]  'symbol': 'XAUUSD',
+[04/02/2026 15:16]  'tp': 5040.85,
+[04/02/2026 15:16]  'type': 'sell',
+[04/02/2026 15:16]  'volume': 0.1}
+[04/02/2026 15:16] 📥 Trader 1 SELL Response: {"status":"ko","message":"Errore invio ordine: {\"detail\":\"Trade failed: AutoTrading disabled by client\"}","logs":"[04/02/2026 15:16] Trader 1 SELL: SL=5046.35, TP=5040.85\n[04/02/2026 15:16] 🚀 Entrato in open_order_on_slave()\n[04/02/2026 15:16] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[04/02/2026 15:16] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[04/02/2026 15:16] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)\n[04/02/2026 15:16] 🔐 Login allo SLAVE...\n[04/02/2026 15:16] ✅ Login SLAVE riuscito\n[04/02/2026 15:16] Simbolo dal payload è: XAUUSD\n[04/02/2026 15:16] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[04/02/2026 15:16] 📈 Tick ricevuto: BID=5045.35 ASK=5045.53\n[04/02/2026 15:16] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[04/02/2026 15:16] 🧾 Dati inviati:{'price': 5045.35,\n[04/02/2026 15:16]  'sl': 5046.35,\n[04/02/2026 15:16]  'symbol': 'XAUUSD',\n[04/02/2026 15:16]  'tp': 5040.85,\n[04/02/2026 15:16]  'type': 'sell',\n[04/02/2026 15:16]  'volume': 0.1}"}
+[04/02/2026 15:16] 🔻 Trader 1: SELL inviato
+[04/02/2026 15:17] ───────S-I-G-N-A-L──────────
+[04/02/2026 15:17] 🔥 [2026-02-04 15:17:52] HOLD signal per XAUUSD
+[04/02/2026 15:18] Trader 1 SELL: SL=5037.78, TP=5032.28
+[04/02/2026 15:18] 🚀 Entrato in open_order_on_slave()
+[04/02/2026 15:18] 🌐 Init MT5 slave: http://127.0.0.1:8001
+[04/02/2026 15:18] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...
+[04/02/2026 15:18] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)
+[04/02/2026 15:18] 🔐 Login allo SLAVE...
+[04/02/2026 15:18] ✅ Login SLAVE riuscito
+[04/02/2026 15:18] Simbolo dal payload è: XAUUSD
+[04/02/2026 15:18] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD
+[04/02/2026 15:18] 📈 Tick ricevuto: BID=5037.02 ASK=5037.06
+[04/02/2026 15:18] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order
+[04/02/2026 15:18] 🧾 Dati inviati:{'price': 5037.02,
+[04/02/2026 15:18]  'sl': 5037.78,
+[04/02/2026 15:18]  'symbol': 'XAUUSD',
+[04/02/2026 15:18]  'tp': 5032.28,
+[04/02/2026 15:18]  'type': 'sell',
+[04/02/2026 15:18]  'volume': 0.1}
+[04/02/2026 15:18] 📥 Trader 1 SELL Response: {"status":"ko","message":"Errore invio ordine: {\"detail\":\"Trade failed: AutoTrading disabled by client\"}","logs":"[04/02/2026 15:18] Trader 1 SELL: SL=5037.78, TP=5032.28\n[04/02/2026 15:18] 🚀 Entrato in open_order_on_slave()\n[04/02/2026 15:18] 🌐 Init MT5 slave: http://127.0.0.1:8001\n[04/02/2026 15:18] 🔍 Controllo MT5 remoto su http://127.0.0.1:8001/health...\n[04/02/2026 15:18] ✅ MT5 attivo (versione 500.5573.1 Feb 2026)\n[04/02/2026 15:18] 🔐 Login allo SLAVE...\n[04/02/2026 15:18] ✅ Login SLAVE riuscito\n[04/02/2026 15:18] Simbolo dal payload è: XAUUSD\n[04/02/2026 15:18] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8001/symbol_tick/XAUUSD\n[04/02/2026 15:18] 📈 Tick ricevuto: BID=5037.02 ASK=5037.06\n[04/02/2026 15:18] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8001/order\n[04/02/2026 15:18] 🧾 Dati inviati:{'price': 5037.02,\n[04/02/2026 15:18]  'sl': 5037.78,\n[04/02/2026 15:18]  'symbol': 'XAUUSD',\n[04/02/2026 15:18]  'tp': 5032.28,\n[04/02/2026 15:18]  'type': 'sell',\n[04/02/2026 15:18]  'volume': 0.1}"}
+[04/02/2026 15:18] 🔻 Trader 1: SELL inviato
