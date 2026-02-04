@@ -130,7 +130,8 @@ def run_signal_logic(trader_id):
     else:
         # Il tuo check_signal originale di base
         check_signal(trader_id)
-    
+
+# FA PARTIRE IL POLLING !!
 @router.post("/start_polling")
 def start_polling(trader: Trader):
     global sessions
@@ -168,6 +169,7 @@ def start_polling(trader: Trader):
 class StopPollingRequest(BaseModel):
     trader_id: int
 
+# STOPPA IL POLLING !!
 @router.post("/stop_polling")
 def stop_polling(req: StopPollingRequest):
     trader_id = req.trader_id
@@ -282,6 +284,9 @@ def check_signal_nohold(trader_id):
     # variabili locali
     symbol = session["trader"].selected_symbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Leggiamo quale segnale ha scelto l'utente nel FE
+    chosen_signal = trader.selected_signal or "BASE"
     
     # Parametri indicatori (usiamo quelli nel trader o default)
     params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
@@ -317,7 +322,9 @@ def check_signal_nohold(trader_id):
 
     if buy_cond:
         new_signal = "BUY"
-        log("───────S-I-G-N-A-L──────────")
+        # log("───────S-I-G-N-A-L────────── ")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+
         log(f"🔥 [{now}] BUY signal per {symbol}")
         if not has_buy:
             if has_sell: close_slave_position(trader_id) # Reverse
@@ -326,7 +333,9 @@ def check_signal_nohold(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
-        log("───────S-I-G-N-A-L──────────")
+        # log("───────S-I-G-N-A-L────────── ")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+
         log(f"🔥 [{now}] SELL signal per {symbol}")
         if not has_sell:
             if has_buy: close_slave_position(trader_id) # Reverse
@@ -335,7 +344,9 @@ def check_signal_nohold(trader_id):
 
     else:
         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        log("───────S-I-G-N-A-L──────────")
+        # log("───────S-I-G-N-A-L────────── ")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+
         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
         # CON HOLD NON CHIUDE !
