@@ -1,5 +1,4 @@
 # --- STATO MULTI-SESSIONE ---
-# Struttura: { trader_id: { "trader": Trader, "prev_signal": str, "timer": Timer } }
 from datetime import datetime
 import os
 import threading
@@ -132,34 +131,6 @@ def run_signal_logic(trader_id):
         # Il tuo check_signal originale di base
         check_signal(trader_id)
     
-# @router.post("/start_polling")
-# def start_polling(trader: Trader):
-#     global sessions
-#     tid = trader.id
-
-#     log("📋 Trader ricevuto:")
-#     for k, v in trader.model_dump().items():
-#         log(f"   - {k}: {v}")
-
-
-#     with sessions_lock:
-#         # Se esiste già un polling per questo trader, lo fermiamo per aggiornarlo
-#         if tid in sessions and sessions[tid]["timer"]:
-#             sessions[tid]["timer"].cancel()
-
-#         # Inizializziamo la sessione dedicata
-#         sessions[tid] = {
-#             "trader": trader,
-#             "prev_signal": "HOLD",
-#             "timer": None
-#         }
-    
-#     # Avviamo il primo ciclo: l' ID DEL TRADER !
-#     polling_loop_timer(tid)
-    
-#     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
-#     return {"status": "started", "trader_id": tid}
-
 @router.post("/start_polling")
 def start_polling(trader: Trader):
     global sessions
@@ -193,17 +164,6 @@ def start_polling(trader: Trader):
     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
     return {"status": "started", "trader_id": tid}
 
-# originale
-# @router.post("/stop_polling")
-# def stop_polling(trader_id: int):
-#     with sessions_lock:
-#         if trader_id in sessions:
-#             if sessions[trader_id]["timer"]:
-#                 sessions[trader_id]["timer"].cancel()
-#             del sessions[trader_id]
-#             return {"status": "stopped", "trader_id": trader_id}
-        
-#     return {"status": "error", "message": "Trader non attivo"}
 
 class StopPollingRequest(BaseModel):
     trader_id: int
@@ -403,11 +363,23 @@ def check_signal_super(trader_id):
     # =========================
     # 1. Recupero sessione
     # =========================
+    # session
+    # with sessions_lock:
+    #     if trader_id not in sessions: return
+    #     session = sessions[trader_id]
+    #     trader = session["trader"]
+    #     trader_data = session["trader_data"]  # <--- qui
+    #     prev_signal = session["prev_signal"]
+
+    # slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+        # session
     with sessions_lock:
+        if trader_id not in sessions: return
         session = sessions[trader_id]
         trader = session["trader"]
-        trader_data = session["trader_data"]
-        prev_signal = session.get("prev_signal", "HOLD")
+        trader_data = session["trader_data"]  # <--- qui
+        prev_signal = session["prev_signal"]
 
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
@@ -537,13 +509,15 @@ def check_signal_super(trader_id):
         #     # close_slave_position(trader_id)
         # elif prev_signal == "SELL" and has_sell:
         #     # close_slave_position(trader_id)
+        log("───────S-I-G-N-A-L──────────")
+        log(f"🔥 [{now}] HOLD signal per {symbol}")
 
     # =========================
     # 11. Update sessione
     # =========================
-        with sessions_lock:
-            if trader_id in sessions:
-                sessions[trader_id]["prev_signal"] = new_signal
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["prev_signal"] = new_signal
 
 
 def send_buy_to_slave(trader_id):
