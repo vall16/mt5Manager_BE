@@ -238,7 +238,8 @@ def check_signal(trader_id):
 
     if buy_cond:
         new_signal = "BUY"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
         log(f"🔥 [{now}] BUY signal per {symbol}")
         if not has_buy:
             if has_sell: close_slave_position(trader_id) # Reverse
@@ -247,7 +248,8 @@ def check_signal(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
         log(f"🔥 [{now}] SELL signal per {symbol}")
         if not has_sell:
             if has_buy: close_slave_position(trader_id) # Reverse
@@ -256,7 +258,8 @@ def check_signal(trader_id):
 
     else:
         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
         if prev_signal == "BUY" and has_buy:
@@ -318,14 +321,17 @@ def check_signal_nohold(trader_id):
     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
 
-    # 6. Logica Decisionale
+    # 6. Logica Decisionalee
     new_signal = "HOLD"
     
 
     if buy_cond:
         new_signal = "BUY"
-        # log("───────S-I-G-N-A-L────────── ")
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+        
         log(f"🔥 [{now}] BUY signal per {symbol}")
 
         if not has_buy:
@@ -335,8 +341,10 @@ def check_signal_nohold(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
-        # log("───────S-I-G-N-A-L────────── ")
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
         log(f"🔥 [{now}] SELL signal per {symbol}")
 
         if not has_sell:
@@ -346,8 +354,10 @@ def check_signal_nohold(trader_id):
 
     else:
         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        # log("───────S-I-G-N-A-L────────── ")
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
         # CON HOLD NON CHIUDE !
@@ -504,7 +514,9 @@ def check_signal_super(trader_id):
 
     if buy_cond:
         new_signal = "BUY"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
         log(f"🔥 [{now}] BUY signal per {symbol}")
         if not has_buy:
             if has_sell:
@@ -514,7 +526,9 @@ def check_signal_super(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
         log(f"🔥 [{now}] SELL signal per {symbol}")
         if not has_sell:
             if has_buy:
@@ -528,8 +542,10 @@ def check_signal_super(trader_id):
         #     # close_slave_position(trader_id)
         # elif prev_signal == "SELL" and has_sell:
         #     # close_slave_position(trader_id)
-        # log("───────S-I-G-N-A-L──────────")
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
+        
+        
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
     # =========================
@@ -638,9 +654,15 @@ def send_sell_to_slave(trader_id):
         sym_info = info_resp.json()
         tick = tick_resp.json()
 
-        if not tick or "bid" not in tick or "ask" not in tick:
-            log(f"⚠️ Trader {trader_id}: Tick incompleto o non valido per {symbol}")
-            return
+        # elimino gestione del tick 
+        # if not tick or "bid" not in tick or "ask" not in tick:
+        #     log(f"⚠️ Trader {trader_id}: Tick incompleto o non valido per {symbol}")
+        #     return
+
+        # if not tick or "bid" not in tick or tick["bid"] in [None, 0]:
+        #     log(f"⚠️ Trader {trader_id}: Bid non valido per {symbol}: {tick}")
+        #     return
+
 
     except Exception as e:
         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
