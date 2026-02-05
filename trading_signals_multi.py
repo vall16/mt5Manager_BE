@@ -198,6 +198,8 @@ def check_signal(trader_id):
 
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
+    # Leggiamo quale segnale ha scelto l'utente nel FE
+    chosen_signal = trader.selected_signal or "BASE"
     # variabili locali
     symbol = session["trader"].selected_symbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -236,7 +238,7 @@ def check_signal(trader_id):
 
     if buy_cond:
         new_signal = "BUY"
-        log("───────S-I-G-N-A-L──────────")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
         log(f"🔥 [{now}] BUY signal per {symbol}")
         if not has_buy:
             if has_sell: close_slave_position(trader_id) # Reverse
@@ -245,7 +247,7 @@ def check_signal(trader_id):
 
     elif sell_cond:
         new_signal = "SELL"
-        log("───────S-I-G-N-A-L──────────")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
         log(f"🔥 [{now}] SELL signal per {symbol}")
         if not has_sell:
             if has_buy: close_slave_position(trader_id) # Reverse
@@ -254,7 +256,7 @@ def check_signal(trader_id):
 
     else:
         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        log("───────S-I-G-N-A-L──────────")
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] ──────────")
         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
         if prev_signal == "BUY" and has_buy:
@@ -285,7 +287,7 @@ def check_signal_nohold(trader_id):
     symbol = session["trader"].selected_symbol  # da Pydantic
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Leggiamo quale segnale ha scelto l'utente nel FE
+    # Leggiamo quale segnale ha scelto l'utente nel FE
     chosen_signal = trader.selected_signal or "BASE"
     
     # Parametri indicatori (usiamo quelli nel trader o default)
