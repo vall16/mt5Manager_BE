@@ -97,7 +97,7 @@ router = APIRouter()
 #             "tp": 0,
 #             "deviation": 10,
 #             "type_time": mt5.ORDER_TIME_GTC,
-#             "type_filling": mt5.ORDER_FILLING_IOC,
+#             "type_": mt5.ORDER_FILLING_IOC,
 #         }
 #         check = mt5.order_check(req)
 #         info["order_check"] = check._asdict() if check else mt5.last_error()

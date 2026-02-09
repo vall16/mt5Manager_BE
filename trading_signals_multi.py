@@ -580,6 +580,9 @@ def send_buy_to_slave(trader_id):
             return
 
         sym_info = info_resp.json()
+
+        log(sym_info.get("filling_mode"))
+
         tick = tick_resp.json()
     except Exception as e:
         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
@@ -652,6 +655,9 @@ def send_sell_to_slave(trader_id):
             return
 
         sym_info = info_resp.json()
+
+        log(sym_info.get("filling_mode"))
+
         tick = tick_resp.json()
 
         # elimino gestione del tick 

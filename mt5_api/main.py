@@ -468,7 +468,25 @@ def send_order(order: dict):
         order["type"] = mt5.ORDER_TYPE_SELL
     else:
         raise HTTPException(status_code=400, detail=f"Invalid order type: {order_type}")
+    
+    # gestione filling ! -------------------------------------
+    symbol = order.get("symbol")
+    symbol_info = mt5.symbol_info(symbol)
+    
+    if symbol_info is None:
+        raise HTTPException(status_code=400, detail=f"Simbolo {symbol} non trovato")
 
+    # Logica dinamica per il Filling Mode
+    if symbol_info.filling_mode & mt5.SYMBOL_FILLING_IOC:
+        filling_type = mt5.ORDER_FILLING_IOC
+    elif symbol_info.filling_mode & mt5.SYMBOL_FILLING_FOK:
+        filling_type = mt5.ORDER_FILLING_FOK
+    else:
+        filling_type = mt5.ORDER_FILLING_RETURN
+    
+    order["type_filling"] = filling_type
+    # gestione filling ! -------------------------------------
+    
     # 🔹 Aggiunge parametri mancanti richiesti da MT5
     order.setdefault("action", mt5.TRADE_ACTION_DEAL)
     order.setdefault("deviation", 10)
