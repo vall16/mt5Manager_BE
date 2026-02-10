@@ -73,6 +73,8 @@ class Trader(BaseModel):
     custom_signal_interval:Optional[int] =None
     selected_symbol: Optional[str] = None
     selected_signal: Optional[str] = None
+    #  //il broker preso dal server slave
+    broker: Optional[str] = None           
 
 
 class Newtrader(BaseModel):

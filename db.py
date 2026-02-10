@@ -957,6 +957,7 @@ def copy_orders(trader_id: int):
                 "sl": calculated_sl,
                 "tp": calculated_tp,
                 "comment": f"Copied from master {trader_id}",
+                
             }
 
             # 🔹 3️⃣ Invio ordine allo slave via API
@@ -1206,6 +1207,7 @@ class OrderPayload(BaseModel):
     symbol: str
     sl: Optional[float] = None
     tp: Optional[float] = None
+    broker: Optional[str] = None
 
 # Lock globale per evitare ordini duplicati simultanei
 open_order_lock = Lock()
@@ -1223,12 +1225,15 @@ def open_order_on_slave(payload: OrderPayload):
         trader_id = payload.trader_id
         sl = payload.sl
         tp = payload.tp
+        # broker corrente ...
+        broker = payload.broker
 
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
 
         log("🚀 Entrato in open_order_on_slave()")
+        log(f"📡 Broker corrente: {broker}")
 
         # 1️⃣ Recupero trader
         trader = get_trader(cursor, trader_id)
@@ -1290,7 +1295,9 @@ def open_order_on_slave(payload: OrderPayload):
             "price": price,
             # "price": 0.0,
             "sl": sl,
-            "tp": tp
+            "tp": tp,
+            "broker" : broker
+
             
         }
 

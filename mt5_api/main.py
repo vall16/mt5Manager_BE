@@ -470,26 +470,11 @@ def send_order(order: dict):
         raise HTTPException(status_code=400, detail=f"Invalid order type: {order_type}")
     
     # gestione filling ! -------------------------------------
-    # symbol = order.get("symbol")
-    # symbol_info = mt5.symbol_info(symbol)
-    
-    # if symbol_info is None:
-    #     raise HTTPException(status_code=400, detail=f"Simbolo {symbol} non trovato")
+    # HARD CODED IOC per ICMARKETS ... da impostare solo se ICMARKETS, altrimenti nulla
+    broker = (order.get("broker") or "").lower()
 
-    # # Logica dinamica per il Filling Mode
-    # if symbol_info.filling_mode & mt5.SYMBOL_FILLING_IOC:
-    #     filling_type = mt5.ORDER_FILLING_IOC
-    # elif symbol_info.filling_mode & mt5.SYMBOL_FILLING_FOK:
-    #     filling_type = mt5.ORDER_FILLING_FOK
-    # else:
-    #     filling_type = mt5.ORDER_FILLING_RETURN
-    
-    # HARD CODED IOC per ICMARKETS ... da impostare solo se ICMARKETS, altrimenti semplicamente
-    # non farlo, lasciando com'era prima ...!
-    # !!!
-    order["type_filling"] = 1
-    # !!!!!
-
+    if "icmarkets" in broker:
+        order["type_filling"] = 1  # IOC (numero secco, zero rischi)
 
     # gestione filling ! -------------------------------------
 
@@ -501,8 +486,6 @@ def send_order(order: dict):
 
     log(f"🚀 Inviando ordine a MetaTrader5: {order}")
     result = mt5.order_send(order)
-
-    
 
     if result is None:
         err = mt5.last_error()
