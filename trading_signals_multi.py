@@ -127,7 +127,10 @@ def run_signal_logic(trader_id):
         check_signal(trader_id)
     elif chosen_signal == "BASE_NOHOLD":
         
-        check_signal_nohold(trader_id)
+        check_signal_reverse(trader_id)
+    elif chosen_signal == "EURUSD_NOHOLD":
+        
+        check_signal_eurusd(trader_id)
     else:
         # Il tuo check_signal originale di base
         check_signal(trader_id)
@@ -276,7 +279,7 @@ def check_signal(trader_id):
             sessions[trader_id]["prev_signal"] = new_signal
 
 # //chiude solo buy --> sell e sell --> buy
-def check_signal_nohold(trader_id):
+def check_signal_reverse(trader_id):
 
     logs.clear()
     # session
@@ -374,6 +377,110 @@ def check_signal_nohold(trader_id):
         if trader_id in sessions:
             sessions[trader_id]["prev_signal"] = new_signal
 
+def check_signal_eurusd(trader_id):
+    """
+    🔹 Check signal per EURUSD
+    - Timeframe M5
+    - EMA breve/lunga + RSI14
+    - Nessuna chiusura automatica HOLD
+    - Adatto a volatilità tipica FX
+    """
+
+    logs.clear()
+    # =========================
+    # 1. Recupero sessione
+    # =========================
+    with sessions_lock:
+        if trader_id not in sessions:
+            return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        trader_data = session["trader_data"]
+        prev_signal = session["prev_signal"]
+
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+    symbol = trader.selected_symbol
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    chosen_signal = trader.selected_signal or "EURUSD_BASE"
+
+    # =========================
+    # 2. Parametri indicatori
+    # =========================
+    params = {
+        "EMA_short": 5,
+        "EMA_long": 20,    # leggermente più lungo per EURUSD
+        "RSI_period": 14
+    }
+
+    # =========================
+    # 3. Dati mercato M5
+    # =========================
+    df = get_data(symbol, 5, 50, slave_url)
+    if df is None or df.empty:
+        return
+
+    # =========================
+    # 4. Indicatori
+    # =========================
+    ema_short = compute_ema(df, params["EMA_short"])
+    ema_long  = compute_ema(df, params["EMA_long"])
+    rsi       = compute_rsi(df, params["RSI_period"])
+
+    # =========================
+    # 5. Condizioni segnale
+    # =========================
+    # EURUSD più lento → riduco la soglia RSI per filtrare falsi segnali
+    buy_cond  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 65
+    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 35
+
+    # =========================
+    # 6. Controllo posizioni slave
+    # =========================
+    positions = []
+    try:
+        resp = requests.get(f"{slave_url}/positions", timeout=5)
+        if resp.status_code == 200:
+            positions = resp.json()
+    except:
+        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+        return
+
+    has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+    # =========================
+    # 7. Decisione
+    # =========================
+    new_signal = "HOLD"
+
+    if buy_cond:
+        new_signal = "BUY"
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+        log(f"🔥 [{now}] BUY signal per {symbol}")
+        if not has_buy:
+            if has_sell: close_slave_position(trader_id)
+            send_buy_to_slave(trader_id)
+            log(f"🔥 Trader {trader_id}: BUY inviato")
+
+    elif sell_cond:
+        new_signal = "SELL"
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+        log(f"🔥 [{now}] SELL signal per {symbol}")
+        if not has_sell:
+            if has_buy: close_slave_position(trader_id)
+            send_sell_to_slave(trader_id)
+            log(f"🔻 Trader {trader_id}: SELL inviato")
+
+    else:
+        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+        log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+    # =========================
+    # 8. Aggiornamento sessione
+    # =========================
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["prev_signal"] = new_signal
 
 def check_signal_super(trader_id):
     """
@@ -620,6 +727,68 @@ def send_buy_to_slave(trader_id):
         log(f"📥 Trader {trader_id} BUY Response: {resp.text}")
     except Exception as e:
         log(f"❌ Trader {trader_id}: Errore invio ordine: {e}")
+
+# nuova versione con order Limit... non usata (16/02)
+def send_buy_to_slave_limit(trader_id):
+    
+    with sessions_lock:
+        if trader_id not in sessions:
+            return
+        session = sessions[trader_id]
+        trader = session["trader"]
+        trader_data = session["trader_data"]  # dati completi DB
+
+    symbol = trader.selected_symbol
+    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+    manager_url = os.getenv("MANAGER_URL")  # BASE_URL del manager
+
+    # 1️⃣ Recupero info simbolo e tick dallo slave
+    try:
+        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+        
+        if info_resp.status_code != 200 or tick_resp.status_code != 200:
+            log(f"❌ Trader {trader_id}: impossibile recuperare dati dallo slave")
+            return
+
+        sym_info = info_resp.json()
+        tick = tick_resp.json()
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: errore connessione slave: {e}")
+        return
+
+    # 2️⃣ Calcolo prezzo limit, SL e TP
+    pip_value = float(sym_info.get("point", 0.01))
+    current_price = tick["ask"]
+
+    # Prezzo di entrata BUY LIMIT leggermente sotto prezzo attuale
+    price_limit = current_price - 0.5 * pip_value  # puoi modificare lo scarto se vuoi
+
+    # SL e TP relativi al prezzo limit
+    sl_value = price_limit - (float(trader.sl) * pip_value) if trader.sl > 0 else None
+    tp_value = price_limit + (float(trader.tp) * pip_value) if trader.tp > 0 else None
+
+    volume = trader.fix_lot
+    broker = trader.broker
+
+    # 3️⃣ Invio ordine pending al manager
+    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+    payload = {
+        "trader_id": trader_id,
+        "order_type": "buy_limit",  # pending order per minimizzare slippage
+        "symbol": symbol,
+        "price": price_limit,       # prezzo di entrata limit
+        "volume": volume,
+        "sl": sl_value,
+        "tp": tp_value,
+        "broker": broker
+    }
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        log(f"📥 Trader {trader_id} BUY LIMIT Response: {resp.text}")
+    except Exception as e:
+        log(f"❌ Trader {trader_id}: errore invio ordine: {e}")
 
 def close_slave_position(trader_id):
     with sessions_lock:
