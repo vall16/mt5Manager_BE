@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="MT5_API")
 
 # Permette ad Angular in sviluppo di chiamare questa API
-origins = ["http://localhost:4200", "http://127.0.0.1:4200"]
+origins = ["http://localhost:4200", "http://127.0.0.1:4200","http://192.168.1.183:4200/"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
