@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="MT5_API")
 
 # Permette ad Angular in sviluppo di chiamare questa API
-origins = ["http://localhost:4200", "http://127.0.0.1:4200","http://192.168.1.183:4200/"]
+origins = ["http://localhost:4200", "http://127.0.0.1:4200","http://192.168.1.183:4200"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -385,8 +385,8 @@ def close_order(ticket: int):
 
 
 # chiusura originale... modificata per permettere la chiusura di eurusd che dava errore
-@app.post("/close_order_by_symbol_OLD")
-def close_order_by_symbol_OLD(payload: dict):
+@app.post("/close_order_by_symbol")
+def close_order_by_symbol(payload: dict):
     """
     Chiude tutte le posizioni aperte per un dato simbolo.
     Payload: {"symbol": "XAUUSD"}
@@ -430,7 +430,9 @@ def close_order_by_symbol_OLD(payload: dict):
             "price": price,
             "deviation": 20,
             "magic": 123456,
-            "comment": "auto-close by symbol"
+            "comment": "auto-close by symbol",
+            "type_filling": mt5.ORDER_FILLING_IOC  # <<< AGGIUNto solo questo per chiudere nel caso EURUSD
+
         }
 
         result = mt5.order_send(request)
@@ -449,90 +451,90 @@ def close_order_by_symbol_OLD(payload: dict):
     return {"closed": closed, "errors": errors}
 
 
-@app.post("/close_order_by_symbol")
-def close_order_by_symbol(payload: dict):
-    """
-    Chiude tutte le posizioni aperte per un dato simbolo.
-    Payload: {"symbol": "XAUUSD"}
-    Funzione intelligente: seleziona metodo chiusura in base a filling_mode.
-    """
-    symbol = payload.get("symbol")
-    if not symbol:
-        raise HTTPException(status_code=400, detail="Missing symbol in payload")
+# @app.post("/close_order_by_symbol")
+# def close_order_by_symbol(payload: dict):
+#     """
+#     Chiude tutte le posizioni aperte per un dato simbolo.
+#     Payload: {"symbol": "XAUUSD"}
+#     Funzione intelligente: seleziona metodo chiusura in base a filling_mode.
+#     """
+#     symbol = payload.get("symbol")
+#     if not symbol:
+#         raise HTTPException(status_code=400, detail="Missing symbol in payload")
 
-    positions = mt5.positions_get(symbol=symbol)
-    if not positions:
-        log(f"❌ Nessuna posizione aperta per {symbol}")
-        return {"status": "none", "message": f"Nessuna posizione aperta per {symbol}"}
+#     positions = mt5.positions_get(symbol=symbol)
+#     if not positions:
+#         log(f"❌ Nessuna posizione aperta per {symbol}")
+#         return {"status": "none", "message": f"Nessuna posizione aperta per {symbol}"}
 
-    closed = []
-    errors = []
+#     closed = []
+#     errors = []
 
-    info = mt5.symbol_info(symbol)
-    if not info:
-        return {"status": "error", "message": f"Symbol info not found for {symbol}"}
+#     info = mt5.symbol_info(symbol)
+#     if not info:
+#         return {"status": "error", "message": f"Symbol info not found for {symbol}"}
 
-    # Determina se il simbolo supporta TRADE_ACTION_DEAL per chiusura
-    use_close_action = info.trade_mode in [mt5.SYMBOL_TRADE_MODE_FULL, mt5.SYMBOL_TRADE_MODE_PARTIAL] and info.filling_mode in [mt5.SYMBOL_FILLING_FOK, mt5.SYMBOL_FILLING_IOC]
+#     # Determina se il simbolo supporta TRADE_ACTION_DEAL per chiusura
+#     use_close_action = info.trade_mode in [mt5.SYMBOL_TRADE_MODE_FULL, mt5.SYMBOL_TRADE_MODE_PARTIAL] and info.filling_mode in [mt5.SYMBOL_FILLING_FOK, mt5.SYMBOL_FILLING_IOC]
 
-    for pos in positions:
-        try:
-            if use_close_action:
-                # Metodo inverso (classico)
-                tick = mt5.symbol_info_tick(pos.symbol)
-                if not tick:
-                    errors.append({"ticket": pos.ticket, "error": "No tick available"})
-                    continue
+#     for pos in positions:
+#         try:
+#             if use_close_action:
+#                 # Metodo inverso (classico)
+#                 tick = mt5.symbol_info_tick(pos.symbol)
+#                 if not tick:
+#                     errors.append({"ticket": pos.ticket, "error": "No tick available"})
+#                     continue
 
-                if pos.type == mt5.ORDER_TYPE_BUY:
-                    price = tick.bid
-                    order_type = mt5.ORDER_TYPE_SELL
-                else:
-                    price = tick.ask
-                    order_type = mt5.ORDER_TYPE_BUY
+#                 if pos.type == mt5.ORDER_TYPE_BUY:
+#                     price = tick.bid
+#                     order_type = mt5.ORDER_TYPE_SELL
+#                 else:
+#                     price = tick.ask
+#                     order_type = mt5.ORDER_TYPE_BUY
 
-                request = {
-                    "action": mt5.TRADE_ACTION_DEAL,
-                    "symbol": pos.symbol,
-                    "volume": pos.volume,
-                    "type": order_type,
-                    "position": pos.ticket,
-                    "price": price,
-                    "deviation": 20,
-                    "magic": 123456,
-                    "comment": "auto-close by symbol"
-                }
+#                 request = {
+#                     "action": mt5.TRADE_ACTION_DEAL,
+#                     "symbol": pos.symbol,
+#                     "volume": pos.volume,
+#                     "type": order_type,
+#                     "position": pos.ticket,
+#                     "price": price,
+#                     "deviation": 20,
+#                     "magic": 123456,
+#                     "comment": "auto-close by symbol"
+#                 }
 
-            else:
-                # Metodo TRADE_ACTION_CLOSE per ECN/DMA
-                request = {
-                    "action": mt5.TRADE_ACTION_CLOSE,
-                    "position": pos.ticket,
-                    "volume": pos.volume,
-                    "symbol": pos.symbol,
-                    "price": 0,  # chiusura al prezzo di mercato
-                    "deviation": 20,
-                    "magic": 123456,
-                    "comment": "auto-close by symbol"
-                }
+#             else:
+#                 # Metodo TRADE_ACTION_CLOSE per ECN/DMA
+#                 request = {
+#                     "action": mt5.TRADE_ACTION_CLOSE,
+#                     "position": pos.ticket,
+#                     "volume": pos.volume,
+#                     "symbol": pos.symbol,
+#                     "price": 0,  # chiusura al prezzo di mercato
+#                     "deviation": 20,
+#                     "magic": 123456,
+#                     "comment": "auto-close by symbol"
+#                 }
 
-            result = mt5.order_send(request)
-            if result is None or result.retcode != mt5.TRADE_RETCODE_DONE:
-                errors.append({"ticket": pos.ticket, "result": result._asdict() if result else None})
-            else:
-                closed.append({
-                    "ticket": pos.ticket,
-                    "symbol": pos.symbol,
-                    "volume": pos.volume,
-                    "price": pos.price_open,
-                    "retcode": result.retcode
-                })
-                log(f"✅ Ordine chiuso: ticket={pos.ticket}, symbol={pos.symbol}, volume={pos.volume}")
+#             result = mt5.order_send(request)
+#             if result is None or result.retcode != mt5.TRADE_RETCODE_DONE:
+#                 errors.append({"ticket": pos.ticket, "result": result._asdict() if result else None})
+#             else:
+#                 closed.append({
+#                     "ticket": pos.ticket,
+#                     "symbol": pos.symbol,
+#                     "volume": pos.volume,
+#                     "price": pos.price_open,
+#                     "retcode": result.retcode
+#                 })
+#                 log(f"✅ Ordine chiuso: ticket={pos.ticket}, symbol={pos.symbol}, volume={pos.volume}")
 
-        except Exception as e:
-            errors.append({"ticket": pos.ticket, "error": str(e)})
+#         except Exception as e:
+#             errors.append({"ticket": pos.ticket, "error": str(e)})
 
-    return {"closed": closed, "errors": errors}
+#     return {"closed": closed, "errors": errors}
 
 # crea un ordine
 @app.post("/order")
