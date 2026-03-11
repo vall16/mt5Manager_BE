@@ -123,7 +123,8 @@ def run_signal_logic(trader_id):
     if chosen_signal == "SUPER":
         # check_signal_super(trader_id)
 
-        check_signal_super_xauusd(trader_id)
+        # check_signal_super_xauusd(trader_id)
+        check_signal_super_xauusd_noclose(trader_id)
     elif chosen_signal == "TRENDGUARD":
         # check_trendguard_xau_signal(trader_id)
         check_signal(trader_id)
