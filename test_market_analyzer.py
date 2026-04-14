@@ -48,7 +48,7 @@ if __name__ == "__main__":
     
     symbol = "XAUUSD"
     start_date = datetime(2026, 3, 13)
-    end_date = datetime(2026, 4, 14)
+    end_date = datetime(2026, 4, 15)
     
     # Esegui l'analisi
     daily, summary = analyze_market_period(symbol, start_date, end_date)
