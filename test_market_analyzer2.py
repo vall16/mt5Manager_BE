@@ -38,6 +38,29 @@ def get_atr_now(symbol, minutes=120):
 
     return df['tr'].mean()
 
+def get_atr_m5(symbol, period=14):
+    rates = mt5.copy_rates_from_pos(
+        symbol,
+        mt5.TIMEFRAME_M5,
+        0,
+        period + 50  # buffer sicurezza
+    )
+
+    df = pd.DataFrame(rates)
+    if df.empty:
+        return None
+
+    df['prev_close'] = df['close'].shift(1)
+
+    df['tr'] = df.apply(lambda r: max(
+        r['high'] - r['low'],
+        abs(r['high'] - r['prev_close']),
+        abs(r['low'] - r['prev_close'])
+    ), axis=1)
+
+    atr = df['tr'].rolling(period).mean().iloc[-1]
+
+    return atr
 
 # =========================================================
 # ATR DAILY LIVE + HIST
@@ -162,7 +185,7 @@ if __name__ == "__main__":
     # ATR NOW (M1)
     # =========================
     atr_now = get_atr_now(symbol)
-
+    atr_m5 = get_atr_m5(symbol)
 
     print("\n" + "-"*60)
     print("VOLATILITY ENGINE")
@@ -186,6 +209,19 @@ if __name__ == "__main__":
         print(f"ATR now (M1)   : {atr_now:.2f}")
     else:
         print("ATR NOW non disponibile")
+
+    if atr_m5:
+        print(f"ATR  (M5)   : {atr_m5:.2f}")
+    else:
+        print("ATR M5 non disponibile")
+    
+        #     ATR M5 è il tuo “vero cervello decisionale”
+
+        # E puoi fare:
+
+        # LOW → < 5–6$
+        # NORMAL → 6–12$
+        # HIGH → > 12–15$
 
 
     mt5.shutdown()
