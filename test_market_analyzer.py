@@ -8,6 +8,33 @@ import pandas as pd
 from datetime import datetime
 from indicators.market_analyzer import analyze_market_state, get_market_summary
 
+
+def get_atr_now(symbol, minutes=120):
+    import MetaTrader5 as mt5
+    import pandas as pd
+    from datetime import datetime, timedelta
+
+    end = datetime.now()
+    start = end - timedelta(minutes=minutes)
+
+    rates = mt5.copy_rates_range(
+        symbol,
+        mt5.TIMEFRAME_M1,
+        start,
+        end
+    )
+
+    df = pd.DataFrame(rates)
+    if df.empty:
+        return None
+
+    df['tr'] = df.apply(lambda r: max(
+        r['high'] - r['low'],
+        abs(r['high'] - r['close']),
+        abs(r['low'] - r['close'])
+    ), axis=1)
+
+    return df['tr'].mean()
 # per l'atr giornaliero...
 def get_live_daily_atr(symbol, period=14):
     # storico daily
@@ -15,6 +42,7 @@ def get_live_daily_atr(symbol, period=14):
     d1_df = pd.DataFrame(d1)
 
     # dati intraday di oggi (M1)
+    # VOLATILITA' PER MINUTO
     today = datetime.now().date()
     m1 = mt5.copy_rates_range(
         symbol,
@@ -125,8 +153,8 @@ if __name__ == "__main__":
     mt5.initialize()
     
     symbol = "XAUUSD"
-    start_date = datetime(2026, 3, 13)
-    end_date = datetime(2026, 4, 30)
+    start_date = datetime(2026, 1, 1)
+    end_date = datetime(2026, 5, 14)
     
     # Esegui l'analisi
     daily, summary = analyze_market_period(symbol, start_date, end_date)
