@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
 from mt5_routes import router as mt5_router
-from trading_signals import router as trade_router
+# from trading_signals import router as trade_router
 from trading_signals_multi import router as trade_router_multi
 
 # --- LOGGING ---
