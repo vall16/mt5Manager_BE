@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     symbol = "XAUUSD"
     start_date = datetime(2026, 1, 1)
-    end_date = datetime(2026, 5, 14)
+    end_date = datetime(2026, 9, 6)
 
     # =========================
     # ANALISI STORICA
