@@ -926,7 +926,6 @@ def check_signal_super_xauusd_noclose(trader_id):
 
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
     symbol = trader.selected_symbol
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     chosen_signal = trader.selected_signal or "SUPER_XAU"
 
     # =========================
@@ -1042,7 +1041,7 @@ def check_signal_super_xauusd_noclose(trader_id):
 
     if buy_condition:
         new_signal = "BUY"
-        log(f"🔥 [{now}] BUY signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+        log(f"🔥 BUY signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         if not has_buy:
             # if has_sell:
@@ -1052,7 +1051,7 @@ def check_signal_super_xauusd_noclose(trader_id):
 
     elif sell_condition:
         new_signal = "SELL"
-        log(f"🔥 [{now}] SELL signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+        log(f"🔥 SELL signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         if not has_sell:
             # if has_buy:
@@ -1061,7 +1060,7 @@ def check_signal_super_xauusd_noclose(trader_id):
             log(f"🔻 Trader {trader_id}: SELL inviato")
 
     else:
-        log(f"🔥 [{now}] HOLD signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+        log(f"🔥 HOLD signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         # if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
         #     # close_slave_position(trader_id)
