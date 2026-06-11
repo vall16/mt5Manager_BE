@@ -128,6 +128,43 @@ def get_live_daily_atr(symbol, period=14):
     }
 
 
+def get_rolling_max_atr_m15(symbol, period=14):
+    # 1. Definiamo quante candele M15 ci sono in una giornata intera (24 ore * 4 candele/ora = 96)
+    # Aggiungiamo un buffer generoso (4 * period) per stabilizzare l'ATR di Wilder
+    buffer_candles = period * 4
+    total_candles_to_request = 96 + buffer_candles
+    
+    # Recuperiamo le candele a ritroso partendo da ORA (orario del terminale)
+    rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M15, 0, total_candles_to_request)
+    
+    if rates is None or len(rates) == 0:
+        return None
+        
+    df = pd.DataFrame(rates)
+    df['time'] = pd.to_datetime(df['time'], unit='s')
+    
+    # 2. Calcoliamo l'ATR Wilder
+    df['H-L'] = df['high'] - df['low']
+    df['H-PC'] = abs(df['high'] - df['close'].shift(1))
+    df['L-PC'] = abs(df['low'] - df['close'].shift(1))
+    df['TR'] = df[['H-L', 'H-PC', 'L-PC']].max(axis=1)
+    df['ATR'] = df['TR'].ewm(alpha=1/period, adjust=False).mean()
+    
+    # 3. Identifichiamo l'inizio della giornata odierna secondo il tempo del BROKER
+    # Prendiamo l'ultimo timestamp disponibile nel df (che è la candela corrente) e isoliamo la data
+    current_broker_time = df['time'].iloc[-1]
+    start_of_today = pd.to_datetime(current_broker_time.date())
+    
+    # Filtriamo solo le candele di OGGI
+    df_today = df[df['time'] >= start_of_today]
+    
+    if df_today.empty:
+        return float(df['ATR'].iloc[-1])
+        
+    max_atr_today = df_today['ATR'].max()
+    return float(max_atr_today)
+
+
 # =========================================================
 # ANALISI PERIODO
 # =========================================================
@@ -156,7 +193,7 @@ if __name__ == "__main__":
 
     symbol = "XAUUSD"
     start_date = datetime(2026, 1, 1)
-    end_date = datetime(2026, 9, 6)
+    end_date = datetime(2026, 9, 10)
 
     # =========================
     # ANALISI STORICA
@@ -180,12 +217,27 @@ if __name__ == "__main__":
     # =========================
     atr_info = get_live_daily_atr(symbol)
 
+    # Recupero del massimo ATR M15 registrato oggi
+    max_atr_m15 = get_rolling_max_atr_m15(symbol)
+
+
+    # Stampa del Massimo ATR M15 intraday
+    # if max_atr_m15 is not None:
+    #     print(f"Max ATR Today (M15): {max_atr_m15:.2f}")
+    # else:
+    #     print("Max ATR Today (M15): Non disponibile")
 
     # =========================
     # ATR NOW (M1)
     # =========================
     atr_now = get_atr_now(symbol)
     atr_m5 = get_atr_m5(symbol)
+
+
+    # =========================
+    # MAX ATR TODAY
+    # =========================
+    max_atr_today= get_live_daily_atr(symbol)
 
     print("\n" + "-"*60)
     print("VOLATILITY ENGINE")
@@ -214,6 +266,15 @@ if __name__ == "__main__":
         print(f"ATR  (M5)   : {atr_m5:.2f}")
     else:
         print("ATR M5 non disponibile")
+
+    # Stampa del Massimo ATR M15 intraday
+    if max_atr_m15 is not None:
+        print(f"Max ATR Today (M15): {max_atr_m15:.2f}")
+    else:
+        print("Max ATR Today (M15): Non disponibile")
+
+
+    
     
         #     ATR M5 è il tuo “vero cervello decisionale”
 
