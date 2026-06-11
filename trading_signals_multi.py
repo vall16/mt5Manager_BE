@@ -973,6 +973,30 @@ def check_signal_super_xauusd_noclose(trader_id):
     is_spike = candle_body > (atr * 3)
 
     # =========================
+    # ATR M5 (stile test_market_analyzer2)
+    # =========================
+    df_m5["prev_close"] = df_m5["close"].shift(1)
+    df_m5["tr"] = df_m5.apply(lambda r: max(
+        r["high"] - r["low"],
+        abs(r["high"] - r["prev_close"]),
+        abs(r["low"] - r["prev_close"])
+    ), axis=1)
+    atr_m5_val = df_m5["tr"].rolling(14).mean().iloc[-2]
+
+    # SL/TP dinamici: se volatilità M5 bassa, tighter
+    if atr_m5_val <= 6:
+        effective_sl = 300
+        effective_tp = 400
+    else:
+        effective_sl = None
+        effective_tp = None
+
+    with sessions_lock:
+        if trader_id in sessions:
+            sessions[trader_id]["effective_sl"] = effective_sl
+            sessions[trader_id]["effective_tp"] = effective_tp
+
+    # =========================
     # CONDIZIONI
     # =========================
     buy_condition = (
@@ -1014,11 +1038,11 @@ def check_signal_super_xauusd_noclose(trader_id):
     # =========================
     new_signal = "HOLD"
 
-    log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+    log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} | ATR M5: {atr_m5_val:.1f} ──────────")
 
     if buy_condition:
         new_signal = "BUY"
-        log(f"🔥 [{now}] BUY signal per {symbol}")
+        log(f"🔥 [{now}] BUY signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         if not has_buy:
             # if has_sell:
@@ -1028,7 +1052,7 @@ def check_signal_super_xauusd_noclose(trader_id):
 
     elif sell_condition:
         new_signal = "SELL"
-        log(f"🔥 [{now}] SELL signal per {symbol}")
+        log(f"🔥 [{now}] SELL signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         if not has_sell:
             # if has_buy:
@@ -1037,7 +1061,7 @@ def check_signal_super_xauusd_noclose(trader_id):
             log(f"🔻 Trader {trader_id}: SELL inviato")
 
     else:
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
+        log(f"🔥 [{now}] HOLD signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
 
         # if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
         #     # close_slave_position(trader_id)
@@ -1062,7 +1086,9 @@ def send_buy_to_slave(trader_id):
             return
         session = sessions[trader_id]
         trader = session["trader"]
-        trader_data = session["trader_data"]  # <-- dati completi DB già presi nello start_polling
+        trader_data = session["trader_data"]
+        effective_sl = session.get("effective_sl")
+        effective_tp = session.get("effective_tp")
 
     symbol = trader.selected_symbol
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
@@ -1087,12 +1113,15 @@ def send_buy_to_slave(trader_id):
         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
         return
 
-    # 2. Calcolo SL e TP dinamici
-    pip_value = float(sym_info.get("point", 0.00001))
-    sl_value = tick["ask"] - (float(trader.sl) * pip_value) if trader.sl > 0 else None
-    tp_value = tick["ask"] + (float(trader.tp) * pip_value) if trader.tp > 0 else None
+    # 2. Calcolo SL e TP dinamici (effective sovrascrive trader.sl/.tp se impostato)
+    sl_points = effective_sl if effective_sl is not None else trader.sl
+    tp_points = effective_tp if effective_tp is not None else trader.tp
 
-    # log(f"Broker !! {trader.broker} ")
+    pip_value = float(sym_info.get("point", 0.00001))
+    sl_value = tick["ask"] - (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
+    tp_value = tick["ask"] + (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
+
+    log(f"📐 Trader {trader_id} BUY: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
 
     volume = trader.fix_lot
     broker = trader.broker
@@ -1204,7 +1233,9 @@ def send_sell_to_slave(trader_id):
             return
         session = sessions[trader_id]
         trader = session["trader"]
-        trader_data = session["trader_data"]  # <-- dati DB master/slave
+        trader_data = session["trader_data"]
+        effective_sl = session.get("effective_sl")
+        effective_tp = session.get("effective_tp")
 
     symbol = trader.selected_symbol
     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
@@ -1240,12 +1271,15 @@ def send_sell_to_slave(trader_id):
         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
         return
 
-    # 2️⃣ Calcolo SL e TP dinamici (SELL)
-    pip_value = float(sym_info.get("point", 0.00001))
-    sl_value = tick["bid"] + (float(trader.sl) * pip_value) if trader.sl > 0 else None
-    tp_value = tick["bid"] - (float(trader.tp) * pip_value) if trader.tp > 0 else None
+    # 2️⃣ Calcolo SL e TP dinamici (SELL) — effective sovrascrive trader.sl/.tp
+    sl_points = effective_sl if effective_sl is not None else trader.sl
+    tp_points = effective_tp if effective_tp is not None else trader.tp
 
-    log(f"Trader {trader_id} SELL: SL={sl_value}, TP={tp_value}")
+    pip_value = float(sym_info.get("point", 0.00001))
+    sl_value = tick["bid"] + (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
+    tp_value = tick["bid"] - (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
+
+    log(f"📐 Trader {trader_id} SELL: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
 
     # log(f"Broker {trader.broker} ")
 
