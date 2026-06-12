@@ -425,7 +425,8 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         return False
 
     def get_dynamic_sl_tp(self, ind: Indicators):
-        if ind.atr_m5_val <= 6:
+        # metto come limite 12.....
+        if ind.atr_m5_val <= 12: 
             return 500, 600
         return None, None
 

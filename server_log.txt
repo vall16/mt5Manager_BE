@@ -3559,3 +3559,377 @@ LL inviato
 [11/06/2026 19:53] 🔥 HOLD signal per XAUUSD (ATR M5: 11.9)
 [11/06/2026 19:54] ─────── S-I-G-N-A-L [SUPER] | Trader 1 | ATR M5: 11.9 ──────────
 [11/06/2026 19:54] 🔥 HOLD signal per XAUUSD (ATR M5: 11.9)
+[12/06/2026 15:46] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:46] 🔻 SELL signal per XAUUSD (ATR M5: 8.7)
+[12/06/2026 15:48] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:48] 🔻 SELL signal per XAUUSD (ATR M5: 8.7)
+[12/06/2026 15:48] 📐 Trader 1 SELL: SL=300.0pts (4191.38), TP=1500.0pts (4173.38)
+[12/06/2026 15:48] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 15:48] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 15:48] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 15:48] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 15:48] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 15:48] 🔐 Login allo SLAVE...
+[12/06/2026 15:48] ✅ Login SLAVE riuscito
+[12/06/2026 15:48] Simbolo dal payload è: XAUUSD
+[12/06/2026 15:48] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 15:48] 📈 Tick ricevuto: BID=4184.55 ASK=4184.72
+[12/06/2026 15:48] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 15:48] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 15:48]  'price': 4184.55,
+[12/06/2026 15:48]  'sl': 4191.38,
+[12/06/2026 15:48]  'symbol': 'XAUUSD',
+[12/06/2026 15:48]  'tp': 4173.38,
+[12/06/2026 15:48]  'type': 'sell',
+[12/06/2026 15:48]  'volume': 0.01}
+[12/06/2026 15:48] Errore invio ordine: HTTPConnectionPool(host='127.0.0.1', port=8080): Read timed out. (read timeout=10)
+[12/06/2026 15:48] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053283402, 'order': 152190604422, 'volume': 0.01, 'price': 4185.33, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657256, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4184.55, 0.0, 4191.38, 4173.38, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 15:49] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:49] 🔻 SELL signal per XAUUSD (ATR M5: 8.7)
+[12/06/2026 15:50] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:50] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)
+[12/06/2026 15:51] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:51] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)
+[12/06/2026 15:51] 📐 Trader 1 SELL: SL=300.0pts (4192.24), TP=1500.0pts (4174.24)
+[12/06/2026 15:51] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 15:51] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 15:51] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 15:51] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 15:51] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 15:51] 🔐 Login allo SLAVE...
+[12/06/2026 15:51] ✅ Login SLAVE riuscito
+[12/06/2026 15:51] Simbolo dal payload è: XAUUSD
+[12/06/2026 15:51] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 15:51] 📈 Tick ricevuto: BID=4189.09 ASK=4189.26
+[12/06/2026 15:51] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 15:51] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 15:51]  'price': 4189.09,
+[12/06/2026 15:51]  'sl': 4192.24,
+[12/06/2026 15:51]  'symbol': 'XAUUSD',
+[12/06/2026 15:51]  'tp': 4174.24,
+[12/06/2026 15:51]  'type': 'sell',
+[12/06/2026 15:51]  'volume': 0.01}
+[12/06/2026 15:51] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053305907, 'order': 152190632653, 'volume': 0.01, 'price': 4189.03, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657257, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4189.09, 0.0, 4192.24, 4174.24, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 15:51] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152190632653,"logs":"[12/06/2026 15:51] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD\n[12/06/2026 15:51] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)\n[12/06/2026 15:51] 📐 Trader 1 SELL: SL=300.0pts (4192.24), TP=1500.0pts (4174.24)\n[12/06/2026 15:51] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 15:51] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 15:51] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 15:51] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 15:51] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 15:51] 🔐 Login allo SLAVE...\n[12/06/2026 15:51] ✅ Login SLAVE riuscito\n[12/06/2026 15:51] Simbolo dal payload è: XAUUSD\n[12/06/2026 15:51] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 15:51] 📈 Tick ricevuto: BID=4189.09 ASK=4189.26\n[12/06/2026 15:51] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 15:51] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 15:51]  'price': 4189.09,\n[12/06/2026 15:51]  'sl': 4192.24,\n[12/06/2026 15:51]  'symbol': 'XAUUSD',\n[12/06/2026 15:51]  'tp': 4174.24,\n[12/06/2026 15:51]  'type': 'sell',\n[12/06/2026 15:51]  'volume': 0.01}\n[12/06/2026 15:51] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053305907, 'order': 152190632653, 'volume': 0.01, 'price': 4189.03, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657257, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4189.09, 0.0, 4192.24, 4174.24, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 15:52] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:52] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)
+[12/06/2026 15:53] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:53] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)
+[12/06/2026 15:53] 📐 Trader 1 SELL: SL=300.0pts (4194.81), TP=1500.0pts (4176.81)
+[12/06/2026 15:53] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 15:53] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 15:53] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 15:53] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 15:53] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 15:53] 🔐 Login allo SLAVE...
+[12/06/2026 15:53] ✅ Login SLAVE riuscito
+[12/06/2026 15:53] Simbolo dal payload è: XAUUSD
+[12/06/2026 15:53] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 15:53] 📈 Tick ricevuto: BID=4192.6 ASK=4192.77
+[12/06/2026 15:53] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 15:53] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 15:53]  'price': 4192.6,
+[12/06/2026 15:53]  'sl': 4194.81,
+[12/06/2026 15:53]  'symbol': 'XAUUSD',
+[12/06/2026 15:53]  'tp': 4176.81,
+[12/06/2026 15:53]  'type': 'sell',
+[12/06/2026 15:53]  'volume': 0.01}
+[12/06/2026 15:53] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053322191, 'order': 152190652361, 'volume': 0.01, 'price': 4192.91, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657258, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4192.6, 0.0, 4194.81, 4176.81, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 15:53] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152190652361,"logs":"[12/06/2026 15:53] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD\n[12/06/2026 15:53] 🔻 SELL signal per XAUUSD (ATR M5: 8.8)\n[12/06/2026 15:53] 📐 Trader 1 SELL: SL=300.0pts (4194.81), TP=1500.0pts (4176.81)\n[12/06/2026 15:53] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 15:53] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 15:53] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 15:53] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 15:53] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 15:53] 🔐 Login allo SLAVE...\n[12/06/2026 15:53] ✅ Login SLAVE riuscito\n[12/06/2026 15:53] Simbolo dal payload è: XAUUSD\n[12/06/2026 15:53] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 15:53] 📈 Tick ricevuto: BID=4192.6 ASK=4192.77\n[12/06/2026 15:53] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 15:53] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 15:53]  'price': 4192.6,\n[12/06/2026 15:53]  'sl': 4194.81,\n[12/06/2026 15:53]  'symbol': 'XAUUSD',\n[12/06/2026 15:53]  'tp': 4176.81,\n[12/06/2026 15:53]  'type': 'sell',\n[12/06/2026 15:53]  'volume': 0.01}\n[12/06/2026 15:53] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053322191, 'order': 152190652361, 'volume': 0.01, 'price': 4192.91, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657258, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4192.6, 0.0, 4194.81, 4176.81, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 15:54] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:54] 🔥 HOLD signal per XAUUSD (ATR M5: 8.8)
+[12/06/2026 15:55] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:55] 🔥 HOLD signal per XAUUSD (ATR M5: 8.6)
+[12/06/2026 15:56] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:56] 🔥 HOLD signal per XAUUSD (ATR M5: 8.6)
+[12/06/2026 15:57] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:57] 🔥 HOLD signal per XAUUSD (ATR M5: 8.6)
+[12/06/2026 15:58] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:58] 🔥 HOLD signal per XAUUSD (ATR M5: 8.6)
+[12/06/2026 15:59] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 15:59] 🔥 HOLD signal per XAUUSD (ATR M5: 8.6)
+[12/06/2026 16:00] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:00] 🔥 HOLD signal per XAUUSD (ATR M5: 8.9)
+[12/06/2026 16:01] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:01] 🔥 HOLD signal per XAUUSD (ATR M5: 8.9)
+[12/06/2026 16:02] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:02] 🔥 HOLD signal per XAUUSD (ATR M5: 8.9)
+[12/06/2026 16:03] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:03] 🔥 HOLD signal per XAUUSD (ATR M5: 8.9)
+[12/06/2026 16:04] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 8.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:04] 🔥 HOLD signal per XAUUSD (ATR M5: 8.9)
+[12/06/2026 16:05] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:05] 🔥 HOLD signal per XAUUSD (ATR M5: 9.3)
+[12/06/2026 16:09] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:09] 🔥 HOLD signal per XAUUSD (ATR M5: 9.3)
+[12/06/2026 16:10] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:10] 🔥 HOLD signal per XAUUSD (ATR M5: 9.8)
+[12/06/2026 16:11] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:11] 🔥 HOLD signal per XAUUSD (ATR M5: 9.8)
+[12/06/2026 16:12] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:12] 🔥 HOLD signal per XAUUSD (ATR M5: 9.8)
+[12/06/2026 16:13] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:13] 🔥 HOLD signal per XAUUSD (ATR M5: 9.8)
+[12/06/2026 16:14] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:14] 🔥 HOLD signal per XAUUSD (ATR M5: 9.8)
+[12/06/2026 16:15] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:15] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 16:16] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:16] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 16:17] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:17] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 16:18] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:18] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 16:19] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:19] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 16:20] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:20] 🔥 HOLD signal per XAUUSD (ATR M5: 9.7)
+[12/06/2026 16:21] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:21] 🔥 HOLD signal per XAUUSD (ATR M5: 9.7)
+[12/06/2026 16:22] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:22] 🔥 HOLD signal per XAUUSD (ATR M5: 9.7)
+[12/06/2026 16:23] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:23] 🔥 HOLD signal per XAUUSD (ATR M5: 9.7)
+[12/06/2026 16:24] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:24] 🔥 HOLD signal per XAUUSD (ATR M5: 9.7)
+[12/06/2026 16:25] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:25] 🔥 HOLD signal per XAUUSD (ATR M5: 9.9)
+[12/06/2026 16:26] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:26] 🔥 HOLD signal per XAUUSD (ATR M5: 9.9)
+[12/06/2026 16:27] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:27] 🔥 HOLD signal per XAUUSD (ATR M5: 9.9)
+[12/06/2026 16:28] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:28] 🔥 HOLD signal per XAUUSD (ATR M5: 9.9)
+[12/06/2026 16:29] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.9) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:29] 🔥 HOLD signal per XAUUSD (ATR M5: 9.9)
+[12/06/2026 16:30] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:30] 🔥 HOLD signal per XAUUSD (ATR M5: 10.0)
+[12/06/2026 16:31] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:31] 🔻 SELL signal per XAUUSD (ATR M5: 10.0)
+[12/06/2026 16:31] 📐 Trader 1 SELL: SL=300.0pts (4189.0), TP=1500.0pts (4171.0)
+[12/06/2026 16:31] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 16:31] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 16:31] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 16:31] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 16:31] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 16:31] 🔐 Login allo SLAVE...
+[12/06/2026 16:31] ✅ Login SLAVE riuscito
+[12/06/2026 16:31] Simbolo dal payload è: XAUUSD
+[12/06/2026 16:31] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 16:31] 📈 Tick ricevuto: BID=4185.58 ASK=4185.75
+[12/06/2026 16:31] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 16:31] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 16:31]  'price': 4185.58,
+[12/06/2026 16:31]  'sl': 4189.0,
+[12/06/2026 16:31]  'symbol': 'XAUUSD',
+[12/06/2026 16:31]  'tp': 4171.0,
+[12/06/2026 16:31]  'type': 'sell',
+[12/06/2026 16:31]  'volume': 0.01}
+[12/06/2026 16:31] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053615224, 'order': 152191000368, 'volume': 0.01, 'price': 4185.06, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657260, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4185.58, 0.0, 4189.0, 4171.0, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 16:31] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191000368,"logs":"[12/06/2026 16:31] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD\n[12/06/2026 16:31] 🔻 SELL signal per XAUUSD (ATR M5: 10.0)\n[12/06/2026 16:31] 📐 Trader 1 SELL: SL=300.0pts (4189.0), TP=1500.0pts (4171.0)\n[12/06/2026 16:31] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 16:31] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 16:31] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 16:31] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 16:31] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 16:31] 🔐 Login allo SLAVE...\n[12/06/2026 16:31] ✅ Login SLAVE riuscito\n[12/06/2026 16:31] Simbolo dal payload è: XAUUSD\n[12/06/2026 16:31] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 16:31] 📈 Tick ricevuto: BID=4185.58 ASK=4185.75\n[12/06/2026 16:31] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 16:31] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 16:31]  'price': 4185.58,\n[12/06/2026 16:31]  'sl': 4189.0,\n[12/06/2026 16:31]  'symbol': 'XAUUSD',\n[12/06/2026 16:31]  'tp': 4171.0,\n[12/06/2026 16:31]  'type': 'sell',\n[12/06/2026 16:31]  'volume': 0.01}\n[12/06/2026 16:31] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053615224, 'order': 152191000368, 'volume': 0.01, 'price': 4185.06, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657260, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4185.58, 0.0, 4189.0, 4171.0, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 16:32] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:32] 🔥 HOLD signal per XAUUSD (ATR M5: 10.0)
+[12/06/2026 16:33] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:33] 🔥 HOLD signal per XAUUSD (ATR M5: 10.0)
+[12/06/2026 16:34] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.0) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:34] 🔥 HOLD signal per XAUUSD (ATR M5: 10.0)
+[12/06/2026 16:35] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:35] 🔻 SELL signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 16:35] 📐 Trader 1 SELL: SL=300.0pts (4191.61), TP=1500.0pts (4173.61)
+[12/06/2026 16:35] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 16:35] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 16:35] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 16:35] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 16:35] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 16:35] 🔐 Login allo SLAVE...
+[12/06/2026 16:35] ✅ Login SLAVE riuscito
+[12/06/2026 16:35] Simbolo dal payload è: XAUUSD
+[12/06/2026 16:35] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 16:35] 📈 Tick ricevuto: BID=4188.8 ASK=4188.94
+[12/06/2026 16:35] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 16:35] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 16:35]  'price': 4188.8,
+[12/06/2026 16:35]  'sl': 4191.61,
+[12/06/2026 16:35]  'symbol': 'XAUUSD',
+[12/06/2026 16:35]  'tp': 4173.61,
+[12/06/2026 16:35]  'type': 'sell',
+[12/06/2026 16:35]  'volume': 0.01}
+[12/06/2026 16:35] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053647909, 'order': 152191038612, 'volume': 0.01, 'price': 4188.92, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657262, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4188.8, 0.0, 4191.61, 4173.61, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 16:35] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191038612,"logs":"[12/06/2026 16:35] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD\n[12/06/2026 16:35] 🔻 SELL signal per XAUUSD (ATR M5: 10.3)\n[12/06/2026 16:35] 📐 Trader 1 SELL: SL=300.0pts (4191.61), TP=1500.0pts (4173.61)\n[12/06/2026 16:35] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 16:35] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 16:35] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 16:35] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 16:35] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 16:35] 🔐 Login allo SLAVE...\n[12/06/2026 16:35] ✅ Login SLAVE riuscito\n[12/06/2026 16:35] Simbolo dal payload è: XAUUSD\n[12/06/2026 16:35] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 16:35] 📈 Tick ricevuto: BID=4188.8 ASK=4188.94\n[12/06/2026 16:35] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 16:35] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 16:35]  'price': 4188.8,\n[12/06/2026 16:35]  'sl': 4191.61,\n[12/06/2026 16:35]  'symbol': 'XAUUSD',\n[12/06/2026 16:35]  'tp': 4173.61,\n[12/06/2026 16:35]  'type': 'sell',\n[12/06/2026 16:35]  'volume': 0.01}\n[12/06/2026 16:35] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053647909, 'order': 152191038612, 'volume': 0.01, 'price': 4188.92, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657262, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4188.8, 0.0, 4191.61, 4173.61, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 16:36] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:36] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 16:37] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:37] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 16:38] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:38] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 16:39] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:39] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 16:40] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:40] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:42] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:42] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:43] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:43] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:44] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:44] 🔻 SELL signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:44] 📐 Trader 1 SELL: SL=500pts (4188.98), TP=600pts (4177.98)
+[12/06/2026 16:44] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 16:44] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 16:44] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 16:44] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 16:44] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 16:44] 🔐 Login allo SLAVE...
+[12/06/2026 16:44] ✅ Login SLAVE riuscito
+[12/06/2026 16:44] Simbolo dal payload è: XAUUSD
+[12/06/2026 16:44] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 16:44] 📈 Tick ricevuto: BID=4184.08 ASK=4184.25
+[12/06/2026 16:44] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 16:44] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 16:44]  'price': 4184.08,
+[12/06/2026 16:44]  'sl': 4188.98,
+[12/06/2026 16:44]  'symbol': 'XAUUSD',
+[12/06/2026 16:44]  'tp': 4177.98,
+[12/06/2026 16:44]  'type': 'sell',
+[12/06/2026 16:44]  'volume': 0.01}
+[12/06/2026 16:44] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053714230, 'order': 152191117159, 'volume': 0.01, 'price': 4184.13, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657263, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4184.08, 0.0, 4188.98, 4177.98, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 16:44] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191117159,"logs":"[12/06/2026 16:44] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD\n[12/06/2026 16:44] 🔻 SELL signal per XAUUSD (ATR M5: 10.5)\n[12/06/2026 16:44] 📐 Trader 1 SELL: SL=500pts (4188.98), TP=600pts (4177.98)\n[12/06/2026 16:44] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 16:44] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 16:44] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 16:44] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 16:44] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 16:44] 🔐 Login allo SLAVE...\n[12/06/2026 16:44] ✅ Login SLAVE riuscito\n[12/06/2026 16:44] Simbolo dal payload è: XAUUSD\n[12/06/2026 16:44] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 16:44] 📈 Tick ricevuto: BID=4184.08 ASK=4184.25\n[12/06/2026 16:44] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 16:44] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 16:44]  'price': 4184.08,\n[12/06/2026 16:44]  'sl': 4188.98,\n[12/06/2026 16:44]  'symbol': 'XAUUSD',\n[12/06/2026 16:44]  'tp': 4177.98,\n[12/06/2026 16:44]  'type': 'sell',\n[12/06/2026 16:44]  'volume': 0.01}\n[12/06/2026 16:44] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053714230, 'order': 152191117159, 'volume': 0.01, 'price': 4184.13, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657263, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4184.08, 0.0, 4188.98, 4177.98, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 16:45] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:45] 🔻 SELL signal per XAUUSD (ATR M5: 10.8)
+[12/06/2026 16:46] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:46] 🔥 HOLD signal per XAUUSD (ATR M5: 10.8)
+[12/06/2026 16:47] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:47] 🔥 HOLD signal per XAUUSD (ATR M5: 10.8)
+[12/06/2026 16:48] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:48] 🔻 SELL signal per XAUUSD (ATR M5: 10.8)
+[12/06/2026 16:48] 📐 Trader 1 SELL: SL=500pts (4187.11), TP=600pts (4176.11)
+[12/06/2026 16:48] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 16:48] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 16:48] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 16:48] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 16:48] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 16:48] 🔐 Login allo SLAVE...
+[12/06/2026 16:48] ✅ Login SLAVE riuscito
+[12/06/2026 16:48] Simbolo dal payload è: XAUUSD
+[12/06/2026 16:48] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 16:48] 📈 Tick ricevuto: BID=4182.17 ASK=4182.36
+[12/06/2026 16:48] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 16:48] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 16:48]  'price': 4182.17,
+[12/06/2026 16:48]  'sl': 4187.11,
+[12/06/2026 16:48]  'symbol': 'XAUUSD',
+[12/06/2026 16:48]  'tp': 4176.11,
+[12/06/2026 16:48]  'type': 'sell',
+[12/06/2026 16:48]  'volume': 0.01}
+[12/06/2026 16:48] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053742979, 'order': 152191152289, 'volume': 0.01, 'price': 4182.2, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657264, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4182.17, 0.0, 4187.11, 4176.11, 10, 1, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 16:48] 📥 Trader 1 SELL Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191152289,"logs":"[12/06/2026 16:48] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD\n[12/06/2026 16:48] 🔻 SELL signal per XAUUSD (ATR M5: 10.8)\n[12/06/2026 16:48] 📐 Trader 1 SELL: SL=500pts (4187.11), TP=600pts (4176.11)\n[12/06/2026 16:48] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 16:48] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 16:48] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 16:48] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 16:48] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 16:48] 🔐 Login allo SLAVE...\n[12/06/2026 16:48] ✅ Login SLAVE riuscito\n[12/06/2026 16:48] Simbolo dal payload è: XAUUSD\n[12/06/2026 16:48] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 16:48] 📈 Tick ricevuto: BID=4182.17 ASK=4182.36\n[12/06/2026 16:48] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 16:48] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 16:48]  'price': 4182.17,\n[12/06/2026 16:48]  'sl': 4187.11,\n[12/06/2026 16:48]  'symbol': 'XAUUSD',\n[12/06/2026 16:48]  'tp': 4176.11,\n[12/06/2026 16:48]  'type': 'sell',\n[12/06/2026 16:48]  'volume': 0.01}\n[12/06/2026 16:48] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053742979, 'order': 152191152289, 'volume': 0.01, 'price': 4182.2, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657264, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4182.17, 0.0, 4187.11, 4176.11, 10, 1, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 16:49] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.8) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:49] 🔥 HOLD signal per XAUUSD (ATR M5: 10.8)
+[12/06/2026 16:50] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:50] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:51] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:51] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:52] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:52] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:53] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:53] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:54] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:54] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 16:55] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:55] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 16:56] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:56] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 16:57] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:57] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 16:58] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:58] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 16:59] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 16:59] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:00] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:00] 🔥 BUY signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:00] 📐 Trader 1 BUY: SL=500pts (4200.69), TP=600pts (4211.69)
+[12/06/2026 17:00] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 17:00] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 17:00] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 17:00] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 17:00] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 17:00] 🔐 Login allo SLAVE...
+[12/06/2026 17:00] ✅ Login SLAVE riuscito
+[12/06/2026 17:00] Simbolo dal payload è: XAUUSD
+[12/06/2026 17:00] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 17:00] 📈 Tick ricevuto: BID=4205.51 ASK=4205.68
+[12/06/2026 17:00] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 17:00] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 17:00]  'price': 4205.68,
+[12/06/2026 17:00]  'sl': 4200.69,
+[12/06/2026 17:00]  'symbol': 'XAUUSD',
+[12/06/2026 17:00]  'tp': 4211.69,
+[12/06/2026 17:00]  'type': 'buy',
+[12/06/2026 17:00]  'volume': 0.01}
+[12/06/2026 17:00] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053855463, 'order': 152191287941, 'volume': 0.01, 'price': 4206.39, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657265, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4205.68, 0.0, 4200.69, 4211.69, 10, 0, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 17:00] 📥 Trader 1 BUY Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191287941,"logs":"[12/06/2026 17:00] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD\n[12/06/2026 17:00] 🔥 BUY signal per XAUUSD (ATR M5: 10.5)\n[12/06/2026 17:00] 📐 Trader 1 BUY: SL=500pts (4200.69), TP=600pts (4211.69)\n[12/06/2026 17:00] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 17:00] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 17:00] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 17:00] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 17:00] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 17:00] 🔐 Login allo SLAVE...\n[12/06/2026 17:00] ✅ Login SLAVE riuscito\n[12/06/2026 17:00] Simbolo dal payload è: XAUUSD\n[12/06/2026 17:00] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 17:00] 📈 Tick ricevuto: BID=4205.51 ASK=4205.68\n[12/06/2026 17:00] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 17:00] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 17:00]  'price': 4205.68,\n[12/06/2026 17:00]  'sl': 4200.69,\n[12/06/2026 17:00]  'symbol': 'XAUUSD',\n[12/06/2026 17:00]  'tp': 4211.69,\n[12/06/2026 17:00]  'type': 'buy',\n[12/06/2026 17:00]  'volume': 0.01}\n[12/06/2026 17:00] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053855463, 'order': 152191287941, 'volume': 0.01, 'price': 4206.39, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657265, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4205.68, 0.0, 4200.69, 4211.69, 10, 0, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 17:01] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:01] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:02] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:02] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:03] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:03] 🔥 BUY signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:04] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:04] 🔥 BUY signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:04] 📐 Trader 1 BUY: SL=500pts (4199.11), TP=600pts (4210.11)
+[12/06/2026 17:04] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 17:04] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 17:04] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 17:04] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 17:04] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 17:04] 🔐 Login allo SLAVE...
+[12/06/2026 17:04] ✅ Login SLAVE riuscito
+[12/06/2026 17:04] Simbolo dal payload è: XAUUSD
+[12/06/2026 17:04] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 17:04] 📈 Tick ricevuto: BID=4203.78 ASK=4203.95
+[12/06/2026 17:04] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 17:04] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 17:04]  'price': 4203.95,
+[12/06/2026 17:04]  'sl': 4199.11,
+[12/06/2026 17:04]  'symbol': 'XAUUSD',
+[12/06/2026 17:04]  'tp': 4210.11,
+[12/06/2026 17:04]  'type': 'buy',
+[12/06/2026 17:04]  'volume': 0.01}
+[12/06/2026 17:04] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053886828, 'order': 152191324998, 'volume': 0.01, 'price': 4203.68, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657266, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4203.95, 0.0, 4199.11, 4210.11, 10, 0, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 17:04] 📥 Trader 1 BUY Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191324998,"logs":"[12/06/2026 17:04] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD\n[12/06/2026 17:04] 🔥 BUY signal per XAUUSD (ATR M5: 10.5)\n[12/06/2026 17:04] 📐 Trader 1 BUY: SL=500pts (4199.11), TP=600pts (4210.11)\n[12/06/2026 17:04] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 17:04] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 17:04] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 17:04] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 17:04] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 17:04] 🔐 Login allo SLAVE...\n[12/06/2026 17:04] ✅ Login SLAVE riuscito\n[12/06/2026 17:04] Simbolo dal payload è: XAUUSD\n[12/06/2026 17:04] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 17:04] 📈 Tick ricevuto: BID=4203.78 ASK=4203.95\n[12/06/2026 17:04] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 17:04] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 17:04]  'price': 4203.95,\n[12/06/2026 17:04]  'sl': 4199.11,\n[12/06/2026 17:04]  'symbol': 'XAUUSD',\n[12/06/2026 17:04]  'tp': 4210.11,\n[12/06/2026 17:04]  'type': 'buy',\n[12/06/2026 17:04]  'volume': 0.01}\n[12/06/2026 17:04] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053886828, 'order': 152191324998, 'volume': 0.01, 'price': 4203.68, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657266, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4203.95, 0.0, 4199.11, 4210.11, 10, 0, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 17:05] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:05] 🔥 BUY signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:05] 📐 Trader 1 BUY: SL=500pts (4205.27), TP=600pts (4216.27)
+[12/06/2026 17:05] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 17:05] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 17:05] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 17:05] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 17:05] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 17:05] 🔐 Login allo SLAVE...
+[12/06/2026 17:05] ✅ Login SLAVE riuscito
+[12/06/2026 17:05] Simbolo dal payload è: XAUUSD
+[12/06/2026 17:05] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 17:05] 📈 Tick ricevuto: BID=4209.33 ASK=4209.5
+[12/06/2026 17:05] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 17:05] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 17:05]  'price': 4209.5,
+[12/06/2026 17:05]  'sl': 4205.27,
+[12/06/2026 17:05]  'symbol': 'XAUUSD',
+[12/06/2026 17:05]  'tp': 4216.27,
+[12/06/2026 17:05]  'type': 'buy',
+[12/06/2026 17:05]  'volume': 0.01}
+[12/06/2026 17:05] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053896286, 'order': 152191336152, 'volume': 0.01, 'price': 4209.88, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657267, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4209.5, 0.0, 4205.27, 4216.27, 10, 0, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 17:05] 📥 Trader 1 BUY Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191336152,"logs":"[12/06/2026 17:05] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD\n[12/06/2026 17:05] 🔥 BUY signal per XAUUSD (ATR M5: 10.7)\n[12/06/2026 17:05] 📐 Trader 1 BUY: SL=500pts (4205.27), TP=600pts (4216.27)\n[12/06/2026 17:05] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 17:05] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 17:05] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 17:05] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 17:05] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 17:05] 🔐 Login allo SLAVE...\n[12/06/2026 17:05] ✅ Login SLAVE riuscito\n[12/06/2026 17:05] Simbolo dal payload è: XAUUSD\n[12/06/2026 17:05] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 17:05] 📈 Tick ricevuto: BID=4209.33 ASK=4209.5\n[12/06/2026 17:05] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 17:05] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 17:05]  'price': 4209.5,\n[12/06/2026 17:05]  'sl': 4205.27,\n[12/06/2026 17:05]  'symbol': 'XAUUSD',\n[12/06/2026 17:05]  'tp': 4216.27,\n[12/06/2026 17:05]  'type': 'buy',\n[12/06/2026 17:05]  'volume': 0.01}\n[12/06/2026 17:05] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152053896286, 'order': 152191336152, 'volume': 0.01, 'price': 4209.88, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657267, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4209.5, 0.0, 4205.27, 4216.27, 10, 0, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 17:06] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:06] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:07] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:07] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:08] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:08] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:09] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.7) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:09] 🔥 HOLD signal per XAUUSD (ATR M5: 10.7)
+[12/06/2026 17:10] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:10] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:11] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:11] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:12] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:12] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
