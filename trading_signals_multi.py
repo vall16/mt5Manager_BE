@@ -984,8 +984,8 @@ def check_signal_super_xauusd_noclose(trader_id):
 
     # SL/TP dinamici: se volatilità M5 bassa, tighter
     if atr_m5_val <= 6:
-        effective_sl = 300
-        effective_tp = 400
+        effective_sl = 500
+        effective_tp = 600
     else:
         effective_sl = None
         effective_tp = None

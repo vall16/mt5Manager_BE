@@ -7,6 +7,7 @@ import time
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from fastapi import APIRouter
+from logger import log as global_log, logs
 from db import get_trader, get_connection
 from models import Trader
 from indicators.ta import (
@@ -94,7 +95,7 @@ def send_order(trader_id: int, direction: str):
         sl_value = price + (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
         tp_value = price - (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
 
-    log(trader_id, f"{direction.upper()}: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
+    log(trader_id, f"📐 Trader {trader_id} {direction.upper()}: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
 
     payload = {
         "trader_id": trader_id,
@@ -111,7 +112,7 @@ def send_order(trader_id: int, direction: str):
             f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave",
             json=payload, timeout=10
         )
-        log(trader_id, f"{direction.upper()} Response: {resp.text}")
+        log(trader_id, f"📥 Trader {trader_id} {direction.upper()} Response: {resp.text}")
     except Exception as e:
         log(trader_id, f"Errore invio ordine: {e}")
 
@@ -128,7 +129,7 @@ def close_slave_position(trader_id: int):
             f"{BASE_URL}/db/traders/{trader_id}/close_order_on_slave",
             json=payload, timeout=10
         )
-        log(trader_id, f"CLOSE Response: {resp.text}")
+        log(trader_id, f"📥 Trader {trader_id} CLOSE Response: {resp.text}")
     except Exception as e:
         log(trader_id, f"Errore chiusura: {e}")
 
@@ -137,6 +138,7 @@ def close_slave_position(trader_id: int):
 
 def log(trader_id: int, msg: str):
     ts = datetime.now().strftime("%H:%M:%S")
+    global_log(msg)
     with sessions_lock:
         if trader_id in sessions:
             sessions[trader_id].setdefault("logs", []).append(f"[{ts}] {msg}")
@@ -177,6 +179,14 @@ class SignalStrategy:
     def get_dynamic_sl_tp(self, ind: Indicators):
         return None, None
 
+    def get_log_details(self, ind: Indicators) -> str:
+        return ""
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        d = f" {details}" if details else ""
+        return f"S-I-G-N-A-L [{self.name}] | {d}".strip()
+
     def run(self, trader_id: int):
         with sessions_lock:
             if trader_id not in sessions:
@@ -185,7 +195,7 @@ class SignalStrategy:
             trader = session["trader"]
             trader_data = session["trader_data"]
             prev_signal = session.get("prev_signal", "HOLD")
-            session["logs"] = []
+            logs.clear()
 
         slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
         symbol = trader.selected_symbol
@@ -236,11 +246,13 @@ class SignalStrategy:
 
         # ── decisione ──
         new_signal = "HOLD"
-        log(trader_id, f"S-I-G-N-A-L [{self.name}] | Trader {trader_id} | {symbol}")
+        log_details = self.get_log_details(ind)
+        header = self.get_log_header(ind)
+        log(trader_id, f"{header} | Trader {trader_id} | {symbol}")
 
         if self.buy_condition(ind):
             new_signal = "BUY"
-            log(trader_id, f"BUY signal per {symbol}")
+            log(trader_id, f"🔥 BUY signal per {symbol} {log_details}")
 
             if not has_buy:
                 if self.reverse_on_buy(has_sell):
@@ -249,7 +261,7 @@ class SignalStrategy:
 
         elif self.sell_condition(ind):
             new_signal = "SELL"
-            log(trader_id, f"SELL signal per {symbol}")
+            log(trader_id, f"🔻 SELL signal per {symbol} {log_details}")
 
             if not has_sell:
                 if self.reverse_on_sell(has_buy):
@@ -257,7 +269,7 @@ class SignalStrategy:
                 send_order(trader_id, "sell")
 
         else:
-            log(trader_id, f"HOLD signal per {symbol}")
+            log(trader_id, f"🔥 HOLD signal per {symbol} {log_details}")
             action = self.on_hold_action(ind, has_buy, has_sell, prev_signal)
             if action == "close_buy":
                 close_slave_position(trader_id)
@@ -414,8 +426,15 @@ class SuperXauNoCloseStrategy(SignalStrategy):
 
     def get_dynamic_sl_tp(self, ind: Indicators):
         if ind.atr_m5_val <= 6:
-            return 300, 400
+            return 500, 600
         return None, None
+
+    def get_log_details(self, ind: Indicators) -> str:
+        return f"(ATR M5: {ind.atr_m5_val:.1f})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        return f"─────── S-I-G-N-A-L [{self.name}] | {details} ──────────"
 
 
 # ─────────────────────── STRATEGY MAP ───────────────────────

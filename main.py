@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 from db import router as db_router
 from mt5_routes import router as mt5_router
 # from trading_signals import router as trade_router
-from trading_signals_multi import router as trade_router_multi
+# from trading_signals_multi import router as trade_router_multi
+from trading_signals_multi2 import router as trade_router_multi
 
 # --- LOGGING ---
 log_file_path = "./fxscript.log"
