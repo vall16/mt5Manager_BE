@@ -3933,3 +3933,80 @@ LL inviato
 [12/06/2026 17:11] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
 [12/06/2026 17:12] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
 [12/06/2026 17:12] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:13] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:13] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:14] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:14] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:16] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.2) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:16] 🔥 HOLD signal per XAUUSD (ATR M5: 10.2)
+[12/06/2026 17:17] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.2) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:17] 🔥 HOLD signal per XAUUSD (ATR M5: 10.2)
+[12/06/2026 17:17] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.2) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:17] 🔥 HOLD signal per XAUUSD (ATR M5: 10.2)
+[12/06/2026 17:17] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 0.1) ────────── | Trader 10 | USDJPY
+[12/06/2026 17:17] 🔥 HOLD signal per USDJPY (ATR M5: 0.1)
+[12/06/2026 17:18] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.2) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:18] 🔥 HOLD signal per XAUUSD (ATR M5: 10.2)
+[12/06/2026 17:18] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 0.0) ────────── | Trader 10 | USDJPY
+[12/06/2026 17:18] 🔥 HOLD signal per USDJPY (ATR M5: 0.0)
+[12/06/2026 17:19] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.2) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:19] 🔥 HOLD signal per XAUUSD (ATR M5: 10.2)
+[12/06/2026 17:19] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 0.0) ────────── | Trader 10 | USDJPY
+[12/06/2026 17:19] 🔥 HOLD signal per USDJPY (ATR M5: 0.0)
+[12/06/2026 17:20] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:20] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 17:20] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 0.0) ────────── | Trader 10 | USDJPY
+[12/06/2026 17:20] 🔥 HOLD signal per USDJPY (ATR M5: 0.0)
+[12/06/2026 17:21] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:21] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 17:21] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 0.0) ────────── | Trader 10 | USDJPY
+[12/06/2026 17:21] 🔥 HOLD signal per USDJPY (ATR M5: 0.0)
+[12/06/2026 17:22] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:22] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 17:23] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:23] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 17:24] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 9.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:24] 🔥 HOLD signal per XAUUSD (ATR M5: 9.6)
+[12/06/2026 17:25] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:25] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 17:26] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:26] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 17:27] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:27] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 17:28] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:28] 🔥 HOLD signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 17:29] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:29] 🔥 BUY signal per XAUUSD (ATR M5: 10.3)
+[12/06/2026 17:30] 📐 Trader 1 BUY: SL=500pts (4220.38), TP=600pts (4231.38)
+[12/06/2026 17:30] 🚀 Entrato in open_order_on_slave()
+[12/06/2026 17:30] 📡 Broker corrente: MetaQuotes-Demo
+[12/06/2026 17:30] 🌐 Init MT5 slave: http://127.0.0.1:8000
+[12/06/2026 17:30] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...
+[12/06/2026 17:30] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)
+[12/06/2026 17:30] 🔐 Login allo SLAVE...
+[12/06/2026 17:30] ✅ Login SLAVE riuscito
+[12/06/2026 17:30] Simbolo dal payload è: XAUUSD
+[12/06/2026 17:30] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD
+[12/06/2026 17:30] 📈 Tick ricevuto: BID=4226.84 ASK=4227.01
+[12/06/2026 17:30] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order
+[12/06/2026 17:30] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',
+[12/06/2026 17:30]  'price': 4227.01,
+[12/06/2026 17:30]  'sl': 4220.38,
+[12/06/2026 17:30]  'symbol': 'XAUUSD',
+[12/06/2026 17:30]  'tp': 4231.38,
+[12/06/2026 17:30]  'type': 'buy',
+[12/06/2026 17:30]  'volume': 0.01}
+[12/06/2026 17:30] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152054117487, 'order': 152191577982, 'volume': 0.01, 'price': 4227.73, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657269, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4227.01, 0.0, 4220.38, 4231.38, 10, 0, 0, 0, 0, '', 0, 0]}}
+[12/06/2026 17:30] 📥 Trader 1 BUY Response: {"status":"ok","message":"Ordine inviato allo SLAVE","ticket":152191577982,"logs":"[12/06/2026 17:29] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.3) ────────── | Trader 1 | XAUUSD\n[12/06/2026 17:29] 🔥 BUY signal per XAUUSD (ATR M5: 10.3)\n[12/06/2026 17:30] 📐 Trader 1 BUY: SL=500pts (4220.38), TP=600pts (4231.38)\n[12/06/2026 17:30] 🚀 Entrato in open_order_on_slave()\n[12/06/2026 17:30] 📡 Broker corrente: MetaQuotes-Demo\n[12/06/2026 17:30] 🌐 Init MT5 slave: http://127.0.0.1:8000\n[12/06/2026 17:30] 🔍 Controllo MT5 remoto su http://127.0.0.1:8000/health...\n[12/06/2026 17:30] ✅ MT5 attivo (versione 500.5836.28 Apr 2026)\n[12/06/2026 17:30] 🔐 Login allo SLAVE...\n[12/06/2026 17:30] ✅ Login SLAVE riuscito\n[12/06/2026 17:30] Simbolo dal payload è: XAUUSD\n[12/06/2026 17:30] 📡 Richiedo tick dello SLAVE: http://127.0.0.1:8000/symbol_tick/XAUUSD\n[12/06/2026 17:30] 📈 Tick ricevuto: BID=4226.84 ASK=4227.01\n[12/06/2026 17:30] 📤 Invio ordine allo SLAVE → http://127.0.0.1:8000/order\n[12/06/2026 17:30] 🧾 Dati inviati:{'broker': 'MetaQuotes-Demo',\n[12/06/2026 17:30]  'price': 4227.01,\n[12/06/2026 17:30]  'sl': 4220.38,\n[12/06/2026 17:30]  'symbol': 'XAUUSD',\n[12/06/2026 17:30]  'tp': 4231.38,\n[12/06/2026 17:30]  'type': 'buy',\n[12/06/2026 17:30]  'volume': 0.01}\n[12/06/2026 17:30] ✅ Risposta SLAVE: {'message': '✅ Order sent', 'result': {'retcode': 10009, 'deal': 152054117487, 'order': 152191577982, 'volume': 0.01, 'price': 4227.73, 'bid': 0.0, 'ask': 0.0, 'comment': 'Request executed', 'request_id': 1497657269, 'retcode_external': 0, 'request': [1, 123456, 0, 'XAUUSD', 0.01, 4227.01, 0.0, 4220.38, 4231.38, 10, 0, 0, 0, 0, '', 0, 0]}}"}
+[12/06/2026 17:31] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:31] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:32] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:32] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:33] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:33] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:34] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.5) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:34] 🔥 HOLD signal per XAUUSD (ATR M5: 10.5)
+[12/06/2026 17:35] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:35] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
+[12/06/2026 17:36] ─────── S-I-G-N-A-L [SUPER] | (ATR M5: 10.6) ────────── | Trader 1 | XAUUSD
+[12/06/2026 17:36] 🔥 HOLD signal per XAUUSD (ATR M5: 10.6)
