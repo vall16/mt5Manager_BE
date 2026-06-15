@@ -556,12 +556,12 @@ class SuperUsdJpyStrategy(SignalStrategy):
         return False
 
     def get_dynamic_sl_tp(self, ind: Indicators):
-        if ind.atr_m5_val <= 2:
+        if ind.atr_m5_val <= 0.050:
             return 500, 600
         return None, None
 
     def get_log_details(self, ind: Indicators) -> str:
-        return f"(ATR M5: {ind.atr_m5_val:.1f})"
+        return f"(ATR M5: {ind.atr_m5_val:.4f})"
 
     def get_log_header(self, ind: Indicators) -> str:
         details = self.get_log_details(ind)
