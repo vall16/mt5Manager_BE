@@ -1,1305 +1,1305 @@
-# --- STATO MULTI-SESSIONE ---
-from datetime import datetime
-import os
-import threading
+# # --- STATO MULTI-SESSIONE ---
+# from datetime import datetime
+# import os
+# import threading
 
-from pydantic import BaseModel
-from logger import log, logs
-from dotenv import load_dotenv
-from fastapi import APIRouter
-from db import get_trader, get_connection
-from models import (
-    Trader
-)
-from indicators.ta import (
-    compute_ema,
-    compute_rsi,
-    compute_macd,
-    compute_atr,
-    compute_bollinger,
-    compute_hma,
-    compute_adx
-)
-import pandas as pd
-import threading
-import time
-import requests
+# from pydantic import BaseModel
+# from logger import log, logs
+# from dotenv import load_dotenv
+# from fastapi import APIRouter
+# from db import get_trader, get_connection
+# from models import (
+#     Trader
+# )
+# from indicators.ta import (
+#     compute_ema,
+#     compute_rsi,
+#     compute_macd,
+#     compute_atr,
+#     compute_bollinger,
+#     compute_hma,
+#     compute_adx
+# )
+# import pandas as pd
+# import threading
+# import time
+# import requests
 
-sessions = {}
-sessions_lock = threading.Lock()
+# sessions = {}
+# sessions_lock = threading.Lock()
 
-router = APIRouter()
+# router = APIRouter()
 
-load_dotenv()  # legge il file .env
+# load_dotenv()  # legge il file .env
 
-HOST = os.getenv("API_HOST")  # default localhost
-PORT = int(os.getenv("API_PORT"))    # default 8080
+# HOST = os.getenv("API_HOST")  # default localhost
+# PORT = int(os.getenv("API_PORT"))    # default 8080
 
-BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
+# BASE_URL = f"http://{HOST}:{PORT}"         # costruisce automaticamente l'URL
 
-def get_data(symbol, timeframe, n_candles, agent_url):
-    """
-    Recupera i dati storici chiamando l'API remota mt5_api.
+# def get_data(symbol, timeframe, n_candles, agent_url):
+#     """
+#     Recupera i dati storici chiamando l'API remota mt5_api.
     
-    :param symbol: str, es. "EURUSD"
-    :param timeframe: int, costante MT5 (es. 15 per M15)
-    :param n_candles: int, numero di candele
-    :param agent_url: str, URL base dell'agente (es. "http://1.2.3.4:5000")
-    """
-    # Endpoint che abbiamo aggiunto a mt5_api.py
-    url = f"{agent_url}/get_rates"
+#     :param symbol: str, es. "EURUSD"
+#     :param timeframe: int, costante MT5 (es. 15 per M15)
+#     :param n_candles: int, numero di candele
+#     :param agent_url: str, URL base dell'agente (es. "http://1.2.3.4:5000")
+#     """
+#     # Endpoint che abbiamo aggiunto a mt5_api.py
+#     url = f"{agent_url}/get_rates"
     
-    payload = {
-        "symbol": symbol,
-        "timeframe": timeframe,
-        "n_candles": n_candles
-    }
+#     payload = {
+#         "symbol": symbol,
+#         "timeframe": timeframe,
+#         "n_candles": n_candles
+#     }
 
-    try:
-        # Timeout di 30s coerente con le tue mt5_routes (init-mt5/login)
-        response = requests.post(url, json=payload, timeout=30)
+#     try:
+#         # Timeout di 30s coerente con le tue mt5_routes (init-mt5/login)
+#         response = requests.post(url, json=payload, timeout=30)
         
-        if response.status_code != 200:
-            # log(f"❌ Errore API {response.status_code}: {response.text}")
-            return None
+#         if response.status_code != 200:
+#             # log(f"❌ Errore API {response.status_code}: {response.text}")
+#             return None
 
-        data = response.json()
-        rates = data.get("rates", [])
+#         data = response.json()
+#         rates = data.get("rates", [])
 
-        if not rates:
-            # log(f"❌ Nessun dato ricevuto da API per {symbol}")
-            return None
+#         if not rates:
+#             # log(f"❌ Nessun dato ricevuto da API per {symbol}")
+#             return None
 
-        # Creiamo il DataFrame dalla lista di dizionari ricevuta
-        df = pd.DataFrame(rates)
+#         # Creiamo il DataFrame dalla lista di dizionari ricevuta
+#         df = pd.DataFrame(rates)
 
-        if "time" not in df.columns:
-            # log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
-            return None
+#         if "time" not in df.columns:
+#             # log(f"❌ La colonna time non esiste nel DataFrame: {df.columns}")
+#             return None
 
-        # Conversione corretta del timestamp Unix in datetime
-        df['time'] = pd.to_datetime(df['time'], unit='s')
+#         # Conversione corretta del timestamp Unix in datetime
+#         df['time'] = pd.to_datetime(df['time'], unit='s')
         
-        return df
+#         return df
 
-    except Exception as e:
-        # log(f"❌ Eccezione durante la chiamata a {url}: {e}")
-        return None
+#     except Exception as e:
+#         # log(f"❌ Eccezione durante la chiamata a {url}: {e}")
+#         return None
 
 
-# Quando dal tuo Frontend chiami this.http.post(..., trader), il backend riceve l'oggetto con il suo ID (es. Trader ID 1). Crea la sessione 1. Se dopo un secondo clicchi sul Trader ID 2, il backend crea la sessione 2 senza toccare la 1.
-# Ogni trader avrà la sua copia privata di parametri e stato del segnale.
-def polling_loop_timer(trader_id):
-    """Ciclo di polling specifico per ogni trader"""
-    with sessions_lock:
-        if trader_id not in sessions:
-            return # Il polling è stato fermato
+# # Quando dal tuo Frontend chiami this.http.post(..., trader), il backend riceve l'oggetto con il suo ID (es. Trader ID 1). Crea la sessione 1. Se dopo un secondo clicchi sul Trader ID 2, il backend crea la sessione 2 senza toccare la 1.
+# # Ogni trader avrà la sua copia privata di parametri e stato del segnale.
+# def polling_loop_timer(trader_id):
+#     """Ciclo di polling specifico per ogni trader"""
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return # Il polling è stato fermato
         
-        session = sessions[trader_id]
-        trader = session["trader"]
+#         session = sessions[trader_id]
+#         trader = session["trader"]
         
-    # Esegue l'analisi passandogli i dati specifici di QUESTO trader
-    run_signal_logic(trader_id)
+#     # Esegue l'analisi passandogli i dati specifici di QUESTO trader
+#     run_signal_logic(trader_id)
 
-    # Re-schedula il prossimo controllo basandosi sul customSignalInterval del trader
-    interval = int(trader.custom_signal_interval or 5)
+#     # Re-schedula il prossimo controllo basandosi sul customSignalInterval del trader
+#     interval = int(trader.custom_signal_interval or 5)
     
-    with sessions_lock:
-        if trader_id in sessions:
-            t = threading.Timer(interval, polling_loop_timer, args=[trader_id])
-            sessions[trader_id]["timer"] = t
-            t.start()
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             t = threading.Timer(interval, polling_loop_timer, args=[trader_id])
+#             sessions[trader_id]["timer"] = t
+#             t.start()
 
 
-def run_signal_logic(trader_id):
-    with sessions_lock:
-        if trader_id not in sessions: return
-        trader = sessions[trader_id]["trader"]
+# def run_signal_logic(trader_id):
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         trader = sessions[trader_id]["trader"]
 
     
-    # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selected_signal or "BASE"
+#     # Leggiamo quale segnale ha scelto l'utente nel FE
+#     chosen_signal = trader.selected_signal or "BASE"
 
-    if chosen_signal == "SUPER":
-        # check_signal_super(trader_id)
+#     if chosen_signal == "SUPER":
+#         # check_signal_super(trader_id)
 
-        # check_signal_super_xauusd(trader_id)
-        check_signal_super_xauusd_noclose(trader_id)
-    elif chosen_signal == "TRENDGUARD":
-        # check_trendguard_xau_signal(trader_id)
-        check_signal(trader_id)
-    elif chosen_signal == "BASE_NOHOLD":
+#         # check_signal_super_xauusd(trader_id)
+#         check_signal_super_xauusd_noclose(trader_id)
+#     elif chosen_signal == "TRENDGUARD":
+#         # check_trendguard_xau_signal(trader_id)
+#         check_signal(trader_id)
+#     elif chosen_signal == "BASE_NOHOLD":
         
-        # check_signal_reverse(trader_id)
-        check_signal_noreverse(trader_id)
-    elif chosen_signal == "EURUSD_NOHOLD":
+#         # check_signal_reverse(trader_id)
+#         check_signal_noreverse(trader_id)
+#     elif chosen_signal == "EURUSD_NOHOLD":
         
-        check_signal_eurusd(trader_id)
-    else:
-        # Il tuo check_signal originale di base
-        check_signal(trader_id)
+#         check_signal_eurusd(trader_id)
+#     else:
+#         # Il tuo check_signal originale di base
+#         check_signal(trader_id)
 
-# FA PARTIRE IL POLLING !!
-@router.post("/start_polling")
-def start_polling(trader: Trader):
-    global sessions
-    tid = trader.id
+# # FA PARTIRE IL POLLING !!
+# @router.post("/start_polling")
+# def start_polling(trader: Trader):
+#     global sessions
+#     tid = trader.id
 
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    trader_data = get_trader(cursor, tid)
-    if not trader_data:
-        log("❌ Trader non trovato nel DB.")
-        return {"status": "error"}
+#     conn = get_connection()
+#     cursor = conn.cursor(dictionary=True)
+#     trader_data = get_trader(cursor, tid)
+#     if not trader_data:
+#         log("❌ Trader non trovato nel DB.")
+#         return {"status": "error"}
 
-    log("📋 Trader ricevuto:")
-    for k, v in trader.model_dump().items():
-        log(f"   - {k}: {v}")
+#     log("📋 Trader ricevuto:")
+#     for k, v in trader.model_dump().items():
+#         log(f"   - {k}: {v}")
     
-    with sessions_lock:
-        if tid in sessions and sessions[tid]["timer"]:
-            sessions[tid]["timer"].cancel()
+#     with sessions_lock:
+#         if tid in sessions and sessions[tid]["timer"]:
+#             sessions[tid]["timer"].cancel()
 
-        # Salviamo sia l'oggetto Pydantic sia i dati DB fissi
-        sessions[tid] = {
-            "trader": trader,
-            "trader_data": trader_data,  # <--- qui
-            "prev_signal": "HOLD",
-            "timer": None
-        }
+#         # Salviamo sia l'oggetto Pydantic sia i dati DB fissi
+#         sessions[tid] = {
+#             "trader": trader,
+#             "trader_data": trader_data,  # <--- qui
+#             "prev_signal": "HOLD",
+#             "timer": None
+#         }
 
-    # log(f"🚀 BROKER SCELTO {trader.broker} ")
+#     # log(f"🚀 BROKER SCELTO {trader.broker} ")
 
-    polling_loop_timer(tid)
+#     polling_loop_timer(tid)
     
-    log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
-    return {"status": "started", "trader_id": tid}
+#     log(f"🚀 Trading avviato per Trader {tid} ({trader.name}) su {trader.selected_symbol}")
+#     return {"status": "started", "trader_id": tid}
 
 
-class StopPollingRequest(BaseModel):
-    trader_id: int
+# class StopPollingRequest(BaseModel):
+#     trader_id: int
 
-# STOPPA IL POLLING !!
-@router.post("/stop_polling")
-def stop_polling(req: StopPollingRequest):
-    trader_id = req.trader_id
-    with sessions_lock:
-        if trader_id in sessions:
-            timer = sessions[trader_id].get("timer")
-            if timer:
-                timer.cancel()
-            del sessions[trader_id]
-            log(f"⏹️ Polling fermato manualmente per Trader {trader_id}")
-            return {"status": "stopped", "trader_id": trader_id}
+# # STOPPA IL POLLING !!
+# @router.post("/stop_polling")
+# def stop_polling(req: StopPollingRequest):
+#     trader_id = req.trader_id
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             timer = sessions[trader_id].get("timer")
+#             if timer:
+#                 timer.cancel()
+#             del sessions[trader_id]
+#             log(f"⏹️ Polling fermato manualmente per Trader {trader_id}")
+#             return {"status": "stopped", "trader_id": trader_id}
 
-    return {"status": "not_running", "message": f"Trader {trader_id} non attivo"}
+#     return {"status": "not_running", "message": f"Trader {trader_id} non attivo"}
 
-# chiude ad ogni cambio di segnale (!)
-def check_signal(trader_id):
+# # chiude ad ogni cambio di segnale (!)
+# def check_signal(trader_id):
 
-    logs.clear()
-    # session
-    with sessions_lock:
-        if trader_id not in sessions: return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]  # <--- qui
-        prev_signal = session["prev_signal"]
+#     logs.clear()
+#     # session
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]  # <--- qui
+#         prev_signal = session["prev_signal"]
 
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
-    # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selected_signal or "BASE"
-    # variabili locali
-    symbol = session["trader"].selected_symbol  # da Pydantic
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     # Leggiamo quale segnale ha scelto l'utente nel FE
+#     chosen_signal = trader.selected_signal or "BASE"
+#     # variabili locali
+#     symbol = session["trader"].selected_symbol  # da Pydantic
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Parametri indicatori (usiamo quelli nel trader o default)
-    params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
+#     # Parametri indicatori (usiamo quelli nel trader o default)
+#     params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
 
-    # 3. Download dati dal suo slave specifico
-    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5, 50 candele
-    if df is None: return
+#     # 3. Download dati dal suo slave specifico
+#     df = get_data(symbol, 5, 50, slave_url) # Timeframe 5, 50 candele
+#     if df is None: return
 
-    # 4. Calcolo Indicatori
-    ema_short = compute_ema(df, params["EMA_short"])
-    ema_long = compute_ema(df, params["EMA_long"])
-    rsi = compute_rsi(df, params["RSI_period"])
+#     # 4. Calcolo Indicatori
+#     ema_short = compute_ema(df, params["EMA_short"])
+#     ema_long = compute_ema(df, params["EMA_long"])
+#     rsi = compute_rsi(df, params["RSI_period"])
 
-    buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
-    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+#     buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+#     sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
 
-    # 5. Controllo posizioni attive sullo slave
-    positions = []
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code == 200:
-            positions = resp.json()
-    except:
-        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
-        return
+#     # 5. Controllo posizioni attive sullo slave
+#     positions = []
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code == 200:
+#             positions = resp.json()
+#     except:
+#         log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+#         return
 
-    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+#     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
 
-    # 6. Logica Decisionale
-    new_signal = "HOLD"
-    
-
-    if buy_cond:
-        new_signal = "BUY"
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] BUY signal per {symbol}")
-        if not has_buy:
-            if has_sell: close_slave_position(trader_id) # Reverse
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
-
-    elif sell_cond:
-        new_signal = "SELL"
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] SELL signal per {symbol}")
-        if not has_sell:
-            if has_buy: close_slave_position(trader_id) # Reverse
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
-
-    else:
-        # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
-
-        if prev_signal == "BUY" and has_buy:
-             close_slave_position(trader_id)
-        elif prev_signal == "SELL" and has_sell:
-             close_slave_position(trader_id)
-
-    # 7. Aggiornamento Segnale Precedente nella sessione corretta
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-# //chiude solo buy --> sell e sell --> buy
-def check_signal_reverse(trader_id):
-
-    logs.clear()
-    # session
-    with sessions_lock:
-        if trader_id not in sessions: return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]  # <--- qui
-        prev_signal = session["prev_signal"]
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-
-    # variabili locali
-    symbol = session["trader"].selected_symbol  # da Pydantic
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selected_signal or "BASE"
-    
-    # Parametri indicatori (usiamo quelli nel trader o default)
-    params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
-
-    # 3. Download dati dal suo slave specifico
-    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5 min, 50 candele
-    if df is None: return
-
-    # 4. Calcolo Indicatori
-    ema_short = compute_ema(df, params["EMA_short"])
-    ema_long = compute_ema(df, params["EMA_long"])
-    rsi = compute_rsi(df, params["RSI_period"])
-
-    buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
-    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
-
-    # 5. Controllo posizioni attive sullo slave
-    positions = []
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code == 200:
-            positions = resp.json()
-    except:
-        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
-        return
-
-    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
-
-    # 6. Logica Decisionalee
-    new_signal = "HOLD"
+#     # 6. Logica Decisionale
+#     new_signal = "HOLD"
     
 
-    if buy_cond:
-        new_signal = "BUY"
+#     if buy_cond:
+#         new_signal = "BUY"
         
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
+#         if not has_buy:
+#             if has_sell: close_slave_position(trader_id) # Reverse
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
+
+#     elif sell_cond:
+#         new_signal = "SELL"
         
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
+#         if not has_sell:
+#             if has_buy: close_slave_position(trader_id) # Reverse
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
 
+#     else:
+#         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
         
-        log(f"🔥 [{now}] BUY signal per {symbol}")
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
-        if not has_buy:
-            if has_sell: close_slave_position(trader_id) # Reverse
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
+#         if prev_signal == "BUY" and has_buy:
+#              close_slave_position(trader_id)
+#         elif prev_signal == "SELL" and has_sell:
+#              close_slave_position(trader_id)
 
-    elif sell_cond:
-        new_signal = "SELL"
-        
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#     # 7. Aggiornamento Segnale Precedente nella sessione corretta
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
 
-        log(f"🔥 [{now}] SELL signal per {symbol}")
+# # //chiude solo buy --> sell e sell --> buy
+# def check_signal_reverse(trader_id):
 
-        if not has_sell:
-            if has_buy: close_slave_position(trader_id) # Reverse
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
+#     logs.clear()
+#     # session
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]  # <--- qui
+#         prev_signal = session["prev_signal"]
 
-    else:
-        # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
-        
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
+#     # variabili locali
+#     symbol = session["trader"].selected_symbol  # da Pydantic
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # CON HOLD NON CHIUDE !
-        # if prev_signal == "BUY" and has_buy:
-        #     #  close_slave_position(trader_id)
-        # elif prev_signal == "SELL" and has_sell:
-        #     #  close_slave_position(trader_id)
-
-    # 7. Aggiornamento Segnale Precedente nella sessione corretta
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-# uguale a check_signal_reverse ma senza chiusura
-def check_signal_noreverse(trader_id):
-
-    logs.clear()
-    # session
-    with sessions_lock:
-        if trader_id not in sessions: return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]  # <--- qui
-        prev_signal = session["prev_signal"]
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-
-    # variabili locali
-    symbol = session["trader"].selected_symbol  # da Pydantic
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selected_signal or "BASE"
+#     # Leggiamo quale segnale ha scelto l'utente nel FE
+#     chosen_signal = trader.selected_signal or "BASE"
     
-    # Parametri indicatori (usiamo quelli nel trader o default)
-    params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
+#     # Parametri indicatori (usiamo quelli nel trader o default)
+#     params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
 
-    # 3. Download dati dal suo slave specifico
-    df = get_data(symbol, 5, 50, slave_url) # Timeframe 5 min, 50 candele
-    if df is None: return
+#     # 3. Download dati dal suo slave specifico
+#     df = get_data(symbol, 5, 50, slave_url) # Timeframe 5 min, 50 candele
+#     if df is None: return
 
-    # 4. Calcolo Indicatori
-    ema_short = compute_ema(df, params["EMA_short"])
-    ema_long = compute_ema(df, params["EMA_long"])
-    rsi = compute_rsi(df, params["RSI_period"])
+#     # 4. Calcolo Indicatori
+#     ema_short = compute_ema(df, params["EMA_short"])
+#     ema_long = compute_ema(df, params["EMA_long"])
+#     rsi = compute_rsi(df, params["RSI_period"])
 
-    buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
-    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+#     buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+#     sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
 
-    # 5. Controllo posizioni attive sullo slave
-    positions = []
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code == 200:
-            positions = resp.json()
-    except:
-        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
-        return
+#     # 5. Controllo posizioni attive sullo slave
+#     positions = []
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code == 200:
+#             positions = resp.json()
+#     except:
+#         log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+#         return
 
-    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+#     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
 
-    # 6. Logica Decisionalee
-    new_signal = "HOLD"
+#     # 6. Logica Decisionalee
+#     new_signal = "HOLD"
     
 
-    if buy_cond:
-        new_signal = "BUY"
+#     if buy_cond:
+#         new_signal = "BUY"
         
         
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
 
         
-        log(f"🔥 [{now}] BUY signal per {symbol}")
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
 
-        if not has_buy:
-            # NO REVERSE
-            # if has_sell: close_slave_position(trader_id) # Reverse
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
+#         if not has_buy:
+#             if has_sell: close_slave_position(trader_id) # Reverse
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
 
-    elif sell_cond:
-        new_signal = "SELL"
+#     elif sell_cond:
+#         new_signal = "SELL"
         
         
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
 
-        log(f"🔥 [{now}] SELL signal per {symbol}")
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
 
-        if not has_sell:
-            # NO REVERSE
-            # if has_buy: close_slave_position(trader_id) # Reverse
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
+#         if not has_sell:
+#             if has_buy: close_slave_position(trader_id) # Reverse
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
 
-    else:
-        # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
+#     else:
+#         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
         
         
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
-
-        # CON HOLD NON CHIUDE !
-        # if prev_signal == "BUY" and has_buy:
-        #     #  close_slave_position(trader_id)
-        # elif prev_signal == "SELL" and has_sell:
-        #     #  close_slave_position(trader_id)
-
-    # 7. Aggiornamento Segnale Precedente nella sessione corretta
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-def check_signal_eurusd(trader_id):
-    """
-    🔹 Check signal per EURUSD
-    - Timeframe M5
-    - EMA breve/lunga + RSI14
-    - Nessuna chiusura automatica HOLD
-    - Adatto a volatilità tipica FX
-    """
-
-    logs.clear()
-    # =========================
-    # 1. Recupero sessione
-    # =========================
-    with sessions_lock:
-        if trader_id not in sessions:
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]
-        prev_signal = session["prev_signal"]
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-    symbol = trader.selected_symbol
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    chosen_signal = trader.selected_signal or "EURUSD_BASE"
-
-    # =========================
-    # 2. Parametri indicatori
-    # =========================
-    params = {
-        "EMA_short": 5,
-        "EMA_long": 20,    # leggermente più lungo per EURUSD
-        "RSI_period": 14
-    }
-
-    # =========================
-    # 3. Dati mercato M5
-    # =========================
-    df = get_data(symbol, 5, 50, slave_url)
-    if df is None or df.empty:
-        return
-
-    # =========================
-    # 4. Indicatori
-    # =========================
-    ema_short = compute_ema(df, params["EMA_short"])
-    ema_long  = compute_ema(df, params["EMA_long"])
-    rsi       = compute_rsi(df, params["RSI_period"])
-
-    # =========================
-    # 5. Condizioni segnale
-    # =========================
-    # EURUSD più lento → riduco la soglia RSI per filtrare falsi segnali
-    buy_cond  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 65
-    sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 35
-
-    # =========================
-    # 6. Controllo posizioni slave
-    # =========================
-    positions = []
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code == 200:
-            positions = resp.json()
-    except:
-        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
-        return
-
-    has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
-
-    # =========================
-    # 7. Decisione
-    # =========================
-    new_signal = "HOLD"
-
-    if buy_cond:
-        new_signal = "BUY"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] BUY signal per {symbol}")
-        if not has_buy:
-            if has_sell: close_slave_position(trader_id)
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: BUY inviato")
-
-    elif sell_cond:
-        new_signal = "SELL"
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] SELL signal per {symbol}")
-        if not has_sell:
-            if has_buy: close_slave_position(trader_id)
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: SELL inviato")
-
-    else:
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
-
-    # =========================
-    # 8. Aggiornamento sessione
-    # =========================
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-def check_signal_super(trader_id):
-    """
-    🔹 Versione SUPER per singolo trader
-    - Indicatori avanzati
-    - Filtri trend / volatilità
-    - Gestione sessione per-trader
-    """
-
-    logs.clear()
-
-    # =========================
-    # 1. Recupero sessione
-    # =========================
-    # session
-    # with sessions_lock:
-    #     if trader_id not in sessions: return
-    #     session = sessions[trader_id]
-    #     trader = session["trader"]
-    #     trader_data = session["trader_data"]  # <--- qui
-    #     prev_signal = session["prev_signal"]
-
-    # slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-
-        # session
-    with sessions_lock:
-        if trader_id not in sessions: return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]  # <--- qui
-        prev_signal = session["prev_signal"]
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-
-    symbol = session["trader"].selected_symbol  # da Pydantic
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # Leggiamo quale segnale ha scelto l'utente nel FE
-    chosen_signal = trader.selected_signal or "BASE"
-
-    # =========================
-    # 2. Parametri indicatori
-    # =========================
-    params = {
-        "EMA_short": 5,
-        "EMA_long": 15,
-        "RSI_period": 14
-    }
-
-    # =========================
-    # 3. Dati mercato
-    # =========================
-    df = get_data(symbol, 5, 50, slave_url)
-    if df is None or df.empty:
-        return
-
-    # =========================
-    # 4. Indicatori
-    # =========================
-    ema_short = compute_ema(df, params["EMA_short"])
-    ema_long  = compute_ema(df, params["EMA_long"])
-    rsi       = compute_rsi(df, params["RSI_period"])
-    macd, macd_signal = compute_macd(df)
-    atr       = compute_atr(df)
-    hma       = compute_hma(df)
-
-    adx_df = compute_adx(df)
-    v_adx = float(adx_df["ADX"].iloc[-1])
-
-    # =========================
-    # 5. Trend superiore (M15)
-    # =========================
-    df15 = get_data(symbol, 15, 50, slave_url)
-    big_trend_up = (
-        compute_ema(df15, 20).iloc[-1] >
-        compute_ema(df15, 50).iloc[-1]
-    ) if df15 is not None else True
-
-    big_trend_down = not big_trend_up
-
-    # =========================
-    # 6. Filtri volume / volatilità
-    # =========================
-    v_mean = float(df["tick_volume"].rolling(20).mean().iloc[-1])
-    v_now  = float(df["tick_volume"].iloc[-1])
-
-    f_volume_ok     = v_now > (v_mean * 1.3) if v_mean > 0 else True
-    f_volatility_ok = float(atr.iloc[-1]) > float(atr.iloc[-5]) if len(atr) >= 5 else True
-    f_strong_trend  = v_adx > 20
-
-    # =========================
-    # 7. GAP filter
-    # =========================
-    gap = abs(df["open"].iloc[-1] - df["close"].iloc[-2]) > (df["close"].iloc[-2] * 0.001)
-    if gap:
-        log(f"⚠️ Trader {trader_id}: GAP → HOLD")
-        return
-
-    # =========================
-    # 8. Posizioni slave
-    # =========================
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code != 200:
-            return
-        positions = resp.json()
-    except:
-        log(f"❌ Trader {trader_id}: Slave non raggiungibile")
-        return
-
-    has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
-
-    # =========================
-    # 9. Condizioni CORE
-    # =========================
-    core_buy = (
-        ema_short.iloc[-1] > ema_long.iloc[-1] and
-        macd.iloc[-1] > macd_signal.iloc[-1] and
-        hma.iloc[-1] > hma.iloc[-2] and
-        rsi.iloc[-1] < 68
-    )
-
-    core_sell = (
-        ema_short.iloc[-1] < ema_long.iloc[-1] and
-        macd.iloc[-1] < macd_signal.iloc[-1] and
-        hma.iloc[-1] < hma.iloc[-2] and
-        rsi.iloc[-1] > 32
-    )
-
-    conf_buy  = sum([big_trend_up, f_volume_ok, f_strong_trend]) >= 1
-    conf_sell = sum([big_trend_down, f_volume_ok, f_strong_trend]) >= 1
-
-    buy_cond  = core_buy  and conf_buy
-    sell_cond = core_sell and conf_sell
-
-    # =========================
-    # 10. Decisione
-    # =========================
-    new_signal = "HOLD"
-
-    if buy_cond:
-        new_signal = "BUY"
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-
-        log(f"🔥 [{now}] BUY signal per {symbol}")
-        if not has_buy:
-            if has_sell:
-                close_slave_position(trader_id)
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: BUY inviato")
-
-    elif sell_cond:
-        new_signal = "SELL"
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-
-        log(f"🔥 [{now}] SELL signal per {symbol}")
-        if not has_sell:
-            if has_buy:
-                close_slave_position(trader_id)
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: SELL inviato")
-
-    else:
-        # hold --> buy e sell --> buy non chiude...
-        # if prev_signal == "BUY" and has_buy:
-        #     # close_slave_position(trader_id)
-        # elif prev_signal == "SELL" and has_sell:
-        #     # close_slave_position(trader_id)
-        
-        
-        log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
-
-    # =========================
-    # 11. Update sessione
-    # =========================
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-def check_signal_super_xauusd(trader_id):
-
-    logs.clear()
-
-    with sessions_lock:
-        if trader_id not in sessions:
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]
-        prev_signal = session.get("prev_signal", "HOLD")
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-    symbol = trader.selected_symbol
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    chosen_signal = trader.selected_signal or "SUPER_XAU"
-
-    # =========================
-    # BLOCCO M1 GIÀ PROCESSATO
-    # =========================
-    current_m1_ts = datetime.now().replace(second=0, microsecond=0)
-    if session.get("last_processed_m1") == current_m1_ts:
-        log(f"⏱️ [{now}] Candela M1 già processata → SKIP")
-        return
-
-    session["last_processed_m1"] = current_m1_ts
-
-    # =========================
-    # DATI MULTI TF
-    # =========================
-    df_m1 = get_data(symbol, 1, 100, slave_url)
-    df_m5 = get_data(symbol, 5, 100, slave_url)
-    df_m15 = get_data(symbol, 15, 50, slave_url)
-
-    if any(d is None or d.empty for d in [df_m1, df_m5, df_m15]):
-        log(f"❌ [{now}] Dati non disponibili → HOLD")
-        return
-
-    # =========================
-    # INDICATORI
-    # =========================
-    ema_fast = compute_ema(df_m1, 9).iloc[-2]
-    ema_slow = compute_ema(df_m1, 21).iloc[-2]
-    rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
-    macd, macd_sig = compute_macd(df_m1)
-
-    hma_m5 = compute_hma(df_m5).iloc[-2]
-    hma_m5_prev = compute_hma(df_m5).iloc[-3]
-
-    ema_m15 = compute_ema(df_m15, 50).iloc[-2]
-    price_m15 = df_m15["close"].iloc[-2]
-    trend_macro_up = price_m15 > ema_m15
-
-    atr_series = compute_atr(df_m1)
-    atr = atr_series.iloc[-2]
-    volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
-
-    candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
-    is_spike = candle_body > (atr * 3)
-
-    # =========================
-    # CONDIZIONI
-    # =========================
-    buy_condition = (
-        ema_fast > ema_slow and
-        macd.iloc[-2] > macd_sig.iloc[-2] and
-        hma_m5 > hma_m5_prev and
-        trend_macro_up and
-        45 < rsi_m1 < 70 and
-        volatilty_expansion and not is_spike
-    )
-
-    sell_condition = (
-        ema_fast < ema_slow and
-        macd.iloc[-2] < macd_sig.iloc[-2] and
-        hma_m5 < hma_m5_prev and
-        not trend_macro_up and
-        30 < rsi_m1 < 55 and
-        volatilty_expansion and not is_spike
-    )
-
-    # =========================
-    # POSIZIONI
-    # =========================
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code != 200:
-            log(f"❌ Slave non risponde")
-            return
-        positions = resp.json()
-    except:
-        log(f"❌ Slave non raggiungibile")
-        return
-
-    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
-
-    # =========================
-    # DECISIONE
-    # =========================
-    new_signal = "HOLD"
-
-    log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
-
-    if buy_condition:
-        new_signal = "BUY"
-        log(f"🔥 [{now}] BUY signal per {symbol}")
-
-        if not has_buy:
-            if has_sell:
-                close_slave_position(trader_id)
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: BUY inviato")
-
-    elif sell_condition:
-        new_signal = "SELL"
-        log(f"🔥 [{now}] SELL signal per {symbol}")
-
-        if not has_sell:
-            if has_buy:
-                close_slave_position(trader_id)
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: SELL inviato")
-
-    else:
-        log(f"🔥 [{now}] HOLD signal per {symbol}")
-
-        if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
-            close_slave_position(trader_id)
-            log(f"⚠️ Chiusura BUY per indebolimento")
-
-        elif has_sell and (ema_fast > ema_slow or rsi_m1 < 20):
-            close_slave_position(trader_id)
-            log(f"⚠️ Chiusura SELL per indebolimento")
-
-    # =========================
-    # UPDATE SESSION
-    # =========================
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-def check_signal_super_xauusd_noclose(trader_id):
-
-    logs.clear()
-
-    with sessions_lock:
-        if trader_id not in sessions:
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]
-        prev_signal = session.get("prev_signal", "HOLD")
-
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-    symbol = trader.selected_symbol
-    chosen_signal = trader.selected_signal or "SUPER_XAU"
-
-    # =========================
-    # BLOCCO M1 GIÀ PROCESSATO
-    # =========================
-    current_m1_ts = datetime.now().replace(second=0, microsecond=0)
-    if session.get("last_processed_m1") == current_m1_ts:
-        log(f"⏱️ [{now}] Candela M1 già processata → SKIP")
-        return
-
-    session["last_processed_m1"] = current_m1_ts
-
-    # =========================
-    # DATI MULTI TF
-    # =========================
-    df_m1 = get_data(symbol, 1, 100, slave_url)
-    df_m5 = get_data(symbol, 5, 100, slave_url)
-    df_m15 = get_data(symbol, 15, 50, slave_url)
-
-    if any(d is None or d.empty for d in [df_m1, df_m5, df_m15]):
-        log(f"❌ [{now}] Dati non disponibili → HOLD")
-        return
-
-    # =========================
-    # INDICATORI
-    # =========================
-    ema_fast = compute_ema(df_m1, 9).iloc[-2]
-    ema_slow = compute_ema(df_m1, 21).iloc[-2]
-    rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
-    macd, macd_sig = compute_macd(df_m1)
-
-    hma_m5 = compute_hma(df_m5).iloc[-2]
-    hma_m5_prev = compute_hma(df_m5).iloc[-3]
-
-    ema_m15 = compute_ema(df_m15, 50).iloc[-2]
-    price_m15 = df_m15["close"].iloc[-2]
-    trend_macro_up = price_m15 > ema_m15
-
-    atr_series = compute_atr(df_m1)
-    atr = atr_series.iloc[-2]
-    volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
-
-    candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
-    is_spike = candle_body > (atr * 3)
-
-    # =========================
-    # ATR M5 (stile test_market_analyzer2)
-    # =========================
-    df_m5["prev_close"] = df_m5["close"].shift(1)
-    df_m5["tr"] = df_m5.apply(lambda r: max(
-        r["high"] - r["low"],
-        abs(r["high"] - r["prev_close"]),
-        abs(r["low"] - r["prev_close"])
-    ), axis=1)
-    atr_m5_val = df_m5["tr"].rolling(14).mean().iloc[-2]
-
-    # SL/TP dinamici: se volatilità M5 bassa, tighter
-    if atr_m5_val <= 6:
-        effective_sl = 500
-        effective_tp = 600
-    else:
-        effective_sl = None
-        effective_tp = None
-
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["effective_sl"] = effective_sl
-            sessions[trader_id]["effective_tp"] = effective_tp
-
-    # =========================
-    # CONDIZIONI
-    # =========================
-    buy_condition = (
-        ema_fast > ema_slow and
-        macd.iloc[-2] > macd_sig.iloc[-2] and
-        hma_m5 > hma_m5_prev and
-        trend_macro_up and
-        45 < rsi_m1 < 70 and
-        volatilty_expansion and not is_spike
-    )
-
-    sell_condition = (
-        ema_fast < ema_slow and
-        macd.iloc[-2] < macd_sig.iloc[-2] and
-        hma_m5 < hma_m5_prev and
-        not trend_macro_up and
-        30 < rsi_m1 < 55 and
-        volatilty_expansion and not is_spike
-    )
-
-    # =========================
-    # POSIZIONI
-    # =========================
-    try:
-        resp = requests.get(f"{slave_url}/positions", timeout=5)
-        if resp.status_code != 200:
-            log(f"❌ Slave non risponde")
-            return
-        positions = resp.json()
-    except:
-        log(f"❌ Slave non raggiungibile")
-        return
-
-    has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
-    has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
-
-    # =========================
-    # DECISIONE
-    # =========================
-    new_signal = "HOLD"
-
-    log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} | ATR M5: {atr_m5_val:.1f} ──────────")
-
-    if buy_condition:
-        new_signal = "BUY"
-        log(f"🔥 BUY signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
-
-        if not has_buy:
-            # if has_sell:
-            #     close_slave_position(trader_id)
-            send_buy_to_slave(trader_id)
-            log(f"🔥 Trader {trader_id}: BUY inviato")
-
-    elif sell_condition:
-        new_signal = "SELL"
-        log(f"🔥 SELL signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
-
-        if not has_sell:
-            # if has_buy:
-            #     close_slave_position(trader_id)
-            send_sell_to_slave(trader_id)
-            log(f"🔻 Trader {trader_id}: SELL inviato")
-
-    else:
-        log(f"🔥 HOLD signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
-
-        # if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
-        #     # close_slave_position(trader_id)
-        #     # log(f"⚠️ Chiusura BUY per indebolimento")
-
-        # elif has_sell and (ema_fast > ema_slow or rsi_m1 < 20):
-            # close_slave_position(trader_id)
-            # log(f"⚠️ Chiusura SELL per indebolimento")
-
-    # =========================
-    # UPDATE SESSION
-    # =========================
-    with sessions_lock:
-        if trader_id in sessions:
-            sessions[trader_id]["prev_signal"] = new_signal
-
-
-def send_buy_to_slave(trader_id):
-
-    with sessions_lock:
-        if trader_id not in sessions: 
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]
-        effective_sl = session.get("effective_sl")
-        effective_tp = session.get("effective_tp")
-
-    symbol = trader.selected_symbol
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-
-    manager_url = os.getenv("MANAGER_URL") # Il tuo BASE_URL del manager
-
-    # 1. Recupero info simbolo e tick dallo slave specifico
-    try:
-        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
-        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
-        
-        if info_resp.status_code != 200 or tick_resp.status_code != 200:
-            log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
-            return
-
-        sym_info = info_resp.json()
-
-        log(sym_info.get("filling_mode"))
-
-        tick = tick_resp.json()
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
-        return
-
-    # 2. Calcolo SL e TP dinamici (effective sovrascrive trader.sl/.tp se impostato)
-    sl_points = effective_sl if effective_sl is not None else trader.sl
-    tp_points = effective_tp if effective_tp is not None else trader.tp
-
-    pip_value = float(sym_info.get("point", 0.00001))
-    sl_value = tick["ask"] - (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
-    tp_value = tick["ask"] + (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
-
-    log(f"📐 Trader {trader_id} BUY: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
-
-    volume = trader.fix_lot
-    broker = trader.broker
-
-    # 3. Invio ordine tramite l'endpoint del Manager che comunica con lo Slave
-    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
-    payload = {
-        "trader_id": trader_id,
-        "order_type": "buy",
-        # "volume": 0.10, # O trader.defaultVolume se lo hai
-        "volume": volume, 
-        "symbol": symbol,
-        "sl": sl_value,
-        "tp": tp_value,
-        # broker corrente ..
-        "broker": broker
-    }
-
-    try:
-        resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Trader {trader_id} BUY Response: {resp.text}")
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: Errore invio ordine: {e}")
-
-# nuova versione con order Limit... non usata (16/02)
-def send_buy_to_slave_limit(trader_id):
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+#         # CON HOLD NON CHIUDE !
+#         # if prev_signal == "BUY" and has_buy:
+#         #     #  close_slave_position(trader_id)
+#         # elif prev_signal == "SELL" and has_sell:
+#         #     #  close_slave_position(trader_id)
+
+#     # 7. Aggiornamento Segnale Precedente nella sessione corretta
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
+
+# # uguale a check_signal_reverse ma senza chiusura
+# def check_signal_noreverse(trader_id):
+
+#     logs.clear()
+#     # session
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]  # <--- qui
+#         prev_signal = session["prev_signal"]
+
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+#     # variabili locali
+#     symbol = session["trader"].selected_symbol  # da Pydantic
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+#     # Leggiamo quale segnale ha scelto l'utente nel FE
+#     chosen_signal = trader.selected_signal or "BASE"
     
-    with sessions_lock:
-        if trader_id not in sessions:
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]  # dati completi DB
+#     # Parametri indicatori (usiamo quelli nel trader o default)
+#     params = {"EMA_short": 5, "EMA_long": 15, "RSI_period": 14} 
 
-    symbol = trader.selected_symbol
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
-    manager_url = os.getenv("MANAGER_URL")  # BASE_URL del manager
+#     # 3. Download dati dal suo slave specifico
+#     df = get_data(symbol, 5, 50, slave_url) # Timeframe 5 min, 50 candele
+#     if df is None: return
 
-    # 1️⃣ Recupero info simbolo e tick dallo slave
-    try:
-        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
-        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+#     # 4. Calcolo Indicatori
+#     ema_short = compute_ema(df, params["EMA_short"])
+#     ema_long = compute_ema(df, params["EMA_long"])
+#     rsi = compute_rsi(df, params["RSI_period"])
+
+#     buy_cond = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 68
+#     sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 32
+
+#     # 5. Controllo posizioni attive sullo slave
+#     positions = []
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code == 200:
+#             positions = resp.json()
+#     except:
+#         log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+#         return
+
+#     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+#     # 6. Logica Decisionalee
+#     new_signal = "HOLD"
+    
+
+#     if buy_cond:
+#         new_signal = "BUY"
         
-        if info_resp.status_code != 200 or tick_resp.status_code != 200:
-            log(f"❌ Trader {trader_id}: impossibile recuperare dati dallo slave")
-            return
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
 
-        sym_info = info_resp.json()
-        tick = tick_resp.json()
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: errore connessione slave: {e}")
-        return
+        
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
 
-    # 2️⃣ Calcolo prezzo limit, SL e TP
-    pip_value = float(sym_info.get("point", 0.01))
-    current_price = tick["ask"]
+#         if not has_buy:
+#             # NO REVERSE
+#             # if has_sell: close_slave_position(trader_id) # Reverse
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: Segnale BUY inviato")
 
-    # Prezzo di entrata BUY LIMIT leggermente sotto prezzo attuale
-    price_limit = current_price - 0.5 * pip_value  # puoi modificare lo scarto se vuoi
+#     elif sell_cond:
+#         new_signal = "SELL"
+        
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
 
-    # SL e TP relativi al prezzo limit
-    sl_value = price_limit - (float(trader.sl) * pip_value) if trader.sl > 0 else None
-    tp_value = price_limit + (float(trader.tp) * pip_value) if trader.tp > 0 else None
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
 
-    volume = trader.fix_lot
-    broker = trader.broker
+#         if not has_sell:
+#             # NO REVERSE
+#             # if has_buy: close_slave_position(trader_id) # Reverse
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: Segnale SELL inviato")
 
-    # 3️⃣ Invio ordine pending al manager
-    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
-    payload = {
-        "trader_id": trader_id,
-        "order_type": "buy_limit",  # pending order per minimizzare slippage
-        "symbol": symbol,
-        "price": price_limit,       # prezzo di entrata limit
-        "volume": volume,
-        "sl": sl_value,
-        "tp": tp_value,
-        "broker": broker
-    }
+#     else:
+#         # HOLD: Se vuoi chiusura immediata (come discusso prima, valuta se tenerlo)
+        
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
 
-    try:
-        resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Trader {trader_id} BUY LIMIT Response: {resp.text}")
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: errore invio ordine: {e}")
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
 
-def close_slave_position(trader_id):
-    with sessions_lock:
-        if trader_id not in sessions: return
-        trader = sessions[trader_id]["trader"]
+#         # CON HOLD NON CHIUDE !
+#         # if prev_signal == "BUY" and has_buy:
+#         #     #  close_slave_position(trader_id)
+#         # elif prev_signal == "SELL" and has_sell:
+#         #     #  close_slave_position(trader_id)
 
-    manager_url = os.getenv("MANAGER_URL")
-    url = f"{BASE_URL}/db/traders/{trader_id}/close_order_on_slave"
-    payload = {
-        "symbol": trader.selected_symbol,
-        "trader_id": trader_id
-    }
+#     # 7. Aggiornamento Segnale Precedente nella sessione corretta
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
 
-    try:
-        resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Trader {trader_id} CLOSE Response: {resp.text}")
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: Errore chiusura: {e}")
+# def check_signal_eurusd(trader_id):
+#     """
+#     🔹 Check signal per EURUSD
+#     - Timeframe M5
+#     - EMA breve/lunga + RSI14
+#     - Nessuna chiusura automatica HOLD
+#     - Adatto a volatilità tipica FX
+#     """
+
+#     logs.clear()
+#     # =========================
+#     # 1. Recupero sessione
+#     # =========================
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]
+#         prev_signal = session["prev_signal"]
+
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     symbol = trader.selected_symbol
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     chosen_signal = trader.selected_signal or "EURUSD_BASE"
+
+#     # =========================
+#     # 2. Parametri indicatori
+#     # =========================
+#     params = {
+#         "EMA_short": 5,
+#         "EMA_long": 20,    # leggermente più lungo per EURUSD
+#         "RSI_period": 14
+#     }
+
+#     # =========================
+#     # 3. Dati mercato M5
+#     # =========================
+#     df = get_data(symbol, 5, 50, slave_url)
+#     if df is None or df.empty:
+#         return
+
+#     # =========================
+#     # 4. Indicatori
+#     # =========================
+#     ema_short = compute_ema(df, params["EMA_short"])
+#     ema_long  = compute_ema(df, params["EMA_long"])
+#     rsi       = compute_rsi(df, params["RSI_period"])
+
+#     # =========================
+#     # 5. Condizioni segnale
+#     # =========================
+#     # EURUSD più lento → riduco la soglia RSI per filtrare falsi segnali
+#     buy_cond  = ema_short.iloc[-1] > ema_long.iloc[-1] and rsi.iloc[-1] < 65
+#     sell_cond = ema_short.iloc[-1] < ema_long.iloc[-1] and rsi.iloc[-1] > 35
+
+#     # =========================
+#     # 6. Controllo posizioni slave
+#     # =========================
+#     positions = []
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code == 200:
+#             positions = resp.json()
+#     except:
+#         log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+#         return
+
+#     has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+#     # =========================
+#     # 7. Decisione
+#     # =========================
+#     new_signal = "HOLD"
+
+#     if buy_cond:
+#         new_signal = "BUY"
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
+#         if not has_buy:
+#             if has_sell: close_slave_position(trader_id)
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: BUY inviato")
+
+#     elif sell_cond:
+#         new_signal = "SELL"
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
+#         if not has_sell:
+#             if has_buy: close_slave_position(trader_id)
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: SELL inviato")
+
+#     else:
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+#     # =========================
+#     # 8. Aggiornamento sessione
+#     # =========================
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
+
+# def check_signal_super(trader_id):
+#     """
+#     🔹 Versione SUPER per singolo trader
+#     - Indicatori avanzati
+#     - Filtri trend / volatilità
+#     - Gestione sessione per-trader
+#     """
+
+#     logs.clear()
+
+#     # =========================
+#     # 1. Recupero sessione
+#     # =========================
+#     # session
+#     # with sessions_lock:
+#     #     if trader_id not in sessions: return
+#     #     session = sessions[trader_id]
+#     #     trader = session["trader"]
+#     #     trader_data = session["trader_data"]  # <--- qui
+#     #     prev_signal = session["prev_signal"]
+
+#     # slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+#         # session
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]  # <--- qui
+#         prev_signal = session["prev_signal"]
+
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+
+#     symbol = session["trader"].selected_symbol  # da Pydantic
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+#     # Leggiamo quale segnale ha scelto l'utente nel FE
+#     chosen_signal = trader.selected_signal or "BASE"
+
+#     # =========================
+#     # 2. Parametri indicatori
+#     # =========================
+#     params = {
+#         "EMA_short": 5,
+#         "EMA_long": 15,
+#         "RSI_period": 14
+#     }
+
+#     # =========================
+#     # 3. Dati mercato
+#     # =========================
+#     df = get_data(symbol, 5, 50, slave_url)
+#     if df is None or df.empty:
+#         return
+
+#     # =========================
+#     # 4. Indicatori
+#     # =========================
+#     ema_short = compute_ema(df, params["EMA_short"])
+#     ema_long  = compute_ema(df, params["EMA_long"])
+#     rsi       = compute_rsi(df, params["RSI_period"])
+#     macd, macd_signal = compute_macd(df)
+#     atr       = compute_atr(df)
+#     hma       = compute_hma(df)
+
+#     adx_df = compute_adx(df)
+#     v_adx = float(adx_df["ADX"].iloc[-1])
+
+#     # =========================
+#     # 5. Trend superiore (M15)
+#     # =========================
+#     df15 = get_data(symbol, 15, 50, slave_url)
+#     big_trend_up = (
+#         compute_ema(df15, 20).iloc[-1] >
+#         compute_ema(df15, 50).iloc[-1]
+#     ) if df15 is not None else True
+
+#     big_trend_down = not big_trend_up
+
+#     # =========================
+#     # 6. Filtri volume / volatilità
+#     # =========================
+#     v_mean = float(df["tick_volume"].rolling(20).mean().iloc[-1])
+#     v_now  = float(df["tick_volume"].iloc[-1])
+
+#     f_volume_ok     = v_now > (v_mean * 1.3) if v_mean > 0 else True
+#     f_volatility_ok = float(atr.iloc[-1]) > float(atr.iloc[-5]) if len(atr) >= 5 else True
+#     f_strong_trend  = v_adx > 20
+
+#     # =========================
+#     # 7. GAP filter
+#     # =========================
+#     gap = abs(df["open"].iloc[-1] - df["close"].iloc[-2]) > (df["close"].iloc[-2] * 0.001)
+#     if gap:
+#         log(f"⚠️ Trader {trader_id}: GAP → HOLD")
+#         return
+
+#     # =========================
+#     # 8. Posizioni slave
+#     # =========================
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code != 200:
+#             return
+#         positions = resp.json()
+#     except:
+#         log(f"❌ Trader {trader_id}: Slave non raggiungibile")
+#         return
+
+#     has_buy  = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+#     # =========================
+#     # 9. Condizioni CORE
+#     # =========================
+#     core_buy = (
+#         ema_short.iloc[-1] > ema_long.iloc[-1] and
+#         macd.iloc[-1] > macd_signal.iloc[-1] and
+#         hma.iloc[-1] > hma.iloc[-2] and
+#         rsi.iloc[-1] < 68
+#     )
+
+#     core_sell = (
+#         ema_short.iloc[-1] < ema_long.iloc[-1] and
+#         macd.iloc[-1] < macd_signal.iloc[-1] and
+#         hma.iloc[-1] < hma.iloc[-2] and
+#         rsi.iloc[-1] > 32
+#     )
+
+#     conf_buy  = sum([big_trend_up, f_volume_ok, f_strong_trend]) >= 1
+#     conf_sell = sum([big_trend_down, f_volume_ok, f_strong_trend]) >= 1
+
+#     buy_cond  = core_buy  and conf_buy
+#     sell_cond = core_sell and conf_sell
+
+#     # =========================
+#     # 10. Decisione
+#     # =========================
+#     new_signal = "HOLD"
+
+#     if buy_cond:
+#         new_signal = "BUY"
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
+#         if not has_buy:
+#             if has_sell:
+#                 close_slave_position(trader_id)
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: BUY inviato")
+
+#     elif sell_cond:
+#         new_signal = "SELL"
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
+#         if not has_sell:
+#             if has_buy:
+#                 close_slave_position(trader_id)
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: SELL inviato")
+
+#     else:
+#         # hold --> buy e sell --> buy non chiude...
+#         # if prev_signal == "BUY" and has_buy:
+#         #     # close_slave_position(trader_id)
+#         # elif prev_signal == "SELL" and has_sell:
+#         #     # close_slave_position(trader_id)
+        
+        
+#         log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+#     # =========================
+#     # 11. Update sessione
+#     # =========================
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
+
+# def check_signal_super_xauusd(trader_id):
+
+#     logs.clear()
+
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]
+#         prev_signal = session.get("prev_signal", "HOLD")
+
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     symbol = trader.selected_symbol
+#     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     chosen_signal = trader.selected_signal or "SUPER_XAU"
+
+#     # =========================
+#     # BLOCCO M1 GIÀ PROCESSATO
+#     # =========================
+#     current_m1_ts = datetime.now().replace(second=0, microsecond=0)
+#     if session.get("last_processed_m1") == current_m1_ts:
+#         log(f"⏱️ [{now}] Candela M1 già processata → SKIP")
+#         return
+
+#     session["last_processed_m1"] = current_m1_ts
+
+#     # =========================
+#     # DATI MULTI TF
+#     # =========================
+#     df_m1 = get_data(symbol, 1, 100, slave_url)
+#     df_m5 = get_data(symbol, 5, 100, slave_url)
+#     df_m15 = get_data(symbol, 15, 50, slave_url)
+
+#     if any(d is None or d.empty for d in [df_m1, df_m5, df_m15]):
+#         log(f"❌ [{now}] Dati non disponibili → HOLD")
+#         return
+
+#     # =========================
+#     # INDICATORI
+#     # =========================
+#     ema_fast = compute_ema(df_m1, 9).iloc[-2]
+#     ema_slow = compute_ema(df_m1, 21).iloc[-2]
+#     rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
+#     macd, macd_sig = compute_macd(df_m1)
+
+#     hma_m5 = compute_hma(df_m5).iloc[-2]
+#     hma_m5_prev = compute_hma(df_m5).iloc[-3]
+
+#     ema_m15 = compute_ema(df_m15, 50).iloc[-2]
+#     price_m15 = df_m15["close"].iloc[-2]
+#     trend_macro_up = price_m15 > ema_m15
+
+#     atr_series = compute_atr(df_m1)
+#     atr = atr_series.iloc[-2]
+#     volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
+
+#     candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
+#     is_spike = candle_body > (atr * 3)
+
+#     # =========================
+#     # CONDIZIONI
+#     # =========================
+#     buy_condition = (
+#         ema_fast > ema_slow and
+#         macd.iloc[-2] > macd_sig.iloc[-2] and
+#         hma_m5 > hma_m5_prev and
+#         trend_macro_up and
+#         45 < rsi_m1 < 70 and
+#         volatilty_expansion and not is_spike
+#     )
+
+#     sell_condition = (
+#         ema_fast < ema_slow and
+#         macd.iloc[-2] < macd_sig.iloc[-2] and
+#         hma_m5 < hma_m5_prev and
+#         not trend_macro_up and
+#         30 < rsi_m1 < 55 and
+#         volatilty_expansion and not is_spike
+#     )
+
+#     # =========================
+#     # POSIZIONI
+#     # =========================
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code != 200:
+#             log(f"❌ Slave non risponde")
+#             return
+#         positions = resp.json()
+#     except:
+#         log(f"❌ Slave non raggiungibile")
+#         return
+
+#     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+#     # =========================
+#     # DECISIONE
+#     # =========================
+#     new_signal = "HOLD"
+
+#     log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} ──────────")
+
+#     if buy_condition:
+#         new_signal = "BUY"
+#         log(f"🔥 [{now}] BUY signal per {symbol}")
+
+#         if not has_buy:
+#             if has_sell:
+#                 close_slave_position(trader_id)
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: BUY inviato")
+
+#     elif sell_condition:
+#         new_signal = "SELL"
+#         log(f"🔥 [{now}] SELL signal per {symbol}")
+
+#         if not has_sell:
+#             if has_buy:
+#                 close_slave_position(trader_id)
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: SELL inviato")
+
+#     else:
+#         log(f"🔥 [{now}] HOLD signal per {symbol}")
+
+#         if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
+#             close_slave_position(trader_id)
+#             log(f"⚠️ Chiusura BUY per indebolimento")
+
+#         elif has_sell and (ema_fast > ema_slow or rsi_m1 < 20):
+#             close_slave_position(trader_id)
+#             log(f"⚠️ Chiusura SELL per indebolimento")
+
+#     # =========================
+#     # UPDATE SESSION
+#     # =========================
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
+
+# def check_signal_super_xauusd_noclose(trader_id):
+
+#     logs.clear()
+
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]
+#         prev_signal = session.get("prev_signal", "HOLD")
+
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     symbol = trader.selected_symbol
+#     chosen_signal = trader.selected_signal or "SUPER_XAU"
+
+#     # =========================
+#     # BLOCCO M1 GIÀ PROCESSATO
+#     # =========================
+#     current_m1_ts = datetime.now().replace(second=0, microsecond=0)
+#     if session.get("last_processed_m1") == current_m1_ts:
+#         log(f"⏱️ [{now}] Candela M1 già processata → SKIP")
+#         return
+
+#     session["last_processed_m1"] = current_m1_ts
+
+#     # =========================
+#     # DATI MULTI TF
+#     # =========================
+#     df_m1 = get_data(symbol, 1, 100, slave_url)
+#     df_m5 = get_data(symbol, 5, 100, slave_url)
+#     df_m15 = get_data(symbol, 15, 50, slave_url)
+
+#     if any(d is None or d.empty for d in [df_m1, df_m5, df_m15]):
+#         log(f"❌ [{now}] Dati non disponibili → HOLD")
+#         return
+
+#     # =========================
+#     # INDICATORI
+#     # =========================
+#     ema_fast = compute_ema(df_m1, 9).iloc[-2]
+#     ema_slow = compute_ema(df_m1, 21).iloc[-2]
+#     rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
+#     macd, macd_sig = compute_macd(df_m1)
+
+#     hma_m5 = compute_hma(df_m5).iloc[-2]
+#     hma_m5_prev = compute_hma(df_m5).iloc[-3]
+
+#     ema_m15 = compute_ema(df_m15, 50).iloc[-2]
+#     price_m15 = df_m15["close"].iloc[-2]
+#     trend_macro_up = price_m15 > ema_m15
+
+#     atr_series = compute_atr(df_m1)
+#     atr = atr_series.iloc[-2]
+#     volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
+
+#     candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
+#     is_spike = candle_body > (atr * 3)
+
+#     # =========================
+#     # ATR M5 (stile test_market_analyzer2)
+#     # =========================
+#     df_m5["prev_close"] = df_m5["close"].shift(1)
+#     df_m5["tr"] = df_m5.apply(lambda r: max(
+#         r["high"] - r["low"],
+#         abs(r["high"] - r["prev_close"]),
+#         abs(r["low"] - r["prev_close"])
+#     ), axis=1)
+#     atr_m5_val = df_m5["tr"].rolling(14).mean().iloc[-2]
+
+#     # SL/TP dinamici: se volatilità M5 bassa, tighter
+#     if atr_m5_val <= 6:
+#         effective_sl = 500
+#         effective_tp = 600
+#     else:
+#         effective_sl = None
+#         effective_tp = None
+
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["effective_sl"] = effective_sl
+#             sessions[trader_id]["effective_tp"] = effective_tp
+
+#     # =========================
+#     # CONDIZIONI
+#     # =========================
+#     buy_condition = (
+#         ema_fast > ema_slow and
+#         macd.iloc[-2] > macd_sig.iloc[-2] and
+#         hma_m5 > hma_m5_prev and
+#         trend_macro_up and
+#         45 < rsi_m1 < 70 and
+#         volatilty_expansion and not is_spike
+#     )
+
+#     sell_condition = (
+#         ema_fast < ema_slow and
+#         macd.iloc[-2] < macd_sig.iloc[-2] and
+#         hma_m5 < hma_m5_prev and
+#         not trend_macro_up and
+#         30 < rsi_m1 < 55 and
+#         volatilty_expansion and not is_spike
+#     )
+
+#     # =========================
+#     # POSIZIONI
+#     # =========================
+#     try:
+#         resp = requests.get(f"{slave_url}/positions", timeout=5)
+#         if resp.status_code != 200:
+#             log(f"❌ Slave non risponde")
+#             return
+#         positions = resp.json()
+#     except:
+#         log(f"❌ Slave non raggiungibile")
+#         return
+
+#     has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
+#     has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+#     # =========================
+#     # DECISIONE
+#     # =========================
+#     new_signal = "HOLD"
+
+#     log(f"─────── S-I-G-N-A-L [{chosen_signal}] | Trader {trader_id} | ATR M5: {atr_m5_val:.1f} ──────────")
+
+#     if buy_condition:
+#         new_signal = "BUY"
+#         log(f"🔥 BUY signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+
+#         if not has_buy:
+#             # if has_sell:
+#             #     close_slave_position(trader_id)
+#             send_buy_to_slave(trader_id)
+#             log(f"🔥 Trader {trader_id}: BUY inviato")
+
+#     elif sell_condition:
+#         new_signal = "SELL"
+#         log(f"🔥 SELL signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+
+#         if not has_sell:
+#             # if has_buy:
+#             #     close_slave_position(trader_id)
+#             send_sell_to_slave(trader_id)
+#             log(f"🔻 Trader {trader_id}: SELL inviato")
+
+#     else:
+#         log(f"🔥 HOLD signal per {symbol} (ATR M5: {atr_m5_val:.1f})")
+
+#         # if has_buy and (ema_fast < ema_slow or rsi_m1 > 80):
+#         #     # close_slave_position(trader_id)
+#         #     # log(f"⚠️ Chiusura BUY per indebolimento")
+
+#         # elif has_sell and (ema_fast > ema_slow or rsi_m1 < 20):
+#             # close_slave_position(trader_id)
+#             # log(f"⚠️ Chiusura SELL per indebolimento")
+
+#     # =========================
+#     # UPDATE SESSION
+#     # =========================
+#     with sessions_lock:
+#         if trader_id in sessions:
+#             sessions[trader_id]["prev_signal"] = new_signal
 
 
-def send_sell_to_slave(trader_id):
-    with sessions_lock:
-        if trader_id not in sessions:
-            return
-        session = sessions[trader_id]
-        trader = session["trader"]
-        trader_data = session["trader_data"]
-        effective_sl = session.get("effective_sl")
-        effective_tp = session.get("effective_tp")
+# def send_buy_to_slave(trader_id):
 
-    symbol = trader.selected_symbol
-    slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     with sessions_lock:
+#         if trader_id not in sessions: 
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]
+#         effective_sl = session.get("effective_sl")
+#         effective_tp = session.get("effective_tp")
 
-    manager_url = os.getenv("MANAGER_URL")
+#     symbol = trader.selected_symbol
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
-    # 1️⃣ Recupero info simbolo e tick dallo slave
-    try:
-        info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
-        tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+#     manager_url = os.getenv("MANAGER_URL") # Il tuo BASE_URL del manager
 
-        if info_resp.status_code != 200 or tick_resp.status_code != 200:
-            log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
-            return
+#     # 1. Recupero info simbolo e tick dallo slave specifico
+#     try:
+#         info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+#         tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+        
+#         if info_resp.status_code != 200 or tick_resp.status_code != 200:
+#             log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
+#             return
 
-        sym_info = info_resp.json()
+#         sym_info = info_resp.json()
 
-        log(sym_info.get("filling_mode"))
+#         log(sym_info.get("filling_mode"))
 
-        tick = tick_resp.json()
+#         tick = tick_resp.json()
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
+#         return
 
-        # elimino gestione del tick 
-        # if not tick or "bid" not in tick or "ask" not in tick:
-        #     log(f"⚠️ Trader {trader_id}: Tick incompleto o non valido per {symbol}")
-        #     return
+#     # 2. Calcolo SL e TP dinamici (effective sovrascrive trader.sl/.tp se impostato)
+#     sl_points = effective_sl if effective_sl is not None else trader.sl
+#     tp_points = effective_tp if effective_tp is not None else trader.tp
 
-        # if not tick or "bid" not in tick or tick["bid"] in [None, 0]:
-        #     log(f"⚠️ Trader {trader_id}: Bid non valido per {symbol}: {tick}")
-        #     return
+#     pip_value = float(sym_info.get("point", 0.00001))
+#     sl_value = tick["ask"] - (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
+#     tp_value = tick["ask"] + (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
+
+#     log(f"📐 Trader {trader_id} BUY: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
+
+#     volume = trader.fix_lot
+#     broker = trader.broker
+
+#     # 3. Invio ordine tramite l'endpoint del Manager che comunica con lo Slave
+#     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+#     payload = {
+#         "trader_id": trader_id,
+#         "order_type": "buy",
+#         # "volume": 0.10, # O trader.defaultVolume se lo hai
+#         "volume": volume, 
+#         "symbol": symbol,
+#         "sl": sl_value,
+#         "tp": tp_value,
+#         # broker corrente ..
+#         "broker": broker
+#     }
+
+#     try:
+#         resp = requests.post(url, json=payload, timeout=10)
+#         log(f"📥 Trader {trader_id} BUY Response: {resp.text}")
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: Errore invio ordine: {e}")
+
+# # nuova versione con order Limit... non usata (16/02)
+# def send_buy_to_slave_limit(trader_id):
+    
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]  # dati completi DB
+
+#     symbol = trader.selected_symbol
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
+#     manager_url = os.getenv("MANAGER_URL")  # BASE_URL del manager
+
+#     # 1️⃣ Recupero info simbolo e tick dallo slave
+#     try:
+#         info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+#         tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
+        
+#         if info_resp.status_code != 200 or tick_resp.status_code != 200:
+#             log(f"❌ Trader {trader_id}: impossibile recuperare dati dallo slave")
+#             return
+
+#         sym_info = info_resp.json()
+#         tick = tick_resp.json()
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: errore connessione slave: {e}")
+#         return
+
+#     # 2️⃣ Calcolo prezzo limit, SL e TP
+#     pip_value = float(sym_info.get("point", 0.01))
+#     current_price = tick["ask"]
+
+#     # Prezzo di entrata BUY LIMIT leggermente sotto prezzo attuale
+#     price_limit = current_price - 0.5 * pip_value  # puoi modificare lo scarto se vuoi
+
+#     # SL e TP relativi al prezzo limit
+#     sl_value = price_limit - (float(trader.sl) * pip_value) if trader.sl > 0 else None
+#     tp_value = price_limit + (float(trader.tp) * pip_value) if trader.tp > 0 else None
+
+#     volume = trader.fix_lot
+#     broker = trader.broker
+
+#     # 3️⃣ Invio ordine pending al manager
+#     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+#     payload = {
+#         "trader_id": trader_id,
+#         "order_type": "buy_limit",  # pending order per minimizzare slippage
+#         "symbol": symbol,
+#         "price": price_limit,       # prezzo di entrata limit
+#         "volume": volume,
+#         "sl": sl_value,
+#         "tp": tp_value,
+#         "broker": broker
+#     }
+
+#     try:
+#         resp = requests.post(url, json=payload, timeout=10)
+#         log(f"📥 Trader {trader_id} BUY LIMIT Response: {resp.text}")
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: errore invio ordine: {e}")
+
+# def close_slave_position(trader_id):
+#     with sessions_lock:
+#         if trader_id not in sessions: return
+#         trader = sessions[trader_id]["trader"]
+
+#     manager_url = os.getenv("MANAGER_URL")
+#     url = f"{BASE_URL}/db/traders/{trader_id}/close_order_on_slave"
+#     payload = {
+#         "symbol": trader.selected_symbol,
+#         "trader_id": trader_id
+#     }
+
+#     try:
+#         resp = requests.post(url, json=payload, timeout=10)
+#         log(f"📥 Trader {trader_id} CLOSE Response: {resp.text}")
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: Errore chiusura: {e}")
 
 
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
-        return
+# def send_sell_to_slave(trader_id):
+#     with sessions_lock:
+#         if trader_id not in sessions:
+#             return
+#         session = sessions[trader_id]
+#         trader = session["trader"]
+#         trader_data = session["trader_data"]
+#         effective_sl = session.get("effective_sl")
+#         effective_tp = session.get("effective_tp")
 
-    # 2️⃣ Calcolo SL e TP dinamici (SELL) — effective sovrascrive trader.sl/.tp
-    sl_points = effective_sl if effective_sl is not None else trader.sl
-    tp_points = effective_tp if effective_tp is not None else trader.tp
+#     symbol = trader.selected_symbol
+#     slave_url = f"http://{trader_data['slave_ip']}:{trader_data['slave_port']}"
 
-    pip_value = float(sym_info.get("point", 0.00001))
-    sl_value = tick["bid"] + (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
-    tp_value = tick["bid"] - (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
+#     manager_url = os.getenv("MANAGER_URL")
 
-    log(f"📐 Trader {trader_id} SELL: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
+#     # 1️⃣ Recupero info simbolo e tick dallo slave
+#     try:
+#         info_resp = requests.get(f"{slave_url}/symbol_info/{symbol}", timeout=10)
+#         tick_resp = requests.get(f"{slave_url}/symbol_tick/{symbol}", timeout=10)
 
-    # log(f"Broker {trader.broker} ")
+#         if info_resp.status_code != 200 or tick_resp.status_code != 200:
+#             log(f"❌ Trader {trader_id}: Impossibile recuperare dati dallo slave")
+#             return
 
-    volume = trader.fix_lot
-    broker = trader.broker
+#         sym_info = info_resp.json()
 
-    # 3️⃣ Invio ordine tramite Manager
-    url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
-    payload = {
-        "trader_id": trader_id,
-        "order_type": "sell",
-        # "volume": 0.10,  # o trader.defaultVolume se lo hai
-        "volume": volume,
-        "symbol": symbol,
-        "sl": sl_value,
-        "tp": tp_value,
-        "broker":broker,
-    }
+#         log(sym_info.get("filling_mode"))
 
-    try:
-        resp = requests.post(url, json=payload, timeout=10)
-        log(f"📥 Trader {trader_id} SELL Response: {resp.text}")
-    except Exception as e:
-        log(f"❌ Trader {trader_id}: Errore invio ordine SELL: {e}")
+#         tick = tick_resp.json()
+
+#         # elimino gestione del tick 
+#         # if not tick or "bid" not in tick or "ask" not in tick:
+#         #     log(f"⚠️ Trader {trader_id}: Tick incompleto o non valido per {symbol}")
+#         #     return
+
+#         # if not tick or "bid" not in tick or tick["bid"] in [None, 0]:
+#         #     log(f"⚠️ Trader {trader_id}: Bid non valido per {symbol}: {tick}")
+#         #     return
+
+
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: Errore connessione slave: {e}")
+#         return
+
+#     # 2️⃣ Calcolo SL e TP dinamici (SELL) — effective sovrascrive trader.sl/.tp
+#     sl_points = effective_sl if effective_sl is not None else trader.sl
+#     tp_points = effective_tp if effective_tp is not None else trader.tp
+
+#     pip_value = float(sym_info.get("point", 0.00001))
+#     sl_value = tick["bid"] + (float(sl_points) * pip_value) if sl_points and sl_points > 0 else None
+#     tp_value = tick["bid"] - (float(tp_points) * pip_value) if tp_points and tp_points > 0 else None
+
+#     log(f"📐 Trader {trader_id} SELL: SL={sl_points}pts ({sl_value}), TP={tp_points}pts ({tp_value})")
+
+#     # log(f"Broker {trader.broker} ")
+
+#     volume = trader.fix_lot
+#     broker = trader.broker
+
+#     # 3️⃣ Invio ordine tramite Manager
+#     url = f"{BASE_URL}/db/traders/{trader_id}/open_order_on_slave"
+#     payload = {
+#         "trader_id": trader_id,
+#         "order_type": "sell",
+#         # "volume": 0.10,  # o trader.defaultVolume se lo hai
+#         "volume": volume,
+#         "symbol": symbol,
+#         "sl": sl_value,
+#         "tp": tp_value,
+#         "broker":broker,
+#     }
+
+#     try:
+#         resp = requests.post(url, json=payload, timeout=10)
+#         log(f"📥 Trader {trader_id} SELL Response: {resp.text}")
+#     except Exception as e:
+#         log(f"❌ Trader {trader_id}: Errore invio ordine SELL: {e}")

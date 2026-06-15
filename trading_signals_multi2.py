@@ -568,6 +568,95 @@ class SuperUsdJpyStrategy(SignalStrategy):
         return f"─────── S-I-G-N-A-L [{self.name}] | {details} ──────────"
 
 
+class GbpUsdStrategy(SignalStrategy):
+    name = "GBPUSD"
+    requires_m1 = True
+    requires_m5 = True
+    requires_m15 = True
+
+    def compute_indicators(self, df_m1, df_m5, df_m15):
+        ema_fast = compute_ema(df_m1, 9).iloc[-2]
+        ema_slow = compute_ema(df_m1, 21).iloc[-2]
+        rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
+        macd, macd_sig = compute_macd(df_m1)
+
+        hma_m5 = compute_hma(df_m5).iloc[-2]
+        hma_m5_prev = compute_hma(df_m5).iloc[-3]
+
+        ema_m15 = compute_ema(df_m15, 50).iloc[-2]
+        price_m15 = df_m15["close"].iloc[-2]
+
+        atr_series = compute_atr(df_m1)
+        atr = atr_series.iloc[-2]
+        volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
+
+        candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
+        is_spike = candle_body > (atr * 3)
+
+        df_m5_tmp = df_m5.copy()
+        df_m5_tmp["prev_close"] = df_m5_tmp["close"].shift(1)
+        df_m5_tmp["tr"] = df_m5_tmp.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]),
+            abs(r["low"] - r["prev_close"])
+        ), axis=1)
+        atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
+
+        return Indicators(
+            ema_fast=ema_fast,
+            ema_slow=ema_slow,
+            rsi_m1=rsi_m1,
+            macd=macd.iloc[-2],
+            macd_sig=macd_sig.iloc[-2],
+            hma_m5=hma_m5,
+            hma_m5_prev=hma_m5_prev,
+            trend_macro_up=price_m15 > ema_m15,
+            volatilty_expansion=volatilty_expansion,
+            is_spike=is_spike,
+            atr_m5_val=atr_m5_val,
+        )
+
+    def buy_condition(self, ind: Indicators) -> bool:
+        return (
+            ind.ema_fast > ind.ema_slow
+            and ind.macd > ind.macd_sig
+            and ind.hma_m5 > ind.hma_m5_prev
+            and ind.trend_macro_up
+            and 40 < ind.rsi_m1 < 70
+            and ind.volatilty_expansion
+            and not ind.is_spike
+        )
+
+    def sell_condition(self, ind: Indicators) -> bool:
+        return (
+            ind.ema_fast < ind.ema_slow
+            and ind.macd < ind.macd_sig
+            and ind.hma_m5 < ind.hma_m5_prev
+            and not ind.trend_macro_up
+            and 30 < ind.rsi_m1 < 60
+            and ind.volatilty_expansion
+            and not ind.is_spike
+        )
+
+    def reverse_on_buy(self, has_sell: bool) -> bool:
+        return False
+
+    def reverse_on_sell(self, has_buy: bool) -> bool:
+        return False
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        if ind.atr_m5_val <= 0.0012:
+            return 500, 600
+        return None, None
+
+    def get_log_details(self, ind: Indicators) -> str:
+        return f"(ATR M5: {ind.atr_m5_val:.5f})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        return f"─────── S-I-G-N-A-L [{self.name}] | {details} ──────────"
+
+
 # ─────────────────────── STRATEGY MAP ───────────────────────
 
 STRATEGIES = {
@@ -579,6 +668,7 @@ STRATEGIES = {
     "SUPER": SuperXauNoCloseStrategy(),
     "MSFT": MsftStrategy(),
     "SUPER_USDJPY": SuperUsdJpyStrategy(),
+    "GBPUSD": GbpUsdStrategy(),
 }
 
 DEFAULT_STRATEGY = BaseStrategy()
