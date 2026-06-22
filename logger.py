@@ -58,6 +58,7 @@ class FakeResponse:
         self.status_code = status_code
         self._json_data = json_data if json_data is not None else {}
         self.error_msg = error_msg
+        self.text = error_msg
 
     def json(self):
         return self._json_data
@@ -72,13 +73,13 @@ def safe_get(url, timeout=3):
         return requests.get(url, timeout=timeout)
     except requests.exceptions.ConnectionError:
         log(f"❌ Connessione fallita verso {url}")
-        return None
+        return FakeResponse(status_code=503, error_msg=f"Connessione fallita verso {url}")
     except requests.exceptions.Timeout:
         log(f"⏳ Timeout chiamando {url}")
-        return None
+        return FakeResponse(status_code=504, error_msg=f"Timeout chiamando {url}")
     except Exception as e:
         log(f"⚠️ Errore GET imprevisto: {e}")
-        return None
+        return FakeResponse(status_code=500, error_msg=f"Errore GET imprevisto: {e}")
     
 
 def safe_post(url, json=None, timeout=3):
@@ -86,10 +87,10 @@ def safe_post(url, json=None, timeout=3):
         return requests.post(url, json=json, timeout=timeout)
     except requests.exceptions.ConnectionError:
         log(f"❌ Connessione fallita verso {url}")
-        return None
+        return FakeResponse(status_code=503, error_msg=f"Connessione fallita verso {url}")
     except requests.exceptions.Timeout:
         log(f"⏳ Timeout chiamando {url}")
-        return None
+        return FakeResponse(status_code=504, error_msg=f"Timeout chiamando {url}")
     except Exception as e:
         log(f"⚠️ Errore POST imprevisto: {e}")
-        return None
+        return FakeResponse(status_code=500, error_msg=f"Errore POST imprevisto: {e}")

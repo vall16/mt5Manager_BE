@@ -6,5 +6,5 @@ venv/
 
 # Logs
 *.log
-*.txt
+server_log.txt
 

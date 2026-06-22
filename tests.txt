@@ -1,0 +1,237 @@
+
+## Ipotesi di partenza
+
+* **XAUUSD**
+* **Volume: 0.1 lot**
+* **Valore nozionale ≈ 20.000 $** (corretto ✅)
+* **Leva: 1:20**
+* **Margine bloccato ≈ 1.000 $**
+
+⚠️ **ATTENZIONE**:
+👉 il **rischio NON è 20.000$**
+👉 il rischio dipende **SOLO dallo SL**
+
+---
+
+## Quanto vale il movimento con 0.1 lot
+
+Su XAUUSD:
+
+* **0.1 lot = 10 once**
+* **1$ di movimento = 10$ di P/L**
+* **0.1$ di movimento = 1$**
+
+---
+
+## Rischio in base allo Stop Loss
+
+### Caso A — SL = 100 punti (1$)
+
+* movimento contro: **−1$**
+* perdita: **−10$**
+
+✅ **Rischio reale: 10$**
+
+---
+
+### Caso B — SL = 400 punti (4$)
+
+* movimento contro: **−4$**
+* perdita: **−40$**
+
+✅ **Rischio reale: 40$**
+
+---
+
+### Caso C — SL = 1.000 punti (10$)
+
+* movimento contro: **−10$**
+* perdita: **−100$**
+
+⚠️ qui inizi a sentire il colpo
+
+---
+
+## Riassunto secco
+
+| SL (punti MT5) | Movimento $ | Perdita con 0.1 |
+| -------------- | ----------- | --------------- |
+| 100            | 1$          | **−10$**        |
+| 400            | 4$          | **−40$**        |
+| 1.000          | 10$         | **−100$**       |
+| 2.000          | 20$         | **−200$**       |
+
+---
+
+## Concetto chiave (importantissimo)
+
+💡 **La leva NON aumenta il rischio**
+
+> aumenta solo il **margine bloccato**
+
+💡 **Il rischio lo decide SOLO lo SL**
+
+Se **non metti SL**, allora sì:
+⚠️ **stai rischiando TUTTO il conto**
+
+---
+
+## Tradotto in pratica (da trader serio)
+
+Con **0.1 su XAUUSD**:
+
+* SL **100–300** → rischio **10–30$** → sano
+* SL **500–800** → rischio **50–80$** → ok se strategia valida
+* SL **>1500** → rischio **importante**
+
+---
+
+
+23/01/2026
+22-23 ---> xauusd , 20sec, 600/300 ----> perdite consistenti notturne (buy/sell ravvicinati)
+
+da 12.07 (orario mt5)
+XAUUSD: 300 sec --->      200/300    check nohold
+EURJPY: 20 sec --->        150/300      nohold
+USDJPY: 20 sec --->        150/300    nohold 
+
+26/01
+XAUUSD  300 sec ---->  100/400 checknohold     positivo attorno 170 (except 00.00-00.500)
+27/01
+XAUUSD  300 sec ---->  100/400 checknohold     positivo attorno 170 (except 00.00-00.500)
+win 170 euro da 5.00 h alle 17.00 circa
+
+29/01
+MSFT  20 sec    150/200 ... occhio a sl/tp che devono essere come minimo queste fix_lot(volume):5
+
+30/01
+ho accesso anche al server .181: funziona... compra MSFT + XAUUSD
+
+02/02/2026
+test 30 min su .180  --> 116 euro (h.14.20)
+test 2 min mSFT + 5 min (300) XAUUS (100/450)----> 13 eur (14.30)
+(se metto XAUUS a 10 sec, guadagno moltissimo...però poi perdo anche tanto...)
+...lo rimetto a 5 minuti (300 sec) 100/450
+
+03/02/2026
+continua il test... al mattino >10.00 sembra tranquillo e in pari...aspettiamo
+primo pomeriggio.
+Alle 12.00: totale 30/01 -: 441 euro
+
+oggi:
+su Zanardi: 1 min, XAUUSD con SUPER
+riepilogo: h.19.30 : Fontana, 5 min (300), basenohold, 513.2 eur
+
+04/02/2026
+su Zanardi : 1 min- SUPER, XAUUSD : 496 eur alle 11:00 !
+dovrebbe essere super, però vedo un NOHOLD...
+Importante è che 1 minuto sembra fare molto bene !
+alle 11.00 rilancio per sicurezza NOHOLD ... al minuto. 
+
+h.12.00
+per pulizia ho reiniziato 
+FONTANA   100/400    5 min (300)   BASE_NOHOLD
+ZANARDI   100/400    1 min (60)    BASE_NOHOLD
+... blackout alle 16.15 circa, ripreso alle 17.30 circa... !!
+
+05/02/2026
+continuano
+FONTANA / ZANARDI ...
+tentativo di loggare ICMARKETS
+
+10/02
+provato 70/400 su icmarkets... sembra al limite...va provato bene
+oggi provo 50/450...
+
+oggi cambio:
+300/600 su icmarkets , 1 min ...promettente ...
+
+11/02
+continuo test 300/600 (1) icmarkets... alle 15.00 è a pari, partendo da mattino 8.00 circa
+dal pomeriggio, riposto 100/500 sperando che giri di notte. Promettente.
+
+12/02
+Icmarkets - 90/400 - 1 min. su server... dalle 15.30 circa... male
+
+13/02
+ICmarkets : XAUUSD super - 100/400 1 min, da 12.20 h..non male...
+... sembra positivo in serata ...***
+EURUSD super - 50/100 1 min.. negativo ...
+
+16/02
+xauusd super  130/420...1 min
+xauusd super  100/400  2 min, prova
+
+eurusd hold  100/180  1 min   1 fix_lot
+
+17/02
+eurusd   25/50 1 min 1 fix_lot, promettente..
+
+18/02
+20/40 eurusd & USDjpy  2 fix_lot.--- vediamo...
+usdjpy crollo... lascio solo eurusd, più promettente
+
+20/02
+provo le 3 monete eurusd/gbpusd/eurgbp     0 SL / 50 tp
+stanno schizzando tutte e su numeri alti sta guadagnando ...
+1000 euro circa sotto ma 1200 etc sopra
+
+25/02
+xauusd 100/600 1 min 0.1 ... prova no
+xauusd 70/200 1 min 0.1  SUPER ... sembra buono
+
+xauusd 150/400 con SUPER EVOLUTA, che dovrebbe essere molto rara... vedremo...
+
+26/02
+xauusd 200/430 con super evoluta... facciamolo respirare... ieri infatti era un po' sotto..
++
+eurusd 30/50 con super evoluta...
+xauusd 300/500 con super evoluta...
+
+02/03
+xauusd 300/500 continua da venerdi è quasi a pari... sembra che si debba
+allargare lo SL...da verificare...
+
+03/03
+xauusd super 300/500 era piuttosto in pari...allargato a 400/600---> molto buono,
+volatilità forte ... era in pari e sup a volte... verso le 16.00 è crashato il broker per guerra.
+ripreso dopo mezz'ora circa. Portato a 450/700
+
+04/04
+ho reimpostato super 400/600 e poi 400/650 ...
+
+05/03
+impostato xauusd 1000/800 superXauusd per respirare bene...
+andrebbe allargato ancora un po' lo SL
+
+06/03
+1200/800 , allargato SL... a Manina si guadagna bene
+80/120 gbp/jpy ...  Sl largo
+
+09/03
+di notte a manina guadagnavo.
+portato:
+1300/1300
+130/130 gbp/jpy
+
+12/03
+xauusd modificato, no close... a occhio 300/1500
+molto bene !
+
+13/03
+continua xauusd 300/1500
+gpb/jpy 150/150 non male per ora
+
+18/03
+continua xauusd 300/1500
+dal 13 al 18 (h.16.00) sono circa 900 euro (674 + 240 fissi persi con gbpjpy)
+gbpjpy provato con 30/150 ma troppi sl... bloccato...
+quindi xauusd 300/1500 continua a promettere, con qualche aiutino di chiusura a 
+mano su TP
+
+15/06
+testando :
+XAUUSD 300/1500 con dinamismo su atr
+USDJPY 800/1000
+GBPUSD 800/1000
+non male....
