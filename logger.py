@@ -19,6 +19,10 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 def colorize_signal(text: str) -> str:
+    # 🔴 Intera riga in rosso se status è "ko"
+    if re.search(r'"status"\s*:\s*"ko"', text, re.IGNORECASE):
+        return f"{RED}{text}{RESET}"
+    # 💛 BUY/SELL signal per <SIMBOLO> → giallo, simbolo rosso
     return re.sub(
         r'(BUY|SELL)\s+signal\s+per\s+(\S+)',
         lambda m: f"{YELLOW}{m.group(1)} signal per {RESET}{RED}{m.group(2)}{RESET}",
