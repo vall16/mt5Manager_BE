@@ -6,12 +6,25 @@ from pprint import pformat
 import time
 import sys
 import io
+import re
 
 
 
 start_time = datetime.now()
 logs = []  # lista globale dei log
 
+# ── ANSI colori ──
+YELLOW = "\033[93m"
+RED = "\033[91m"
+RESET = "\033[0m"
+
+def colorize_signal(text: str) -> str:
+    return re.sub(
+        r'(BUY|SELL)\s+signal\s+per\s+(\S+)',
+        lambda m: f"{YELLOW}{m.group(1)} signal per {RESET}{RED}{m.group(2)}{RESET}",
+        text,
+        flags=re.IGNORECASE,
+    )
 
 
 def log(message):
@@ -44,9 +57,10 @@ def log(message):
         line_to_print = f"{timestamp} {line}"
         # 1. Salva in memoriaa
         logs.append(line_to_print)
-        # 2. Stampa a video
-        print(line_to_print, flush=True)
-        # 3. SCRIVI SU FILE (Aggiunta)
+        # 2. Stampa a video con colori ANSI
+        colored = colorize_signal(line_to_print)
+        print(colored, flush=True)
+        # 3. SCRIVI SU FILE (SEMPRE SENZA COLORI)
         with open("server_log.txt", "a", encoding="utf-8") as f:
             f.write(line_to_print + "\n")
 
