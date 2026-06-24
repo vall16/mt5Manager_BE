@@ -248,7 +248,7 @@ class SignalStrategy:
         new_signal = "HOLD"
         log_details = self.get_log_details(ind)
         header = self.get_log_header(ind)
-        log(trader_id, f"{header} | Trader {trader_id} | {symbol}")
+        log(trader_id, f"{header} | {trader.name} | {symbol}")
 
         if self.buy_condition(ind):
             new_signal = "BUY"
