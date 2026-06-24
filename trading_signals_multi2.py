@@ -84,7 +84,12 @@ def send_order(trader_id: int, direction: str):
 
     pip_value = float(sym_info.get("point", 0.00001))
     sl_points = effective_sl if effective_sl is not None else trader.sl
-    tp_points = effective_tp if effective_tp is not None else trader.tp
+    use_profit_tp = getattr(trader, 'use_profit_tp', False)
+    profit_tp_value = getattr(trader, 'profit_tp_value', None)
+    if use_profit_tp and profit_tp_value and profit_tp_value > 0:
+        tp_points = None
+    else:
+        tp_points = effective_tp if effective_tp is not None else trader.tp
 
     if direction == "buy":
         price = tick["ask"]
@@ -243,6 +248,18 @@ class SignalStrategy:
 
         has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
         has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
+
+        # ── Profit TP check (sovrascrive qualsiasi TP) ──
+        use_profit_tp = getattr(trader, 'use_profit_tp', False)
+        profit_tp_value = getattr(trader, 'profit_tp_value', None)
+        if use_profit_tp and profit_tp_value and profit_tp_value > 0:
+            for p in positions:
+                if p["symbol"] == symbol and p.get("profit", 0) >= profit_tp_value:
+                    log(trader_id, f"💰 Profit TP {profit_tp_value}$ raggiunto per {symbol} (profit: {p['profit']:.2f})")
+                    close_slave_position(trader_id)
+                    has_buy = False
+                    has_sell = False
+                    break
 
         # ── decisione ──
         new_signal = "HOLD"

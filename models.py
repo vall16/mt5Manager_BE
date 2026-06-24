@@ -76,6 +76,10 @@ class Trader(BaseModel):
     #  //il broker preso dal server slave
     broker: Optional[str] = None           
 
+    # 🆕 Profit TP locale (non salvato in DB)
+    use_profit_tp: bool = False
+    profit_tp_value: Optional[float] = None
+
 
 class Newtrader(BaseModel):
     

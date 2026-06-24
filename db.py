@@ -1264,8 +1264,6 @@ def open_order_on_slave(payload: OrderPayload):
 
         log("✅ Login SLAVE riuscito")
 
-        log(f"Simbolo dal payload è: {symbol}")
-
         # 4️⃣ Recupero tick SLAVE
         # symbol = trader["symbol"] if "symbol" in trader else "XAUUSD"
         tick_url = f"{base_url_slave}/symbol_tick/{symbol}"
@@ -1303,9 +1301,6 @@ def open_order_on_slave(payload: OrderPayload):
 
         order_url = f"{base_url_slave}/order"
         log(f"📤 Invio ordine allo SLAVE → {order_url}")
-        # log(json.dumps(order_request, indent=2))
-        # log(pformat(order_request))
-        log("🧾 Dati inviati:" + pformat(order_request))
 
 
         
@@ -1319,7 +1314,8 @@ def open_order_on_slave(payload: OrderPayload):
                     }
 
         result = resp_order.json()
-        log(f"✅ Risposta SLAVE: {result}")
+        r = result.get("result", {})
+        log(f"✅ Risposta SLAVE: retcode={r.get('retcode')}, deal={r.get('deal')}, ticket={r.get('order')}")
 
         ticket = result.get("result", {}).get("order")
 
