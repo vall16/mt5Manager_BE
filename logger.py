@@ -16,12 +16,27 @@ logs = []  # lista globale dei log
 # ── ANSI colori ──
 YELLOW = "\033[93m"
 RED = "\033[91m"
+GREEN = "\033[92m"
 RESET = "\033[0m"
 
 def colorize_signal(text: str) -> str:
     # 🔴 Intera riga in rosso se status è "ko"
     if re.search(r'"status"\s*:\s*"ko"', text, re.IGNORECASE):
         return f"{RED}{text}{RESET}"
+    # 🟢 START polling in verde
+    if re.search(r'▶\s*START', text):
+        return re.sub(
+            r'▶\s*START(.+)',
+            lambda m: f"{GREEN}▶ START{RESET}{GREEN}{m.group(1)}{RESET}",
+            text,
+        )
+    # 🔴 STOP polling in rosso
+    if re.search(r'⏹\s*STOP', text):
+        return re.sub(
+            r'⏹\s*STOP(.+)',
+            lambda m: f"{RED}⏹ STOP{RESET}{RED}{m.group(1)}{RESET}",
+            text,
+        )
     # 💛 BUY/SELL signal per <SIMBOLO> → giallo, simbolo rosso
     return re.sub(
         r'(BUY|SELL)\s+signal\s+per\s+(\S+)',

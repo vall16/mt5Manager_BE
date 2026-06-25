@@ -970,6 +970,7 @@ def start_polling(trader: Trader):
             "logs": [],
         }
 
+    global_log(f"▶ START {trader.name} | {trader.selected_symbol}")
     polling_loop_timer(tid)
     return {"status": "started", "trader_id": tid}
 
@@ -979,9 +980,13 @@ def stop_polling(req: StopPollingRequest):
     trader_id = req.trader_id
     with sessions_lock:
         if trader_id in sessions:
+            trader = sessions[trader_id].get("trader")
             timer = sessions[trader_id].get("timer")
             if timer:
                 timer.cancel()
+            trader_name = trader.name if trader else str(trader_id)
+            trader_symbol = trader.selected_symbol if trader else "?"
             del sessions[trader_id]
+            global_log(f"⏹ STOP {trader_name} | {trader_symbol}")
             return {"status": "stopped", "trader_id": trader_id}
     return {"status": "not_running"}
