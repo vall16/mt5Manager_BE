@@ -1,5 +1,6 @@
 # logger.py
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from decimal import Decimal
 import json
 from pprint import pformat
@@ -69,7 +70,7 @@ def log(message):
     # timestamp = f"[+{elapsed:.1f}s]"
 
     # 📅 timestamp stile italiano SENZA secondi
-    timestamp = datetime.now().strftime("[%d/%m/%Y %H:%M]")
+    timestamp = datetime.now(ZoneInfo("Europe/Rome")).strftime("[%d/%m/%Y %H:%M]")
 
 
     for line in message.splitlines():

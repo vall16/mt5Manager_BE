@@ -1,5 +1,6 @@
 # --- STATO MULTI-SESSIONE (REFACTORED: STRATEGY PATTERN) ---
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 import os
 import threading
 import time
@@ -52,7 +53,7 @@ def get_data(symbol, timeframe, n_candles, agent_url):
 
 
 def now_str() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now(ZoneInfo("Europe/Rome")).strftime("%Y-%m-%d %H:%M:%S")
 
 
 # ─────────────────────── SEND ORDER (unified) ───────────────────────
@@ -142,7 +143,7 @@ def close_slave_position(trader_id: int):
 # ─────────────────────── PER-TRADER LOG ───────────────────────
 
 def log(trader_id: int, msg: str):
-    ts = datetime.now().strftime("%H:%M:%S")
+    ts = datetime.now(ZoneInfo("Europe/Rome")).strftime("%H:%M:%S")
     global_log(msg)
     with sessions_lock:
         if trader_id in sessions:
