@@ -400,6 +400,10 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         ), axis=1)
         atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
 
+        volume_avg = df_m5["tick_volume"].rolling(20).mean().iloc[-2]
+        volume_now = df_m5["tick_volume"].iloc[-2]
+        volume_ok = volume_now > volume_avg * 1.3 if volume_avg > 0 else True
+
         return Indicators(
             ema_fast=ema_fast,
             ema_slow=ema_slow,
@@ -412,6 +416,7 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             volatilty_expansion=volatilty_expansion,
             is_spike=is_spike,
             atr_m5_val=atr_m5_val,
+            volume_ok=volume_ok,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
@@ -423,6 +428,7 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             and 45 < ind.rsi_m1 < 70
             and ind.volatilty_expansion
             and not ind.is_spike
+            and ind.volume_ok
         )
 
     def sell_condition(self, ind: Indicators) -> bool:
@@ -434,6 +440,7 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             and 30 < ind.rsi_m1 < 55
             and ind.volatilty_expansion
             and not ind.is_spike
+            and ind.volume_ok
         )
 
     def reverse_on_buy(self, has_sell: bool) -> bool:
@@ -449,7 +456,8 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         return None, None
 
     def get_log_details(self, ind: Indicators) -> str:
-        return f"(ATR M5: {ind.atr_m5_val:.1f})"
+        vol = f"VOL:{'OK' if ind.volume_ok else 'LOW'}"
+        return f"(ATR M5: {ind.atr_m5_val:.1f} | {vol})"
 
     def get_log_header(self, ind: Indicators) -> str:
         details = self.get_log_details(ind)
