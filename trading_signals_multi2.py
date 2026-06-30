@@ -56,6 +56,22 @@ def now_str() -> str:
     return datetime.now(ZoneInfo("Europe/Rome")).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def is_market_open(symbol: str) -> bool:
+    now = datetime.now(ZoneInfo("Europe/Rome"))
+    weekday = now.isoweekday()
+    hour = now.hour
+
+    # Saturday (6) sempre chiuso
+    if weekday == 6:
+        return False
+
+    # Sunday (7) chiuso fino alle 23:00 Rome time (forex open)
+    if weekday == 7 and hour < 23:
+        return False
+
+    return True
+
+
 # ─────────────────────── SEND ORDER (unified) ───────────────────────
 
 def send_order(trader_id: int, direction: str):
@@ -213,6 +229,11 @@ class SignalStrategy:
             if session.get("last_processed_m1") == current_m1_ts:
                 return
             session["last_processed_m1"] = current_m1_ts
+
+        # ── mercato aperto? ──
+        if not is_market_open(symbol):
+            log(trader_id, f"⏸ Mercato chiuso (weekend) per {symbol}")
+            return
 
         # ── fetch dati ──
         df_m1 = get_data(symbol, 1, 100, slave_url) if self.requires_m1 else None
