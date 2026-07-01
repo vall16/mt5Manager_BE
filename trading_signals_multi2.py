@@ -322,32 +322,11 @@ class SignalStrategy:
 
 # ─────────────────────── CONCRETE STRATEGIES ───────────────────────
 
-class BaseStrategy(SignalStrategy):
-    name = "BASE"
-
-    def compute_indicators(self, df_m1, df_m5, df_m15):
-        return Indicators(
-            ema_short=compute_ema(df_m5, 5).iloc[-1],
-            ema_long=compute_ema(df_m5, 15).iloc[-1],
-            rsi=compute_rsi(df_m5, 14).iloc[-1],
-        )
-
-    def buy_condition(self, ind: Indicators) -> bool:
-        return ind.ema_short > ind.ema_long and ind.rsi < 68
-
-    def sell_condition(self, ind: Indicators) -> bool:
-        return ind.ema_short < ind.ema_long and ind.rsi > 32
-
-    def on_hold_action(self, ind, has_buy, has_sell, prev_signal):
-        if prev_signal == "BUY" and has_buy:
-            return "close_buy"
-        if prev_signal == "SELL" and has_sell:
-            return "close_sell"
-        return None
-
-
 class NoReverseStrategy(SignalStrategy):
     name = "BASE_NOHOLD"
+
+    def __init__(self, close_on_hold=False):
+        self.close_on_hold = close_on_hold
 
     def compute_indicators(self, df_m1, df_m5, df_m15):
         return Indicators(
@@ -367,6 +346,15 @@ class NoReverseStrategy(SignalStrategy):
 
     def reverse_on_sell(self, has_buy: bool) -> bool:
         return False
+
+    def on_hold_action(self, ind, has_buy, has_sell, prev_signal):
+        if not self.close_on_hold:
+            return None
+        if prev_signal == "BUY" and has_buy:
+            return "close_buy"
+        if prev_signal == "SELL" and has_sell:
+            return "close_sell"
+        return None
 
 
 class EurUsdStrategy(SignalStrategy):
@@ -926,10 +914,10 @@ class AudJpyStrategy(SignalStrategy):
 # ─────────────────────── STRATEGY MAP ───────────────────────
 
 STRATEGIES = {
-    "BASE": BaseStrategy(),
+    "BASE": NoReverseStrategy(close_on_hold=True),
     "BASE_NOHOLD": NoReverseStrategy(),
-    "TRENDGUARD": BaseStrategy(),
-    "TRENDGUARD_XAU": BaseStrategy(),
+    "TRENDGUARD": NoReverseStrategy(close_on_hold=True),
+    "TRENDGUARD_XAU": NoReverseStrategy(close_on_hold=True),
     "EURUSD_NOHOLD": EurUsdStrategy(),
     "SUPER": SuperXauNoCloseStrategy(),
     "MSFT": MsftStrategy(),
@@ -940,7 +928,7 @@ STRATEGIES = {
     "AUDJPY": AudJpyStrategy(),
 }
 
-DEFAULT_STRATEGY = BaseStrategy()
+DEFAULT_STRATEGY = NoReverseStrategy(close_on_hold=True)
 
 
 # ─────────────────────── POLLING LOOP ───────────────────────
