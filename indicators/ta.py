@@ -108,3 +108,12 @@ def compute_adx(df, period=14):
     adx = dx.rolling(period).mean()
 
     return pd.DataFrame({'ADX': adx, '+DI': plus_di, '-DI': minus_di})
+
+
+def compute_ichimoku(df, tenkan_period=9, kijun_period=26, senkou_b_period=52):
+    tenkan = (df['high'].rolling(tenkan_period).max() + df['low'].rolling(tenkan_period).min()) / 2
+    kijun = (df['high'].rolling(kijun_period).max() + df['low'].rolling(kijun_period).min()) / 2
+    senkou_a = ((tenkan + kijun) / 2).shift(kijun_period)
+    senkou_b = ((df['high'].rolling(senkou_b_period).max() + df['low'].rolling(senkou_b_period).min()) / 2).shift(kijun_period)
+    chikou = df['close'].shift(-kijun_period)
+    return tenkan, kijun, senkou_a, senkou_b, chikou

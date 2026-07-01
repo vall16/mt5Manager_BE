@@ -13,7 +13,8 @@ from db import get_trader, get_connection
 from models import Trader
 from indicators.ta import (
     compute_ema, compute_rsi, compute_macd, compute_atr,
-    compute_bollinger, compute_hma, compute_adx
+    compute_bollinger, compute_hma, compute_adx,
+    compute_ichimoku
 )
 import pandas as pd
 import requests
@@ -179,8 +180,9 @@ class SignalStrategy:
     requires_m1 = False
     requires_m5 = True
     requires_m15 = False
+    requires_h1 = False
 
-    def compute_indicators(self, df_m1, df_m5, df_m15) -> Indicators:
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None) -> Indicators:
         raise NotImplementedError
 
     def buy_condition(self, ind: Indicators) -> bool:
@@ -223,12 +225,17 @@ class SignalStrategy:
         symbol = trader.selected_symbol
         now = now_str()
 
-        # ── skip duplicato M1 ──
+        # ── skip duplicato ──
         if self.requires_m1:
-            current_m1_ts = datetime.now().replace(second=0, microsecond=0)
-            if session.get("last_processed_m1") == current_m1_ts:
+            current_ts = datetime.now().replace(second=0, microsecond=0)
+            if session.get("last_processed_m1") == current_ts:
                 return
-            session["last_processed_m1"] = current_m1_ts
+            session["last_processed_m1"] = current_ts
+        if self.requires_h1:
+            current_ts = datetime.now().replace(minute=0, second=0, microsecond=0)
+            if session.get("last_processed_h1") == current_ts:
+                return
+            session["last_processed_h1"] = current_ts
 
         # ── mercato aperto? ──
         if not is_market_open(symbol):
@@ -239,6 +246,7 @@ class SignalStrategy:
         df_m1 = get_data(symbol, 1, 100, slave_url) if self.requires_m1 else None
         df_m5 = get_data(symbol, 5, 100, slave_url) if self.requires_m5 else None
         df_m15 = get_data(symbol, 15, 50, slave_url) if self.requires_m15 else None
+        df_h1 = get_data(symbol, 60, 120, slave_url) if self.requires_h1 else None
 
         if self.requires_m1 and (df_m1 is None or df_m1.empty):
             return
@@ -246,9 +254,11 @@ class SignalStrategy:
             return
         if self.requires_m15 and (df_m15 is None or df_m15.empty):
             return
+        if self.requires_h1 and (df_h1 is None or df_h1.empty):
+            return
 
         # ── indicatori ──
-        ind = self.compute_indicators(df_m1, df_m5, df_m15)
+        ind = self.compute_indicators(df_m1, df_m5, df_m15, df_h1=df_h1)
 
         # ── SL/TP dinamico ──
         effective_sl, effective_tp = self.get_dynamic_sl_tp(ind)
@@ -328,7 +338,7 @@ class NoReverseStrategy(SignalStrategy):
     def __init__(self, close_on_hold=False):
         self.close_on_hold = close_on_hold
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         return Indicators(
             ema_short=compute_ema(df_m5, 5).iloc[-1],
             ema_long=compute_ema(df_m5, 15).iloc[-1],
@@ -360,7 +370,7 @@ class NoReverseStrategy(SignalStrategy):
 class EurUsdStrategy(SignalStrategy):
     name = "EURUSD_NOHOLD"
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         return Indicators(
             ema_short=compute_ema(df_m5, 5).iloc[-1],
             ema_long=compute_ema(df_m5, 20).iloc[-1],
@@ -380,7 +390,7 @@ class SuperXauNoCloseStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
         rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
@@ -468,7 +478,7 @@ class MsftStrategy(SignalStrategy):
     name = "MSFT"
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         df = df_m15
         volume_avg = df["tick_volume"].rolling(20).mean().iloc[-1]
         volume_now = df["tick_volume"].iloc[-1]
@@ -509,7 +519,7 @@ class NvdaStrategy(SignalStrategy):
     name = "NVDA"
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         df = df_m15
         volume_avg = df["tick_volume"].rolling(20).mean().iloc[-1]
         volume_now = df["tick_volume"].iloc[-1]
@@ -552,7 +562,7 @@ class SuperUsdJpyStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
         rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
@@ -641,7 +651,7 @@ class GbpUsdStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
         rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
@@ -730,7 +740,7 @@ class GbpJpyStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
         rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
@@ -819,7 +829,7 @@ class AudJpyStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
-    def compute_indicators(self, df_m1, df_m5, df_m15):
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
         rsi_m1 = compute_rsi(df_m1, 14).iloc[-2]
@@ -902,6 +912,50 @@ class AudJpyStrategy(SignalStrategy):
         return f"S-I-G-N-A-L [{self.name}] | {details}"
 
 
+class IchimokuXauStrategy(SignalStrategy):
+    name = "ICHIMOKU"
+    requires_m1 = False
+    requires_m5 = False
+    requires_m15 = False
+    requires_h1 = True
+
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
+        tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
+        return Indicators(
+            tenkan=tenkan.iloc[-2],
+            kijun=kijun.iloc[-2],
+            senkou_a=senkou_a.iloc[-2],
+            senkou_b=senkou_b.iloc[-2],
+            chikou=chikou.iloc[-2],
+            chikou_prev=chikou.iloc[-3],
+            price=df_h1["close"].iloc[-2],
+        )
+
+    def buy_condition(self, ind: Indicators) -> bool:
+        above_cloud = ind.price > ind.senkou_a and ind.price > ind.senkou_b
+        tk_bull = ind.tenkan > ind.kijun
+        return above_cloud and tk_bull
+
+    def sell_condition(self, ind: Indicators) -> bool:
+        below_cloud = ind.price < ind.senkou_a and ind.price < ind.senkou_b
+        tk_bear = ind.tenkan < ind.kijun
+        return below_cloud and tk_bear
+
+    def reverse_on_buy(self, has_sell: bool) -> bool:
+        return True
+
+    def reverse_on_sell(self, has_buy: bool) -> bool:
+        return True
+
+    def get_log_details(self, ind: Indicators) -> str:
+        cloud_pos = "ABOVE" if ind.price > max(ind.senkou_a, ind.senkou_b) else "BELOW" if ind.price < min(ind.senkou_a, ind.senkou_b) else "INSIDE"
+        return f"(T:{ind.tenkan:.1f} K:{ind.kijun:.1f} Cloud:{cloud_pos})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        return f"S-I-G-N-A-L [{self.name}] | {details}"
+
+
 # ─────────────────────── STRATEGY MAP ───────────────────────
 
 STRATEGIES = {
@@ -911,6 +965,7 @@ STRATEGIES = {
     "TRENDGUARD_XAU": NoReverseStrategy(close_on_hold=True),
     "EURUSD_NOHOLD": EurUsdStrategy(),
     "SUPER": SuperXauNoCloseStrategy(),
+    "ICHIMOKU": IchimokuXauStrategy(),
     "MSFT": MsftStrategy(),
     "NVDA": NvdaStrategy(),
     "SUPER_USDJPY": SuperUsdJpyStrategy(),
