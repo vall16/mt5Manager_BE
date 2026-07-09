@@ -225,17 +225,12 @@ class SignalStrategy:
         symbol = trader.selected_symbol
         now = now_str()
 
-        # ── skip duplicato ──
+        # ── skip duplicato M1 ──
         if self.requires_m1:
             current_ts = datetime.now().replace(second=0, microsecond=0)
             if session.get("last_processed_m1") == current_ts:
                 return
             session["last_processed_m1"] = current_ts
-        if self.requires_h1:
-            current_ts = datetime.now().replace(minute=0, second=0, microsecond=0)
-            if session.get("last_processed_h1") == current_ts:
-                return
-            session["last_processed_h1"] = current_ts
 
         # ── mercato aperto? ──
         if not is_market_open(symbol):
@@ -246,7 +241,7 @@ class SignalStrategy:
         df_m1 = get_data(symbol, 1, 100, slave_url) if self.requires_m1 else None
         df_m5 = get_data(symbol, 5, 100, slave_url) if self.requires_m5 else None
         df_m15 = get_data(symbol, 15, 50, slave_url) if self.requires_m15 else None
-        df_h1 = get_data(symbol, 60, 120, slave_url) if self.requires_h1 else None
+        df_h1 = get_data(symbol, 16385, 120, slave_url) if self.requires_h1 else None
 
         if self.requires_m1 and (df_m1 is None or df_m1.empty):
             return
@@ -256,6 +251,18 @@ class SignalStrategy:
             return
         if self.requires_h1 and (df_h1 is None or df_h1.empty):
             return
+
+        # ── skip H1 se candela non ancora chiusa ──
+        if self.requires_h1:
+            latest_h1_ts = df_h1["time"].iloc[-1]
+            if session.get("last_processed_h1") == latest_h1_ts:
+                skip_count = session.get("h1_skip_count", 0) + 1
+                session["h1_skip_count"] = skip_count
+                if skip_count % 5 == 0:
+                    log(trader_id, f"⏳ In attesa della prossima candela H1...")
+                return
+            session["last_processed_h1"] = latest_h1_ts
+            session["h1_skip_count"] = 0
 
         # ── indicatori ──
         ind = self.compute_indicators(df_m1, df_m5, df_m15, df_h1=df_h1)
@@ -468,6 +475,198 @@ class SuperXauNoCloseStrategy(SignalStrategy):
 
     def get_log_details(self, ind: Indicators) -> str:
         return f"(ATR M5: {ind.atr_m5_val:.1f})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        return f"S-I-G-N-A-L [{self.name}] | {details}"
+
+
+class SuperXauProStrategy(SignalStrategy):
+    name = "SUPER_PRO"
+    requires_m1 = True
+    requires_m5 = True
+    requires_m15 = True
+
+    def _get_session_params(self):
+        now = datetime.now(ZoneInfo("Europe/Rome"))
+        hour = now.hour
+        minute = now.minute
+
+        # Asia: 01:00-09:00 — bassa volatilità
+        if 1 <= hour < 9:
+            return {
+                "label": "ASIA",
+                "rsi_period": 21,
+                "rsi_buy_min": 50, "rsi_buy_max": 78,
+                "rsi_sell_min": 22, "rsi_sell_max": 50,
+                "vol_expansion_mult": 1.3,
+                "sl_atr_factor": 4.0,
+                "tp_atr_factor": 2.0,
+            }
+        # London: 09:00-14:00 — media volatilità
+        elif 9 <= hour < 14:
+            return {
+                "label": "LONDON",
+                "rsi_period": 14,
+                "rsi_buy_min": 45, "rsi_buy_max": 72,
+                "rsi_sell_min": 28, "rsi_sell_max": 55,
+                "vol_expansion_mult": 1.0,
+                "sl_atr_factor": 3.0,
+                "tp_atr_factor": 1.8,
+            }
+        # NY-London overlap: 14:00-17:30 — massima volatilità
+        elif 14 <= hour < 17 or (hour == 17 and minute < 30):
+            return {
+                "label": "NY-LON",
+                "rsi_period": 9,
+                "rsi_buy_min": 42, "rsi_buy_max": 68,
+                "rsi_sell_min": 32, "rsi_sell_max": 58,
+                "vol_expansion_mult": 0.8,
+                "sl_atr_factor": 2.5,
+                "tp_atr_factor": 2.2,
+            }
+        # NY late: 17:30-22:00
+        elif (hour == 17 and minute >= 30) or 18 <= hour < 22:
+            return {
+                "label": "NY",
+                "rsi_period": 14,
+                "rsi_buy_min": 45, "rsi_buy_max": 70,
+                "rsi_sell_min": 30, "rsi_sell_max": 55,
+                "vol_expansion_mult": 1.0,
+                "sl_atr_factor": 3.0,
+                "tp_atr_factor": 1.5,
+            }
+        # Chiuso / bassa liquidità: 22:00-01:00
+        else:
+            return {
+                "label": "OFF",
+                "rsi_period": 21,
+                "rsi_buy_min": 55, "rsi_buy_max": 85,
+                "rsi_sell_min": 15, "rsi_sell_max": 45,
+                "vol_expansion_mult": 1.5,
+                "sl_atr_factor": 5.0,
+                "tp_atr_factor": 1.2,
+            }
+
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
+        params = self._get_session_params()
+
+        # ── M1 ──
+        ema_fast = compute_ema(df_m1, 9).iloc[-2]
+        ema_slow = compute_ema(df_m1, 21).iloc[-2]
+        rsi_m1 = compute_rsi(df_m1, params["rsi_period"]).iloc[-2]
+        macd, macd_sig = compute_macd(df_m1)
+
+        # ── M5 ──
+        hma_m5 = compute_hma(df_m5).iloc[-2]
+        hma_m5_prev = compute_hma(df_m5).iloc[-3]
+
+        # ── M15: EMA200 macro trend filter (vs SUPER che usa EMA50) ──
+        ema_m15_200 = compute_ema(df_m15, 200).iloc[-2]
+        price_m15 = df_m15["close"].iloc[-2]
+        trend_macro_up = price_m15 > ema_m15_200
+
+        # M15 EMA50 per conferma aggiuntiva
+        ema_m15_50 = compute_ema(df_m15, 50).iloc[-2]
+        trend_macro_50_up = price_m15 > ema_m15_50
+
+        # ── Volatilità M1 ──
+        atr_series = compute_atr(df_m1)
+        atr = atr_series.iloc[-2]
+        atr_mean = atr_series.rolling(10).mean().iloc[-2]
+        volatility_expansion = atr > atr_mean * params["vol_expansion_mult"]
+
+        candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
+        is_spike = candle_body > (atr * 3)
+
+        # ── ATR M5 per SL/TP ──
+        df_m5_tmp = df_m5.copy()
+        df_m5_tmp["prev_close"] = df_m5_tmp["close"].shift(1)
+        df_m5_tmp["tr"] = df_m5_tmp.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]),
+            abs(r["low"] - r["prev_close"])
+        ), axis=1)
+        atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
+
+        return Indicators(
+            ema_fast=ema_fast,
+            ema_slow=ema_slow,
+            rsi_m1=rsi_m1,
+            macd=macd.iloc[-2],
+            macd_sig=macd_sig.iloc[-2],
+            hma_m5=hma_m5,
+            hma_m5_prev=hma_m5_prev,
+            trend_macro_up=trend_macro_up,
+            trend_macro_50_up=trend_macro_50_up,
+            volatility_expansion=volatility_expansion,
+            is_spike=is_spike,
+            atr_m5_val=atr_m5_val,
+            atr_m1=atr,
+            session_label=params["label"],
+        )
+
+    def buy_condition(self, ind: Indicators) -> bool:
+        params = self._get_session_params()
+        # 1) Trend filter: solo long se sopra EMA200
+        if not ind.trend_macro_up:
+            return False
+        # 2) Multi-timeframe: EMA50 M15 deve confermare
+        if not ind.trend_macro_50_up:
+            return False
+        return (
+            ind.ema_fast > ind.ema_slow
+            and ind.macd > ind.macd_sig
+            and ind.hma_m5 > ind.hma_m5_prev
+            and params["rsi_buy_min"] < ind.rsi_m1 < params["rsi_buy_max"]
+            and ind.volatility_expansion
+            and not ind.is_spike
+        )
+
+    def sell_condition(self, ind: Indicators) -> bool:
+        params = self._get_session_params()
+        # 1) Trend filter: solo short se sotto EMA200
+        if ind.trend_macro_up:
+            return False
+        # 2) Multi-timeframe: EMA50 M15 deve confermare
+        if ind.trend_macro_50_up:
+            return False
+        return (
+            ind.ema_fast < ind.ema_slow
+            and ind.macd < ind.macd_sig
+            and ind.hma_m5 < ind.hma_m5_prev
+            and params["rsi_sell_min"] < ind.rsi_m1 < params["rsi_sell_max"]
+            and ind.volatility_expansion
+            and not ind.is_spike
+        )
+
+    def reverse_on_buy(self, has_sell: bool) -> bool:
+        return False
+
+    def reverse_on_sell(self, has_buy: bool) -> bool:
+        return False
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        params = self._get_session_params()
+        atr = ind.atr_m5_val
+        if atr <= 0:
+            return None, None
+        sl = int(atr * params["sl_atr_factor"] * 10)
+        tp = int(atr * params["tp_atr_factor"] * 10)
+        sl = max(300, min(sl, 2000))
+        tp = max(sl + 100, min(tp, 3000))
+        return sl, tp
+
+    def on_hold_action(self, ind, has_buy, has_sell, prev_signal):
+        # 4) Exit rule: chiudi se trend macro inverte
+        if has_buy and not ind.trend_macro_up and ind.hma_m5 < ind.hma_m5_prev:
+            return "close_buy"
+        if has_sell and ind.trend_macro_up and ind.hma_m5 > ind.hma_m5_prev:
+            return "close_sell"
+        return None
+
+    def get_log_details(self, ind: Indicators) -> str:
+        return f"(ATR:{ind.atr_m5_val:.1f} S:{ind.session_label} RSI:{ind.rsi_m1:.0f} Trend:{'UP' if ind.trend_macro_up else 'DOWN'})"
 
     def get_log_header(self, ind: Indicators) -> str:
         details = self.get_log_details(ind)
@@ -965,6 +1164,7 @@ STRATEGIES = {
     "TRENDGUARD_XAU": NoReverseStrategy(close_on_hold=True),
     "EURUSD_NOHOLD": EurUsdStrategy(),
     "SUPER": SuperXauNoCloseStrategy(),
+    "SUPER_PRO": SuperXauProStrategy(),
     "ICHIMOKU": IchimokuXauStrategy(),
     "MSFT": MsftStrategy(),
     "NVDA": NvdaStrategy(),
