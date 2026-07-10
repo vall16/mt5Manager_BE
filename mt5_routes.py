@@ -14,11 +14,16 @@ router = APIRouter()
 
 @router.post("/check-server")
 async def manager_check_server(payload: dict):
-    # L'host e port arrivano da Angular
     agent_url = f"http://{payload['host']}:{payload['port']}/check-server"
-    # Chiamata all'agente mt5_api (che abbiamo memorizzato prima)
-    r = requests.post(agent_url, json={}, timeout=5) 
-    return r.json()
+    try:
+        r = requests.post(agent_url, json={}, timeout=5)
+        return r.json()
+    except requests.exceptions.ConnectionError:
+        return {"connected": False, "error": "Connessione rifiutata — agente MT5 non raggiungibile"}
+    except requests.exceptions.Timeout:
+        return {"connected": False, "error": "Timeout — agente MT5 non risponde"}
+    except Exception:
+        return {"connected": False, "error": "Errore sconosciuto durante il check del server"}
 
 
 class ServerRequest(BaseModel):

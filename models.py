@@ -80,6 +80,9 @@ class Trader(BaseModel):
     use_profit_tp: bool = False
     profit_tp_value: Optional[float] = None
 
+    # 🆕 Blocco notturno
+    block_night_trading: bool = False
+
 
 class Newtrader(BaseModel):
     

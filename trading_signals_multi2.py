@@ -73,6 +73,13 @@ def is_market_open(symbol: str) -> bool:
     return True
 
 
+def is_night_time() -> bool:
+    now = datetime.now(ZoneInfo("Europe/Rome"))
+    hour = now.hour
+    # Notte: 00:00 - 05:00 Rome time (bassa liquidità XAUUSD)
+    return 0 <= hour < 5
+
+
 # ─────────────────────── SEND ORDER (unified) ───────────────────────
 
 def send_order(trader_id: int, direction: str):
@@ -235,6 +242,12 @@ class SignalStrategy:
         # ── mercato aperto? ──
         if not is_market_open(symbol):
             log(trader_id, f"⏸ Mercato chiuso (weekend) per {symbol}")
+            return
+
+        # ── blocco notturno ──
+        block_night = getattr(trader, 'block_night_trading', False)
+        if block_night and is_night_time():
+            log(trader_id, f"🌙 Blocco notturno attivo — trading sospeso (22:00-09:00)")
             return
 
         # ── fetch dati ──
