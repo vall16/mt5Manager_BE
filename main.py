@@ -12,7 +12,12 @@ from db import router as db_router
 from mt5_routes import router as mt5_router
 # from trading_signals import router as trade_router
 # from trading_signals_multi import router as trade_router_multi
-from trading_signals_multi2 import router as trade_router_multi
+try:
+    from trading_signals_multi2 import router as trade_router_multi
+except ImportError as e:
+    import sys
+    print(f"ERRORE CRITICO: {e}", file=sys.stderr)
+    sys.exit(1)
 
 # --- LOGGING ---
 log_file_path = "./fxscript.log"
