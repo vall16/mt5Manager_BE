@@ -12,12 +12,12 @@ from db import router as db_router
 from mt5_routes import router as mt5_router
 # from trading_signals import router as trade_router
 # from trading_signals_multi import router as trade_router_multi
-try:
-    from trading_signals_multi2 import router as trade_router_multi
-except ImportError as e:
-    import sys
-    print(f"ERRORE CRITICO: {e}", file=sys.stderr)
-    sys.exit(1)
+# try:
+from trading_signals_multi2 import router as trade_router_multi
+# except ImportError as e:
+#     import sys
+#     print(f"ERRORE CRITICO: {e}", file=sys.stderr)
+#     sys.exit(1)
 
 # --- LOGGING ---
 log_file_path = "./fxscript.log"
@@ -48,7 +48,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="MT5 Manager API")
 
 # --- CORS ---
-origins = ["http://localhost:4200", "http://127.0.0.1:4200"]
+load_dotenv()
+cors_raw = os.getenv("CORS_ORIGINS", "http://localhost:4200")
+origins = [o.strip() for o in cors_raw.split(",")]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
