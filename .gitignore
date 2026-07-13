@@ -7,4 +7,5 @@ venv/
 # Logs
 *.log
 server_log.txt
+.env
 

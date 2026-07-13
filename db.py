@@ -1199,6 +1199,30 @@ def get_history_db(trader_id, symbol=None, profit_min=None, profit_max=None):
 
     return rows
 
+# --- AI ANALYSIS ---
+from ai_analysis import get_analysis
+
+class AnalyzeRequest(BaseModel):
+    trader_id: int
+    limit: int = 100
+
+@router.post("/analyze")
+def analyze_trades(req: AnalyzeRequest):
+    conn = get_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    try:
+        result = get_analysis(conn, req.trader_id, req.limit)
+        if "error" in result:
+            raise HTTPException(status_code=404, detail=result["error"])
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analisi fallita: {str(e)}")
+    finally:
+        conn.close()
+
 # manda ordine allo slave, no copytrading
 class OrderPayload(BaseModel):
     trader_id: int
