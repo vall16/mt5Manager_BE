@@ -196,6 +196,29 @@ def get_positions():
     return [p._asdict() for p in positions]
 
 
+@app.get("/history")
+def get_history(days: int = 30):
+    """
+    Restituisce lo storico deal chiusi degli ultimi N giorni.
+    """
+    from datetime import datetime, timedelta
+    date_to = datetime.now()
+    date_from = date_to - timedelta(days=days)
+
+    deals = mt5.history_deals_get(date_from, date_to)
+    if deals is None:
+        return []
+
+    result = []
+    for d in deals:
+        deal = d._asdict()
+        deal["time"] = str(deal.get("time", ""))
+        deal["time_msc"] = str(deal.get("time_msc", ""))
+        result.append(deal)
+
+    return {"deals": result, "count": len(result)}
+
+
 @app.get("/symbols/active")
 def get_active_symbols():
     """

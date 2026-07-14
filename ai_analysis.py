@@ -1,10 +1,13 @@
 import os
 import json
+import requests
 from decimal import Decimal
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+
+MT5_API_URL = os.environ.get("MT5_API_URL", "http://127.0.0.1:8081")
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -34,6 +37,68 @@ def fetch_trade_data(conn, trader_id, limit=100):
     trades = cursor.fetchall()
 
     cursor.close()
+
+    for t in trades:
+        for k, v in t.items():
+            if isinstance(v, Decimal):
+                t[k] = float(v)
+
+    return trader, trades
+
+
+def fetch_trade_data_from_mt5(trader_id, days=30, limit=100):
+    """Fetch closed trades from MT5 history + trader config from DB."""
+    import requests
+    from db import get_connection
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT t.name, t.sl, tp, t.tsl, t.moltiplicatore, t.fix_lot,
+               t.selected_signal, t.selected_symbol,
+               ss.ip AS slave_ip, ss.port AS slave_port
+        FROM traders t
+        LEFT JOIN servers ss ON t.slave_server_id = ss.id
+        WHERE t.id = %s
+    """, (trader_id,))
+    trader = cursor.fetchone()
+
+    cursor.execute("SELECT ticket FROM slave_orders WHERE trader_id = %s", (trader_id,))
+    known_tickets = {row["ticket"] for row in cursor.fetchall()}
+    cursor.close()
+    conn.close()
+
+    if not trader or not trader.get("slave_ip"):
+        return trader, []
+
+    slave_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+    resp = requests.get(f"{slave_url}/history", params={"days": days}, timeout=15)
+    if resp.status_code != 200:
+        return trader, []
+
+    deals = resp.json().get("deals", [])
+    trades = []
+    for d in deals:
+        if d.get("type") not in (0, 1):  # only BUY/SELL
+            continue
+        entry = d.get("entry", 0)
+        if entry != 1:  # 1 = out (close), skip opening deals
+            continue
+        trades.append({
+            "symbol": d.get("symbol", ""),
+            "type": "BUY" if d.get("type") == 0 else "SELL",
+            "volume": d.get("volume", 0),
+            "price_open": d.get("price", 0),
+            "price_close": d.get("price", 0),
+            "profit": d.get("profit", 0),
+            "opened_at": str(d.get("time", "")),
+            "closed_at": str(d.get("time", "")),
+            "comment": d.get("comment", ""),
+        })
+
+    trades.sort(key=lambda x: x["closed_at"], reverse=True)
+    trades = trades[:limit]
 
     for t in trades:
         for k, v in t.items():
@@ -187,8 +252,11 @@ def analyze_with_qwen(prompt):
     return response.choices[0].message.content
 
 
-def get_analysis(conn, trader_id, limit=100):
-    trader, trades = fetch_trade_data(conn, trader_id, limit)
+def get_analysis(conn, trader_id, limit=100, source="db", days=30):
+    if source == "mt5":
+        trader, trades = fetch_trade_data_from_mt5(trader_id, days=days, limit=limit)
+    else:
+        trader, trades = fetch_trade_data(conn, trader_id, limit)
     if not trades:
         return {"error": "Nessun trade chiuso trovato per questo trader"}
 
@@ -199,6 +267,7 @@ def get_analysis(conn, trader_id, limit=100):
     return {
         "trader_id": trader_id,
         "trader_name": trader.get("name"),
+        "source": source,
         "metrics": metrics,
         "analysis": analysis,
     }

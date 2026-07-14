@@ -1014,25 +1014,25 @@ def copy_orders(trader_id: int):
 
 
 
-                # 🔹 Inserimento nel DB slave_orders (aggiunto master_ticket)
-                cursor.execute("""
-                    INSERT INTO slave_orders (
-                        trader_id, master_order_id, master_ticket, ticket,
-                        symbol, type, volume, price_open, sl, tp, opened_at
-                    )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                """, (
-                    trader_id,
-                    master_order_id,
-                    pos.get("ticket"),  # <-- master_ticket
-                    result.get("result", {}).get("order"),  # ticket slave
-                    symbol,
-                    order_type,
-                    volume,
-                    request["price"],
-                    pos.get("sl"),
-                    pos.get("tp")
-                ))
+                # 🔹 Inserimento nel DB slave_orders (copy trading) - DISABILITATO
+                # cursor.execute("""
+                #     INSERT INTO slave_orders (
+                #         trader_id, master_order_id, master_ticket, ticket,
+                #         symbol, type, volume, price_open, sl, tp, opened_at
+                #     )
+                #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                # """, (
+                #     trader_id,
+                #     master_order_id,
+                #     pos.get("ticket"),  # <-- master_ticket
+                #     result.get("result", {}).get("order"),  # ticket slave
+                #     symbol,
+                #     order_type,
+                #     volume,
+                #     request["price"],
+                #     pos.get("sl"),
+                #     pos.get("tp")
+                # ))
 
                 conn.commit()
                 log(f"✅ Ordine copiato e registrato: {symbol}")
@@ -1205,14 +1205,14 @@ from ai_analysis import get_analysis
 class AnalyzeRequest(BaseModel):
     trader_id: int
     limit: int = 100
+    source: str = "db"
+    days: int = 30
 
 @router.post("/analyze")
 def analyze_trades(req: AnalyzeRequest):
     conn = get_connection()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Database connection failed")
     try:
-        result = get_analysis(conn, req.trader_id, req.limit)
+        result = get_analysis(conn, req.trader_id, req.limit, source=req.source, days=req.days)
         if "error" in result:
             raise HTTPException(status_code=404, detail=result["error"])
         return result
@@ -1221,7 +1221,8 @@ def analyze_trades(req: AnalyzeRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analisi fallita: {str(e)}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 # manda ordine allo slave, no copytrading
 class OrderPayload(BaseModel):
@@ -1343,18 +1344,18 @@ def open_order_on_slave(payload: OrderPayload):
 
         ticket = result.get("result", {}).get("order")
 
-        # 6️⃣ Scrive nel DB solo slave_orders
-        # if ticket:
-        #     cursor.execute("""
-        #         INSERT INTO slave_orders
-        #             (trader_id, master_order_id, master_ticket, ticket,
-        #              symbol, type, volume, price_open, opened_at)
-        #         VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
-        #     """,
-        #     (trader_id, ticket, symbol, order_type, volume, price))
+        # 6️⃣ Scrive nel DB slave_orders
+        if ticket:
+            cursor.execute("""
+                INSERT INTO slave_orders
+                    (trader_id, master_order_id, master_ticket, ticket,
+                     symbol, type, volume, price_open, opened_at)
+                VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
+            """,
+            (trader_id, ticket, symbol, order_type, volume, price))
 
-        #     conn.commit()
-        #     log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
+            conn.commit()
+            log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
 
         # 7️⃣ Fine
         cursor.close()
@@ -1444,6 +1445,18 @@ def close_order_on_slave(payload: CloseOrderPayload):
 
         result = resp_order.json()
         log(f"✅ Risposta SLAVE chiusura: {result}")
+
+        # Aggiorna DB: chiudi il trade del listen
+        try:
+            total_profit = result.get("total_profit", 0)
+            cursor.execute(
+                "UPDATE slave_orders SET closed_at=NOW(), profit=%s WHERE trader_id=%s AND symbol=%s AND closed_at IS NULL",
+                (total_profit, trader_id, symbol)
+            )
+            conn.commit()
+            log(f"💾 Trade chiuso nel DB. Profit={total_profit}")
+        except Exception as e:
+            log(f"⚠️ Errore aggiornamento DB chiusura: {e}")
 
     except requests.RequestException as e:
         log(f"❌ Errore invio richiesta chiusura ordine: {e}")
