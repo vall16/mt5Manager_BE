@@ -294,8 +294,8 @@ class SignalStrategy:
                 log(trader_id, f"Slave non risponde")
                 return
             positions = resp.json()
-        except:
-            log(trader_id, f"Slave non raggiungibile")
+        except Exception as e:
+            log(trader_id, f"Slave non raggiungibile: {e}")
             return
 
         has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)

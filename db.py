@@ -1346,16 +1346,19 @@ def open_order_on_slave(payload: OrderPayload):
 
         # 6️⃣ Scrive nel DB slave_orders
         if ticket:
-            cursor.execute("""
+            try:
+                cursor.execute("""
                 INSERT INTO slave_orders
                     (trader_id, master_order_id, master_ticket, ticket,
                      symbol, type, volume, price_open, opened_at)
                 VALUES (%s, NULL, NULL, %s, %s, %s, %s, %s, NOW())
-            """,
-            (trader_id, ticket, symbol, order_type, volume, price))
+                """,
+                (trader_id, ticket, symbol, order_type, volume, price))
 
-            conn.commit()
-            log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
+                conn.commit()
+                log(f"💾 Ordine SLAVE salvato nel DB. Ticket={ticket}")
+            except Exception as e:
+                log(f"❌ Errore salvataggio slave_orders: {e}")
 
         # 7️⃣ Fine
         cursor.close()
