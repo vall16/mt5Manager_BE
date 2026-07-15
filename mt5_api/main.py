@@ -467,6 +467,7 @@ def close_order_by_symbol(payload: dict):
                 "symbol": pos.symbol,
                 "volume": pos.volume,
                 "price": price,
+                "profit": pos.profit,
                 "retcode": result.retcode
             })
             log(f"✅ Ordine chiuso: ticket={pos.ticket}, symbol={pos.symbol}, volume={pos.volume}")

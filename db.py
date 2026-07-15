@@ -1450,16 +1450,20 @@ def close_order_on_slave(payload: CloseOrderPayload):
         log(f"✅ Risposta SLAVE chiusura: {result}")
 
         # Aggiorna DB: chiudi il trade del listen
-        try:
-            total_profit = result.get("total_profit", 0)
-            cursor.execute(
-                "UPDATE slave_orders SET closed_at=NOW(), profit=%s WHERE trader_id=%s AND symbol=%s AND closed_at IS NULL",
-                (total_profit, trader_id, symbol)
-            )
-            conn.commit()
-            log(f"💾 Trade chiuso nel DB. Profit={total_profit}")
-        except Exception as e:
-            log(f"⚠️ Errore aggiornamento DB chiusura: {e}")
+        if result.get("status") == "none":
+            log("⚠️ Nessuna posizione da chiudere sullo slave")
+        else:
+            try:
+                closed = result.get("closed", [])
+                total_profit = sum(c.get("profit", 0) for c in closed if isinstance(c, dict))
+                cursor.execute(
+                    "UPDATE slave_orders SET closed_at=NOW(), profit=%s WHERE trader_id=%s AND symbol=%s AND closed_at IS NULL",
+                    (total_profit, trader_id, symbol)
+                )
+                conn.commit()
+                log(f"💾 Trade chiuso nel DB. Profit={total_profit}")
+            except Exception as e:
+                log(f"⚠️ Errore aggiornamento DB chiusura: {e}")
 
     except requests.RequestException as e:
         log(f"❌ Errore invio richiesta chiusura ordine: {e}")
