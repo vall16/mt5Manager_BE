@@ -1456,10 +1456,12 @@ def close_order_on_slave(payload: CloseOrderPayload):
             try:
                 closed = result.get("closed", [])
                 total_profit = sum(c.get("profit", 0) for c in closed if isinstance(c, dict))
+                log(f"🔍 UPDATE slave_orders SET closed_at=NOW(), profit={total_profit} WHERE trader_id={trader_id} AND symbol={symbol} AND closed_at IS NULL")
                 cursor.execute(
                     "UPDATE slave_orders SET closed_at=NOW(), profit=%s WHERE trader_id=%s AND symbol=%s AND closed_at IS NULL",
                     (total_profit, trader_id, symbol)
                 )
+                log(f"🔍 Rows affected: {cursor.rowcount}")
                 conn.commit()
                 log(f"💾 Trade chiuso nel DB. Profit={total_profit}")
             except Exception as e:
