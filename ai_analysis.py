@@ -248,6 +248,7 @@ def analyze_with_qwen(prompt):
     response = client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
+        max_tokens=4000,
     )
     return response.choices[0].message.content
 
