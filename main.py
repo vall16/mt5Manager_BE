@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 # i files a cui punta il main: db.py, mt5_routes.py
 from db import router as db_router
+from db import run_migrations
 from mt5_routes import router as mt5_router
 # from trading_signals import router as trade_router
 # from trading_signals_multi import router as trade_router_multi
@@ -37,6 +38,7 @@ async def lifespan(app: FastAPI):
     """
     # --- STARTUP ---
     logging.info("✅ Manager API avviata correttamente. Nessuna inizializzazione MT5 al startup.")
+    run_migrations()
     # start_polling()  # se vuoi avviare polling automatico
 
     yield  # qui l'app è in esecuzione

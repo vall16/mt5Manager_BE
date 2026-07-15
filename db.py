@@ -154,6 +154,30 @@ def get_connection():
     except MySQLError as e:
         raise HTTPException(status_code=500, detail=f"Errore di connessione MySQL: {e}")
 
+
+def run_migrations():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SHOW COLUMNS FROM slave_orders WHERE Field='master_order_id' AND IS_NULLABLE='NO'")
+        if cursor.fetchone():
+            log("🔧 Migration: rendo master_order_id nullable...")
+            cursor.execute("ALTER TABLE slave_orders DROP FOREIGN KEY fk_slave_order_master")
+            cursor.execute("ALTER TABLE slave_orders MODIFY master_order_id INT NULL")
+            cursor.execute("ALTER TABLE slave_orders MODIFY master_ticket BIGINT NULL")
+            cursor.execute("""ALTER TABLE slave_orders ADD CONSTRAINT fk_slave_order_master
+                FOREIGN KEY (master_order_id) REFERENCES master_orders(id) ON DELETE SET NULL""")
+            conn.commit()
+            log("✅ Migration completata: master_order_id e master_ticket ora nullable")
+        else:
+            log("✅ Migration slave_orders già applicata")
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        log(f"⚠️ Migration slave_orders saltata: {e}")
+
 # funz che recupera il trader corrente
 def get_trader(cursor, trader_id):
     cursor.execute("""
