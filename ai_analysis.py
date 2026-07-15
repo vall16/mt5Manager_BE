@@ -73,6 +73,17 @@ def fetch_trade_data_from_mt5(trader_id, days=30, limit=100):
         return trader, []
 
     slave_url = f"http://{trader['slave_ip']}:{trader['slave_port']}"
+
+    # Recupera info conto MT5
+    try:
+        status_resp = requests.get(f"{slave_url}/server_status", timeout=5)
+        if status_resp.status_code == 200:
+            account = status_resp.json().get("account", {})
+            trader["mt5_login"] = account.get("login")
+            trader["mt5_server"] = account.get("server")
+    except Exception:
+        pass
+
     resp = requests.get(f"{slave_url}/history", params={"days": days}, timeout=15)
     if resp.status_code != 200:
         return trader, []
@@ -268,6 +279,10 @@ def get_analysis(conn, trader_id, limit=100, source="db", days=30):
     return {
         "trader_id": trader_id,
         "trader_name": trader.get("name"),
+        "slave_ip": trader.get("slave_ip"),
+        "slave_port": trader.get("slave_port"),
+        "mt5_login": trader.get("mt5_login"),
+        "mt5_server": trader.get("mt5_server"),
         "source": source,
         "metrics": metrics,
         "analysis": analysis,
