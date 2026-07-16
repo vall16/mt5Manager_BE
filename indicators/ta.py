@@ -22,8 +22,8 @@ def compute_macd(df, fast=12, slow=26, signal=9):
     return macd, macd_signal
 
 def compute_atr(df, period=14):
-    df['tr'] = df['high'] - df['low']
-    atr = df['tr'].rolling(period).mean()
+    tr = df['high'] - df['low']
+    atr = tr.rolling(period).mean()
     return atr
 def compute_bollinger(df, period=20, num_std=2):
     """

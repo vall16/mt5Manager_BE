@@ -21,22 +21,25 @@ balance = 10000.0
 position = None
 
 def fetch_data(symbol, start, end):
+    MAX_BARS = 50000
     print(f"Scaricamento dati M1...")
-    m1 = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M1, start, end)
+    m1 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, MAX_BARS)
     if m1 is None or len(m1) == 0:
         raise ValueError("Nessun dato M1")
     df_m1 = pd.DataFrame(m1)
     df_m1["time"] = pd.to_datetime(df_m1["time"], unit="s")
+    df_m1 = df_m1[df_m1["time"] >= pd.Timestamp(start)]
+    print(f"M1: {len(df_m1)} candele ({df_m1['time'].iloc[0]} → {df_m1['time'].iloc[-1]})")
 
     print(f"Scaricamento dati M5...")
-    m5 = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M5, start, end)
+    m5 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, MAX_BARS)
     if m5 is None or len(m5) == 0:
         raise ValueError("Nessun dato M5")
     df_m5 = pd.DataFrame(m5)
     df_m5["time"] = pd.to_datetime(df_m5["time"], unit="s")
 
     print(f"Scaricamento dati M15...")
-    m15 = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_M15, start, end)
+    m15 = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M15, 0, MAX_BARS)
     if m15 is None or len(m15) == 0:
         raise ValueError("Nessun dato M15")
     df_m15 = pd.DataFrame(m15)
@@ -44,15 +47,6 @@ def fetch_data(symbol, start, end):
 
     return df_m1, df_m5, df_m15
 
-def get_m5_atr(df_m5_window):
-    tmp = df_m5_window.copy()
-    tmp["prev_close"] = tmp["close"].shift(1)
-    tmp["tr"] = tmp.apply(lambda r: max(
-        r["high"] - r["low"],
-        abs(r["high"] - r["prev_close"]),
-        abs(r["low"] - r["prev_close"])
-    ), axis=1)
-    return tmp["tr"].rolling(14).mean().iloc[-1]
 
 def get_indicators(df_m1_i, df_m5_i, df_m15_i):
     ema_fast = compute_ema(df_m1_i, 9).iloc[-1]
@@ -122,26 +116,80 @@ def check_sell(ind):
 def run_backtest(df_m1, df_m5, df_m15):
     global balance, position
 
+    print("Pre-calcolo indicatori M1...")
+    df_m1["ema_fast"] = compute_ema(df_m1, 9)
+    df_m1["ema_slow"] = compute_ema(df_m1, 21)
+    df_m1["rsi_m1"] = compute_rsi(df_m1, 14)
+    macd, macd_sig = compute_macd(df_m1)
+    df_m1["macd"] = macd
+    df_m1["macd_sig"] = macd_sig
+    atr_series = compute_atr(df_m1)
+    df_m1["atr"] = atr_series
+    df_m1["atr_ma"] = atr_series.rolling(10).mean()
+    df_m1["candle_body"] = (df_m1["close"] - df_m1["open"]).abs()
+    df_m1["is_spike"] = df_m1["candle_body"] > (df_m1["atr"] * 3)
+
+    print("Pre-calcolo indicatori M5...")
+    df_m5["prev_close"] = df_m5["close"].shift(1)
+    df_m5["tr"] = df_m5.apply(lambda r: max(
+        r["high"] - r["low"],
+        abs(r["high"] - r["prev_close"]),
+        abs(r["low"] - r["prev_close"])
+    ), axis=1)
+    df_m5["atr_m5"] = df_m5["tr"].rolling(14).mean()
+    df_m5["volume_avg"] = df_m5["tick_volume"].rolling(20).mean()
+
+    hma_m5 = compute_hma(df_m5)
+    df_m5["hma"] = hma_m5
+    df_m5["hma_prev"] = hma_m5.shift(1)
+
+    print("Pre-calcolo indicatori M15...")
+    df_m15["ema50"] = compute_ema(df_m15, 50)
+
+    print("Esecuzione backtest...")
+
+    df_m5_times = df_m5["time"].values
+    df_m15_times = df_m15["time"].values
+    m5_end_times = pd.Series(df_m5_times) - pd.to_timedelta(pd.DatetimeIndex(df_m5_times).minute % 5, unit="m")
+    m15_end_times = pd.Series(df_m15_times) - pd.to_timedelta(pd.DatetimeIndex(df_m15_times).minute % 15, unit="m")
+
+    m1_times = df_m1["time"].values
+    print_steps = len(df_m1) // 20
+
     for i in range(M1_LOOKBACK, len(df_m1)):
+        if i % print_steps == 0:
+            pct = (i - M1_LOOKBACK) / (len(df_m1) - M1_LOOKBACK) * 100
+            print(f"  ... {pct:.0f}% ({i}/{len(df_m1)}) | Trades: {len(trades)} | Bal: {balance:.2f}")
+
+        ts = m1_times[i]
         row = df_m1.iloc[i]
-        ts = row["time"]
 
-        m1_window = df_m1.iloc[:i+1]
+        idx_m5 = int(m5_end_times.searchsorted(ts, side="right")) - 1
+        idx_m15 = int(m15_end_times.searchsorted(ts, side="right")) - 1
 
-        last_m5_time = m1_window[m1_window["time"] <= ts]["time"] \
-            .apply(lambda t: t - pd.Timedelta(minutes=t.minute % 5, seconds=t.second)) \
-            .max()
-        last_m15_time = m1_window[m1_window["time"] <= ts]["time"] \
-            .apply(lambda t: t - pd.Timedelta(minutes=t.minute % 15, seconds=t.second)) \
-            .max()
-
-        m5_window = df_m5[df_m5["time"] <= last_m5_time]
-        m15_window = df_m15[df_m15["time"] <= last_m15_time]
-
-        if len(m5_window) < 20 or len(m15_window) < M15_LOOKBACK:
+        if idx_m5 < M5_LOOKBACK or idx_m15 < M15_LOOKBACK:
             continue
 
-        ind = get_indicators(m1_window, m5_window, m15_window)
+        vol_now = df_m5.iloc[idx_m5]["tick_volume"]
+        vol_avg = df_m5.iloc[idx_m5]["volume_avg"]
+        volume_ok = vol_now > vol_avg * VOLUME_MULT if vol_avg > 0 else True
+
+        trend_macro_up = row["close"] > df_m15.iloc[idx_m15]["ema50"]
+
+        ind = {
+            "ema_fast": row["ema_fast"],
+            "ema_slow": row["ema_slow"],
+            "macd": row["macd"],
+            "macd_sig": row["macd_sig"],
+            "hma_m5": df_m5.iloc[idx_m5]["hma"],
+            "hma_m5_prev": df_m5.iloc[idx_m5]["hma_prev"],
+            "trend_macro_up": trend_macro_up,
+            "rsi_m1": row["rsi_m1"],
+            "volatilty_expansion": row["atr"] > row["atr_ma"],
+            "is_spike": row["is_spike"],
+            "atr_m5_val": df_m5.iloc[idx_m5]["atr_m5"],
+            "volume_ok": volume_ok,
+        }
 
         if position:
             low = row["low"]
