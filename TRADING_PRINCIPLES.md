@@ -31,5 +31,5 @@ Se guadagna nel backtest, forse guadagnerà nel reale — ma con spread e slippa
 
 ## La verità
 
-Il真正的 vantaggio non è la strategia in sé.
+Il vero vantaggio non è la strategia in sé.
 È la disciplina di eseguirla sistematicamente mentre gli altri trade d'impulso.
