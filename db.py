@@ -1519,6 +1519,7 @@ class BacktestRequest(PydanticBaseModel):
     days: int = 30
     lot: float = 0.01
     balance: float = 10000.0
+    trader_id: int | None = None
 
 @router.post("/backtest")
 def run_backtest_endpoint(req: BacktestRequest):
@@ -1526,6 +1527,27 @@ def run_backtest_endpoint(req: BacktestRequest):
 
     if req.strategy not in STRATEGIES:
         return JSONResponse(status_code=400, content={"error": f"Unknown strategy: {req.strategy}"})
+
+    mt5_api_url = None
+    if req.trader_id:
+        conn = get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT ss.ip, ss.port
+                FROM traders t
+                JOIN servers ss ON ss.id = t.slave_server_id
+                WHERE t.id = %s
+            """, (req.trader_id,))
+            row = cursor.fetchone()
+            if row and row[0] and row[1]:
+                mt5_api_url = f"http://{row[0]}:{row[1]}"
+        finally:
+            cursor.close()
+            conn.close()
+
+    if not mt5_api_url:
+        return JSONResponse(status_code=400, content={"error": "trader_id obbligatorio o trader non trovato"})
 
     session_id = str(uuid.uuid4())[:8]
 
@@ -1540,6 +1562,7 @@ def run_backtest_endpoint(req: BacktestRequest):
                 days=req.days,
                 lot=req.lot,
                 balance=req.balance,
+                mt5_api_url=mt5_api_url,
                 cancel_flag=lambda: backtest_sessions.get(session_id, {}).get("cancelled", False),
             )
             with backtest_lock:

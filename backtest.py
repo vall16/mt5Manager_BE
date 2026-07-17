@@ -1,11 +1,31 @@
-import MetaTrader5 as mt5
 import pandas as pd
 import argparse
 import sys
+import requests
 from datetime import datetime, timedelta
 
 from trading_signals_multi2 import STRATEGIES, Indicators
 from indicators.ta import compute_ema, compute_rsi, compute_macd, compute_atr, compute_hma, compute_ichimoku
+
+TIMEFRAME_MAP = {
+    "m1": 1,
+    "m5": 5,
+    "m15": 15,
+    "h1": 60,
+}
+
+def fetch_rates(symbol, tf_key, n_candles, mt5_api_url):
+    url = f"{mt5_api_url.rstrip('/')}/get_rates"
+    payload = {"symbol": symbol, "timeframe": TIMEFRAME_MAP[tf_key], "n_candles": n_candles}
+    resp = requests.post(url, json=payload, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+    rates = data.get("rates", [])
+    if not rates:
+        return None
+    import numpy as np
+    dtype = [("time", "i8"), ("open", "f8"), ("high", "f8"), ("low", "f8"), ("close", "f8"), ("tick_volume", "i8")]
+    return np.array([(r["time"], r["open"], r["high"], r["low"], r["close"], r.get("tick_volume", 0)) for r in rates], dtype=dtype)
 
 DEFAULT_SYMBOL = "XAUUSD"
 DEFAULT_DAYS = 30
@@ -29,7 +49,7 @@ DEFAULT_SL = 500
 DEFAULT_TP = 600
 
 
-def fetch_data(symbol, strategy, days):
+def fetch_data(symbol, strategy, days, mt5_api_url):
     need_m1 = strategy.requires_m1
     need_m5 = strategy.requires_m5
     need_m15 = strategy.requires_m15
@@ -37,53 +57,26 @@ def fetch_data(symbol, strategy, days):
 
     dfs = {}
 
-    if need_m1:
-        print(f"  Fetching M1...")
-        raw = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, MAX_BARS)
-        if raw is None or len(raw) == 0:
-            raise ValueError(f"No M1 data for {symbol}")
-        df = pd.DataFrame(raw)
-        df["time"] = pd.to_datetime(df["time"], unit="s")
-        cutoff = datetime.now() - timedelta(days=days)
-        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
-        print(f"  M1: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
-        dfs["m1"] = df
+    tf_map = {
+        "m1": (need_m1, MAX_BARS),
+        "m5": (need_m5, MAX_BARS),
+        "m15": (need_m15, MAX_BARS),
+        "h1": (need_h1, MAX_BARS),
+    }
 
-    if need_m5:
-        print(f"  Fetching M5...")
-        raw = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M5, 0, MAX_BARS)
+    for tf_key, (needed, n_candles) in tf_map.items():
+        if not needed:
+            continue
+        print(f"  Fetching {tf_key.upper()} via {mt5_api_url}...")
+        raw = fetch_rates(symbol, tf_key, n_candles, mt5_api_url)
         if raw is None or len(raw) == 0:
-            raise ValueError(f"No M5 data for {symbol}")
+            raise ValueError(f"No {tf_key.upper()} data for {symbol}")
         df = pd.DataFrame(raw)
         df["time"] = pd.to_datetime(df["time"], unit="s")
         cutoff = datetime.now() - timedelta(days=days)
         df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
-        print(f"  M5: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
-        dfs["m5"] = df
-
-    if need_m15:
-        print(f"  Fetching M15...")
-        raw = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M15, 0, MAX_BARS)
-        if raw is None or len(raw) == 0:
-            raise ValueError(f"No M15 data for {symbol}")
-        df = pd.DataFrame(raw)
-        df["time"] = pd.to_datetime(df["time"], unit="s")
-        cutoff = datetime.now() - timedelta(days=days)
-        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
-        print(f"  M15: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
-        dfs["m15"] = df
-
-    if need_h1:
-        print(f"  Fetching H1...")
-        raw = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 0, MAX_BARS)
-        if raw is None or len(raw) == 0:
-            raise ValueError(f"No H1 data for {symbol}")
-        df = pd.DataFrame(raw)
-        df["time"] = pd.to_datetime(df["time"], unit="s")
-        cutoff = datetime.now() - timedelta(days=days)
-        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
-        print(f"  H1: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
-        dfs["h1"] = df
+        print(f"  {tf_key.upper()}: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
+        dfs[tf_key] = df
 
     return dfs
 
@@ -414,16 +407,13 @@ def compute_summary(trades, balance, initial_balance):
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, cancel_flag=None):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
 
-    if not mt5.initialize():
-        return {"error": "MT5 initialization failed"}
-
     try:
-        dfs = fetch_data(symbol, strategy, days)
+        dfs = fetch_data(symbol, strategy, days, mt5_api_url)
         trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag)
         summary_data = compute_summary(trades, final_bal, balance)
 
@@ -446,8 +436,8 @@ def run_backtest_api(strategy_name, symbol, days, lot, balance, cancel_flag=None
             "summary": summary_data,
             "trades": serializable_trades,
         }
-    finally:
-        mt5.shutdown()
+    except Exception as e:
+        return {"error": str(e)}
 
 
 if __name__ == "__main__":
@@ -457,20 +447,15 @@ if __name__ == "__main__":
     parser.add_argument("--days", "-d", type=int, default=DEFAULT_DAYS, help="Days of history (default: 30)")
     parser.add_argument("--lot", "-l", type=float, default=DEFAULT_LOT, help="Lot size (default: 0.01)")
     parser.add_argument("--balance", "-b", type=float, default=DEFAULT_BALANCE, help="Starting balance (default: 10000)")
+    parser.add_argument("--mt5-api-url", required=True, help="URL del mt5_api (es. http://192.168.1.180:8000)")
     args = parser.parse_args()
 
     strategy = STRATEGIES[args.strategy]
     print(f"Backtest: {args.strategy} | {args.symbol} | {args.days} days | {args.lot} lot | ${args.balance}")
+    print(f"MT5 API: {args.mt5_api_url}")
 
-    if not mt5.initialize():
-        print("MT5 initialization failed")
-        sys.exit(1)
-
-    try:
-        print("Fetching data...")
-        dfs = fetch_data(args.symbol, strategy, args.days)
-        print(f"Running backtest...")
-        trades, final_bal = run_backtest(strategy, dfs, args.symbol, args.lot, args.balance)
-        summary(trades, final_bal, args.balance)
-    finally:
-        mt5.shutdown()
+    print("Fetching data via mt5_api...")
+    dfs = fetch_data(args.symbol, strategy, args.days, args.mt5_api_url)
+    print(f"Running backtest...")
+    trades, final_bal = run_backtest(strategy, dfs, args.symbol, args.lot, args.balance)
+    summary(trades, final_bal, args.balance)
