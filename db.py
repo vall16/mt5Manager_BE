@@ -1503,3 +1503,79 @@ def close_order_on_slave(payload: CloseOrderPayload):
 if __name__ == "__main__":
     create_user("roberto", "roberto123")
 
+
+# ─────────────────────── BACKTEST ───────────────────────
+
+import uuid
+import threading
+from pydantic import BaseModel as PydanticBaseModel
+
+backtest_sessions = {}
+backtest_lock = threading.Lock()
+
+class BacktestRequest(PydanticBaseModel):
+    strategy: str
+    symbol: str = "XAUUSD"
+    days: int = 30
+    lot: float = 0.01
+    balance: float = 10000.0
+
+@router.post("/backtest")
+def run_backtest_endpoint(req: BacktestRequest):
+    from backtest import run_backtest_api, STRATEGIES
+
+    if req.strategy not in STRATEGIES:
+        return JSONResponse(status_code=400, content={"error": f"Unknown strategy: {req.strategy}"})
+
+    session_id = str(uuid.uuid4())[:8]
+
+    with backtest_lock:
+        backtest_sessions[session_id] = {"status": "running", "result": None, "cancelled": False}
+
+    def _run():
+        try:
+            result = run_backtest_api(
+                strategy_name=req.strategy,
+                symbol=req.symbol,
+                days=req.days,
+                lot=req.lot,
+                balance=req.balance,
+                cancel_flag=lambda: backtest_sessions.get(session_id, {}).get("cancelled", False),
+            )
+            with backtest_lock:
+                if session_id in backtest_sessions:
+                    if backtest_sessions[session_id]["cancelled"]:
+                        backtest_sessions[session_id]["status"] = "cancelled"
+                    else:
+                        backtest_sessions[session_id]["status"] = "done"
+                        backtest_sessions[session_id]["result"] = result
+        except Exception as e:
+            with backtest_lock:
+                if session_id in backtest_sessions:
+                    backtest_sessions[session_id]["status"] = "error"
+                    backtest_sessions[session_id]["result"] = {"error": str(e)}
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+
+    return {"session_id": session_id}
+
+
+@router.get("/backtest/{session_id}")
+def get_backtest_status(session_id: str):
+    with backtest_lock:
+        session = backtest_sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
+    return {"status": session["status"], "result": session["result"]}
+
+
+@router.post("/backtest/{session_id}/cancel")
+def cancel_backtest(session_id: str):
+    with backtest_lock:
+        session = backtest_sessions.get(session_id)
+        if not session:
+            return JSONResponse(status_code=404, content={"error": "Session not found"})
+        session["cancelled"] = True
+    return {"status": "cancelling"}
+

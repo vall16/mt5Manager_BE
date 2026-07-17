@@ -5,6 +5,7 @@ import sys
 from datetime import datetime, timedelta
 
 from trading_signals_multi2 import STRATEGIES, Indicators
+from indicators.ta import compute_ema, compute_rsi, compute_macd, compute_atr, compute_hma, compute_ichimoku
 
 DEFAULT_SYMBOL = "XAUUSD"
 DEFAULT_DAYS = 30
@@ -55,6 +56,9 @@ def fetch_data(symbol, strategy, days):
             raise ValueError(f"No M5 data for {symbol}")
         df = pd.DataFrame(raw)
         df["time"] = pd.to_datetime(df["time"], unit="s")
+        cutoff = datetime.now() - timedelta(days=days)
+        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
+        print(f"  M5: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
         dfs["m5"] = df
 
     if need_m15:
@@ -64,6 +68,9 @@ def fetch_data(symbol, strategy, days):
             raise ValueError(f"No M15 data for {symbol}")
         df = pd.DataFrame(raw)
         df["time"] = pd.to_datetime(df["time"], unit="s")
+        cutoff = datetime.now() - timedelta(days=days)
+        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
+        print(f"  M15: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
         dfs["m15"] = df
 
     if need_h1:
@@ -73,12 +80,15 @@ def fetch_data(symbol, strategy, days):
             raise ValueError(f"No H1 data for {symbol}")
         df = pd.DataFrame(raw)
         df["time"] = pd.to_datetime(df["time"], unit="s")
+        cutoff = datetime.now() - timedelta(days=days)
+        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
+        print(f"  H1: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
         dfs["h1"] = df
 
     return dfs
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance):
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None):
     trades = []
     position = None
 
@@ -111,67 +121,114 @@ def run_backtest(strategy, dfs, symbol, lot, balance):
     instr = INSTRUMENT.get(symbol, {"pip": 0.01, "contract": 100})
     pip = instr["pip"]
     contract = instr["contract"]
-    start_idx = M1_LOOKBACK if use_m1 else 0
-    print_steps = max(total // 20, 1) if use_m1 else 1
 
-    for i in range(start_idx, total if use_m1 else 1):
-        if use_m1 and i % print_steps == 0:
+    print("Pre-calcolo indicatori...")
+    if use_m1:
+        df_m1["ema9"] = compute_ema(df_m1, 9)
+        df_m1["ema21"] = compute_ema(df_m1, 21)
+        df_m1["rsi14"] = compute_rsi(df_m1, 14)
+        macd, macd_sig = compute_macd(df_m1)
+        df_m1["macd"] = macd
+        df_m1["macd_sig"] = macd_sig
+        atr_s = compute_atr(df_m1)
+        df_m1["atr"] = atr_s
+        df_m1["atr_ma10"] = atr_s.rolling(10).mean()
+        df_m1["candle_body"] = (df_m1["close"] - df_m1["open"]).abs()
+        df_m1["is_spike"] = df_m1["candle_body"] > (df_m1["atr"] * 3)
+
+    if use_m5:
+        hma = compute_hma(df_m5)
+        df_m5["hma"] = hma
+        df_m5["hma_prev"] = hma.shift(1)
+        df_m5["prev_close"] = df_m5["close"].shift(1)
+        df_m5["tr"] = df_m5.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]),
+            abs(r["low"] - r["prev_close"])
+        ), axis=1)
+        df_m5["atr_m5"] = df_m5["tr"].rolling(14).mean()
+        df_m5["ema5"] = compute_ema(df_m5, 5)
+        df_m5["ema15"] = compute_ema(df_m5, 15)
+        df_m5["ema20"] = compute_ema(df_m5, 20)
+        df_m5["rsi14"] = compute_rsi(df_m5, 14)
+        df_m5["vol_avg"] = df_m5["tick_volume"].rolling(20).mean()
+
+    if use_m15:
+        df_m15["ema50"] = compute_ema(df_m15, 50)
+        df_m15["ema200"] = compute_ema(df_m15, 200)
+        df_m15["ema5"] = compute_ema(df_m15, 5)
+        df_m15["ema20_m15"] = compute_ema(df_m15, 20)
+        hma15 = compute_hma(df_m15)
+        df_m15["hma"] = hma15
+        df_m15["hma_prev"] = hma15.shift(1)
+        df_m15["rsi14"] = compute_rsi(df_m15, 14)
+        df_m15["vol_avg"] = df_m15["tick_volume"].rolling(20).mean()
+
+    if use_h1:
+        tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
+        df_h1["tenkan"] = tenkan
+        df_h1["kijun"] = kijun
+        df_h1["senkou_a"] = senkou_a
+        df_h1["senkou_b"] = senkou_b
+        df_h1["chikou"] = chikou
+
+    if use_h1:
+        hma_h1 = compute_hma(df_h1)
+        df_h1["hma"] = hma_h1
+        df_h1["hma_prev"] = hma_h1.shift(1)
+        df_h1["rsi14"] = compute_rsi(df_h1, 14)
+        df_h1["prev_close"] = df_h1["close"].shift(1)
+        df_h1["tr"] = df_h1.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"],
+            abs(r["low"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"]
+        ), axis=1)
+        df_h1["atr_h1"] = df_h1["tr"].rolling(14).mean()
+        df_h1["vol_avg"] = df_h1["tick_volume"].rolling(20).mean()
+
+    print("Esecuzione backtest...")
+    if use_m1:
+        primary_df = df_m1
+        primary_times = m1_times
+        lookback = M1_LOOKBACK
+        entry_step = 15
+    elif use_h1:
+        primary_df = df_h1
+        primary_times = h1_times
+        lookback = 78
+        entry_step = 1
+    else:
+        print("Nessun timeframe primario disponibile")
+        return trades, balance
+
+    total = len(primary_df)
+    start_idx = lookback
+    print_steps = max(total // 20, 1)
+
+    for i in range(start_idx, total):
+        if cancel_flag and cancel_flag():
+            break
+
+        ts = primary_times[i]
+        row = primary_df.iloc[i]
+        low = row["low"]
+        high = row["high"]
+        price = row["close"]
+        ts_str = str(ts)
+
+        if i % print_steps == 0:
             pct = (i - start_idx) / max(total - start_idx, 1) * 100
             print(f"  ... {pct:.0f}% ({i}/{total}) | Trades: {len(trades)} | Bal: {balance:.2f}")
-
-        ts = m1_times[i] if use_m1 else None
-
-        slices = {}
-        if use_m1:
-            slices["df_m1"] = df_m1.iloc[:i + 1]
-        if use_m5:
-            idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1 if ts is not None else len(df_m5) - 1
-            if idx_m5 < 30:
-                continue
-            slices["df_m5"] = df_m5.iloc[:idx_m5 + 1]
-        if use_m15:
-            idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1 if ts is not None else len(df_m15) - 1
-            if idx_m15 < 30:
-                continue
-            slices["df_m15"] = df_m15.iloc[:idx_m15 + 1]
-        if use_h1:
-            idx_h1 = int(h1_end.searchsorted(ts, side="right")) - 1 if ts is not None else len(df_h1) - 1
-            if idx_h1 < 60:
-                continue
-            slices["df_h1"] = df_h1.iloc[:idx_h1 + 1]
-
-        try:
-            ind = strategy.compute_indicators(
-                slices.get("df_m1"),
-                slices.get("df_m5"),
-                slices.get("df_m15"),
-                slices.get("df_h1"),
-            )
-        except Exception:
-            continue
-
-        if use_m1:
-            row = df_m1.iloc[i]
-            low = row["low"]
-            high = row["high"]
-            price = row["close"]
-            ts_str = str(ts)
-        else:
-            continue
 
         if position:
             entry, direction, sl, tp = position
 
             if direction == "buy":
-                action = strategy.on_hold_action(ind, True, False, "BUY") if hasattr(strategy, "on_hold_action") else None
-                if action == "close_buy" or low <= sl:
-                    hit_sl = low <= sl
-                    exit_price = sl if hit_sl else price
-                    pnl = (exit_price - entry) * lot * contract
-                    exit_type = "SL" if hit_sl else "HOLD_EXIT"
+                if low <= sl:
+                    pnl = (sl - entry) * lot * contract
                     balance += pnl
-                    print(f"{ts_str} BUY {exit_type} @ {exit_price:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
-                    trades.append({"time": ts, "type": "BUY", "exit": exit_type, "pnl": pnl, "balance": balance})
+                    print(f"{ts_str} BUY SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    trades.append({"time": ts, "type": "BUY", "exit": "SL", "pnl": pnl, "balance": balance})
                     position = None
                 elif high >= tp:
                     gain = (tp - entry) * lot * contract
@@ -180,15 +237,11 @@ def run_backtest(strategy, dfs, symbol, lot, balance):
                     trades.append({"time": ts, "type": "BUY", "exit": "TP", "pnl": gain, "balance": balance})
                     position = None
             else:
-                action = strategy.on_hold_action(ind, False, True, "SELL") if hasattr(strategy, "on_hold_action") else None
-                if action == "close_sell" or high >= sl:
-                    hit_sl = high >= sl
-                    exit_price = sl if hit_sl else price
-                    pnl = (entry - exit_price) * lot * contract
-                    exit_type = "SL" if hit_sl else "HOLD_EXIT"
+                if high >= sl:
+                    pnl = (entry - sl) * lot * contract
                     balance += pnl
-                    print(f"{ts_str} SELL {exit_type} @ {exit_price:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
-                    trades.append({"time": ts, "type": "SELL", "exit": exit_type, "pnl": pnl, "balance": balance})
+                    print(f"{ts_str} SELL SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    trades.append({"time": ts, "type": "SELL", "exit": "SL", "pnl": pnl, "balance": balance})
                     position = None
                 elif low <= tp:
                     gain = (entry - tp) * lot * contract
@@ -197,12 +250,69 @@ def run_backtest(strategy, dfs, symbol, lot, balance):
                     trades.append({"time": ts, "type": "SELL", "exit": "TP", "pnl": gain, "balance": balance})
                     position = None
 
-        if position is None:
-            has_sell = False
-            has_buy = False
+        if position is None and i % entry_step == 0:
+            ind = Indicators()
 
-            buy = strategy.buy_condition(ind)
-            sell = strategy.sell_condition(ind)
+            if use_m1:
+                ind.ema_fast = row["ema9"]
+                ind.ema_slow = row["ema21"]
+                ind.rsi_m1 = row["rsi14"]
+                ind.macd = row["macd"]
+                ind.macd_sig = row["macd_sig"]
+                ind.volatilty_expansion = row["atr"] > row["atr_ma10"]
+                ind.volatility_expansion = ind.volatilty_expansion
+                ind.is_spike = row["is_spike"]
+                ind.atr_m1 = row["atr"]
+
+                if use_m5:
+                    idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
+                    if idx_m5 >= 30:
+                        ind.hma_m5 = df_m5.iloc[idx_m5]["hma"]
+                        ind.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
+                        ind.atr_m5_val = df_m5.iloc[idx_m5]["atr_m5"]
+                        ind.ema_short = df_m5.iloc[idx_m5]["ema5"]
+                        ind.ema_long = df_m5.iloc[idx_m5]["ema15"]
+                        ind.rsi = df_m5.iloc[idx_m5]["rsi14"]
+
+                if use_m15:
+                    idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
+                    if idx_m15 >= 30:
+                        price_m15 = df_m15.iloc[idx_m15]["close"]
+                        ind.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
+                        ind.trend_macro_50_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
+                        ind.ema_short = getattr(ind, "ema_short", None) or df_m15.iloc[idx_m15]["ema5"]
+                        ind.ema_long = getattr(ind, "ema_long", None) or df_m15.iloc[idx_m15]["ema20_m15"]
+                        ind.hma = df_m15.iloc[idx_m15]["hma"]
+                        ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
+                        vol_now = df_m15.iloc[idx_m15]["tick_volume"]
+                        vol_avg = df_m15.iloc[idx_m15]["vol_avg"]
+                        ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
+
+                if use_h1:
+                    idx_h1 = int(h1_end.searchsorted(ts, side="right")) - 1
+                    if idx_h1 >= 60:
+                        ind.tenkan = df_h1.iloc[idx_h1]["tenkan"]
+                        ind.kijun = df_h1.iloc[idx_h1]["kijun"]
+                        ind.senkou_a = df_h1.iloc[idx_h1]["senkou_a"]
+                        ind.senkou_b = df_h1.iloc[idx_h1]["senkou_b"]
+                        ind.chikou = df_h1.iloc[idx_h1]["chikou"]
+                        ind.price = df_h1.iloc[idx_h1]["close"]
+            elif use_h1:
+                ind.tenkan = row.get("tenkan")
+                ind.kijun = row.get("kijun")
+                ind.senkou_a = row.get("senkou_a")
+                ind.senkou_b = row.get("senkou_b")
+                ind.chikou = row.get("chikou")
+                ind.price = price
+                ind.rsi = row.get("rsi14")
+                ind.hma = row.get("hma")
+                ind.hma_prev = row.get("hma_prev")
+
+            try:
+                buy = strategy.buy_condition(ind)
+                sell = strategy.sell_condition(ind)
+            except Exception:
+                continue
 
             direction = None
             if buy:
@@ -265,6 +375,79 @@ def summary(trades, balance, initial_balance):
 
     for t in trades[-10:]:
         print(f"{t['time']} | {t['type']:5} | {t['exit']:10} | PnL: {t['pnl']:8.2f} | Bal: {t['balance']:.2f}")
+
+
+def compute_summary(trades, balance, initial_balance):
+    wins = [t for t in trades if t["pnl"] > 0]
+    losses = [t for t in trades if t["pnl"] < 0]
+
+    max_dd = 0
+    peak = initial_balance
+    for t in trades:
+        if t["balance"] > peak:
+            peak = t["balance"]
+        dd = peak - t["balance"]
+        if dd > max_dd:
+            max_dd = dd
+
+    win_rate = len(wins) / len(trades) * 100 if trades else 0
+    gross_profit = sum(t["pnl"] for t in wins)
+    gross_loss = sum(t["pnl"] for t in losses)
+    avg_win = gross_profit / len(wins) if wins else 0
+    avg_loss = gross_loss / len(losses) if losses else 0
+    win_loss_ratio = abs(avg_win / avg_loss) if losses and wins else 0
+
+    return {
+        "total_trades": len(trades),
+        "wins": len(wins),
+        "losses": len(losses),
+        "win_rate": round(win_rate, 1),
+        "gross_profit": round(gross_profit, 2),
+        "gross_loss": round(gross_loss, 2),
+        "net_pnl": round(gross_profit + gross_loss, 2),
+        "final_balance": round(balance, 2),
+        "return_pct": round((balance - initial_balance) / initial_balance * 100, 1),
+        "avg_win": round(avg_win, 2),
+        "avg_loss": round(avg_loss, 2),
+        "win_loss_ratio": round(win_loss_ratio, 2),
+        "max_drawdown": round(max_dd, 2),
+    }
+
+
+def run_backtest_api(strategy_name, symbol, days, lot, balance, cancel_flag=None):
+    strategy = STRATEGIES.get(strategy_name)
+    if not strategy:
+        return {"error": f"Unknown strategy: {strategy_name}"}
+
+    if not mt5.initialize():
+        return {"error": "MT5 initialization failed"}
+
+    try:
+        dfs = fetch_data(symbol, strategy, days)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag)
+        summary_data = compute_summary(trades, final_bal, balance)
+
+        serializable_trades = []
+        for t in trades:
+            serializable_trades.append({
+                "time": str(t["time"]),
+                "type": t["type"],
+                "exit": t["exit"],
+                "pnl": round(t["pnl"], 2),
+                "balance": round(t["balance"], 2),
+            })
+
+        return {
+            "strategy": strategy_name,
+            "symbol": symbol,
+            "days": days,
+            "lot": lot,
+            "initial_balance": balance,
+            "summary": summary_data,
+            "trades": serializable_trades,
+        }
+    finally:
+        mt5.shutdown()
 
 
 if __name__ == "__main__":
