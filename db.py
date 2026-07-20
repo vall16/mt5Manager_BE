@@ -1552,9 +1552,16 @@ def run_backtest_endpoint(req: BacktestRequest):
     session_id = str(uuid.uuid4())[:8]
 
     with backtest_lock:
-        backtest_sessions[session_id] = {"status": "running", "result": None, "cancelled": False}
+        backtest_sessions[session_id] = {"status": "running", "result": None, "cancelled": False, "progress": 0, "trades_count": 0, "balance": 0}
 
     def _run():
+        def on_progress(pct, trades_count, balance):
+            with backtest_lock:
+                if session_id in backtest_sessions:
+                    backtest_sessions[session_id]["progress"] = pct
+                    backtest_sessions[session_id]["trades_count"] = trades_count
+                    backtest_sessions[session_id]["balance"] = balance
+
         try:
             result = run_backtest_api(
                 strategy_name=req.strategy,
@@ -1564,6 +1571,7 @@ def run_backtest_endpoint(req: BacktestRequest):
                 balance=req.balance,
                 mt5_api_url=mt5_api_url,
                 cancel_flag=lambda: backtest_sessions.get(session_id, {}).get("cancelled", False),
+                progress_callback=on_progress,
             )
             with backtest_lock:
                 if session_id in backtest_sessions:
@@ -1590,7 +1598,7 @@ def get_backtest_status(session_id: str):
         session = backtest_sessions.get(session_id)
     if not session:
         return JSONResponse(status_code=404, content={"error": "Session not found"})
-    return {"status": session["status"], "result": session["result"]}
+    return {"status": session["status"], "result": session["result"], "progress": session.get("progress", 0), "trades_count": session.get("trades_count", 0), "balance": session.get("balance", 0)}
 
 
 @router.post("/backtest/{session_id}/cancel")

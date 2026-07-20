@@ -3,6 +3,7 @@ import argparse
 import sys
 import requests
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from trading_signals_multi2 import STRATEGIES, Indicators
 from indicators.ta import compute_ema, compute_rsi, compute_macd, compute_atr, compute_hma, compute_ichimoku
@@ -13,6 +14,23 @@ TIMEFRAME_MAP = {
     "m15": 15,
     "h1": 60,
 }
+
+def _get_session_label(ts):
+    try:
+        dt = pd.Timestamp(ts).to_pydatetime().replace(tzinfo=ZoneInfo("Europe/Rome"))
+    except Exception:
+        return "UNKNOWN"
+    h, m = dt.hour, dt.minute
+    if 1 <= h < 9:
+        return "ASIA"
+    elif 9 <= h < 14:
+        return "LONDON"
+    elif 14 <= h < 17 or (h == 17 and m < 30):
+        return "NY-LON"
+    elif (h == 17 and m >= 30) or 18 <= h < 22:
+        return "NY"
+    else:
+        return "OFF"
 
 def fetch_rates(symbol, tf_key, n_candles, mt5_api_url):
     url = f"{mt5_api_url.rstrip('/')}/get_rates"
@@ -81,7 +99,7 @@ def fetch_data(symbol, strategy, days, mt5_api_url):
     return dfs
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None):
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None):
     trades = []
     position = None
 
@@ -212,6 +230,8 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None):
         if i % print_steps == 0:
             pct = (i - start_idx) / max(total - start_idx, 1) * 100
             print(f"  ... {pct:.0f}% ({i}/{total}) | Trades: {len(trades)} | Bal: {balance:.2f}")
+            if progress_callback:
+                progress_callback(round(pct), len(trades), round(balance, 2))
 
         if position:
             entry, direction, sl, tp = position
@@ -245,6 +265,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None):
 
         if position is None and i % entry_step == 0:
             ind = Indicators()
+            ind.session_label = _get_session_label(ts)
 
             if use_m1:
                 ind.ema_fast = row["ema9"]
@@ -371,6 +392,8 @@ def summary(trades, balance, initial_balance):
 
 
 def compute_summary(trades, balance, initial_balance):
+    from zoneinfo import ZoneInfo
+
     wins = [t for t in trades if t["pnl"] > 0]
     losses = [t for t in trades if t["pnl"] < 0]
 
@@ -390,6 +413,66 @@ def compute_summary(trades, balance, initial_balance):
     avg_loss = gross_loss / len(losses) if losses else 0
     win_loss_ratio = abs(avg_win / avg_loss) if losses and wins else 0
 
+    def _get_session(dt):
+        h, m = dt.hour, dt.minute
+        if 1 <= h < 9:
+            return "ASIA"
+        elif 9 <= h < 14:
+            return "LONDON"
+        elif 14 <= h < 17 or (h == 17 and m < 30):
+            return "NY-LON"
+        elif (h == 17 and m >= 30) or 18 <= h < 22:
+            return "NY"
+        else:
+            return "OFF"
+
+    session_stats = {}
+    hour_stats = {}
+    dow_stats = {}
+    direction_stats = {"BUY": {"wins": 0, "losses": 0, "pnl": 0}, "SELL": {"wins": 0, "losses": 0, "pnl": 0}}
+
+    for t in trades:
+        try:
+            dt = pd.Timestamp(t["time"]).to_pydatetime().replace(tzinfo=ZoneInfo("Europe/Rome"))
+        except Exception:
+            continue
+
+        session = _get_session(dt)
+        hour = dt.hour
+        dow = dt.strftime("%A")
+        is_win = t["pnl"] > 0
+
+        if session not in session_stats:
+            session_stats[session] = {"wins": 0, "losses": 0, "pnl": 0}
+        session_stats[session]["wins"] += 1 if is_win else 0
+        session_stats[session]["losses"] += 1 if not is_win else 0
+        session_stats[session]["pnl"] = round(session_stats[session]["pnl"] + t["pnl"], 2)
+
+        if hour not in hour_stats:
+            hour_stats[hour] = {"wins": 0, "losses": 0, "pnl": 0}
+        hour_stats[hour]["wins"] += 1 if is_win else 0
+        hour_stats[hour]["losses"] += 1 if not is_win else 0
+        hour_stats[hour]["pnl"] = round(hour_stats[hour]["pnl"] + t["pnl"], 2)
+
+        if dow not in dow_stats:
+            dow_stats[dow] = {"wins": 0, "losses": 0, "pnl": 0}
+        dow_stats[dow]["wins"] += 1 if is_win else 0
+        dow_stats[dow]["losses"] += 1 if not is_win else 0
+        dow_stats[dow]["pnl"] = round(dow_stats[dow]["pnl"] + t["pnl"], 2)
+
+        direction = t["type"]
+        direction_stats[direction]["wins"] += 1 if is_win else 0
+        direction_stats[direction]["losses"] += 1 if not is_win else 0
+        direction_stats[direction]["pnl"] = round(direction_stats[direction]["pnl"] + t["pnl"], 2)
+
+    for d in [*session_stats.values(), *hour_stats.values(), *dow_stats.values(), *direction_stats.values()]:
+        total = d["wins"] + d["losses"]
+        d["win_rate"] = round(d["wins"] / total * 100, 1) if total > 0 else 0
+        d["total"] = total
+        d["avg_pnl"] = round(d["pnl"] / total, 2) if total > 0 else 0
+
+    hour_sorted = dict(sorted(hour_stats.items()))
+
     return {
         "total_trades": len(trades),
         "wins": len(wins),
@@ -404,17 +487,21 @@ def compute_summary(trades, balance, initial_balance):
         "avg_loss": round(avg_loss, 2),
         "win_loss_ratio": round(win_loss_ratio, 2),
         "max_drawdown": round(max_dd, 2),
+        "by_session": session_stats,
+        "by_hour": hour_sorted,
+        "by_day": dow_stats,
+        "by_direction": direction_stats,
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
 
     try:
         dfs = fetch_data(symbol, strategy, days, mt5_api_url)
-        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback)
         summary_data = compute_summary(trades, final_bal, balance)
 
         serializable_trades = []
