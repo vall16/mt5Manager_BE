@@ -59,8 +59,8 @@ INSTRUMENT = {
     "GBPJPY":  {"pip": 0.01,   "contract": 1000},
     "AUDJPY":  {"pip": 0.01,   "contract": 1000},
     "EURUSD":  {"pip": 0.0001, "contract": 100000},
-    "MSFT":    {"pip": 0.01,   "contract": 100},
-    "NVDA":    {"pip": 0.01,   "contract": 100},
+    "MSFT.NAS": {"pip": 0.01,   "contract": 100},
+    "NVDA.NAS": {"pip": 0.01,   "contract": 100},
 }
 
 DEFAULT_SL = 500
@@ -203,6 +203,11 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         primary_times = m1_times
         lookback = M1_LOOKBACK
         entry_step = 15
+    elif use_m15:
+        primary_df = df_m15
+        primary_times = m15_times
+        lookback = 70
+        entry_step = 1
     elif use_h1:
         primary_df = df_h1
         primary_times = h1_times
@@ -321,6 +326,17 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 ind.rsi = row.get("rsi14")
                 ind.hma = row.get("hma")
                 ind.hma_prev = row.get("hma_prev")
+            elif use_m15:
+                ind.ema_short = row.get("ema5")
+                ind.ema_long = row.get("ema20_m15")
+                ind.rsi = row.get("rsi14")
+                ind.hma = row.get("hma")
+                ind.hma_prev = row.get("hma_prev")
+                vol_now = row.get("tick_volume", 0)
+                vol_avg = row.get("vol_avg")
+                ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
+                ind.trend_macro_up = price > row.get("ema50", price) if pd.notna(row.get("ema50")) else None
+                ind.trend_macro_50_up = ind.trend_macro_up
 
             try:
                 buy = strategy.buy_condition(ind)

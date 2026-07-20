@@ -688,6 +688,8 @@ class SuperXauProStrategy(SignalStrategy):
 
 class MsftStrategy(SignalStrategy):
     name = "MSFT"
+    requires_m1 = False
+    requires_m5 = False
     requires_m15 = True
 
     def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
@@ -729,6 +731,8 @@ class MsftStrategy(SignalStrategy):
 
 class NvdaStrategy(SignalStrategy):
     name = "NVDA"
+    requires_m1 = False
+    requires_m5 = False
     requires_m15 = True
 
     def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
