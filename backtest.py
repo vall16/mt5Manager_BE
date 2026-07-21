@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import argparse
 import sys
 import requests
@@ -32,25 +33,31 @@ def _get_session_label(ts):
     else:
         return "OFF"
 
-def fetch_rates(symbol, tf_key, n_candles, mt5_api_url):
+def fetch_rates(symbol, tf_key, n_candles, mt5_api_url, start_pos=0, retries=3):
     url = f"{mt5_api_url.rstrip('/')}/get_rates"
-    payload = {"symbol": symbol, "timeframe": TIMEFRAME_MAP[tf_key], "n_candles": n_candles}
-    resp = requests.post(url, json=payload, timeout=30)
-    resp.raise_for_status()
-    data = resp.json()
-    rates = data.get("rates", [])
-    if not rates:
-        return None
-    import numpy as np
-    dtype = [("time", "i8"), ("open", "f8"), ("high", "f8"), ("low", "f8"), ("close", "f8"), ("tick_volume", "i8")]
-    return np.array([(r["time"], r["open"], r["high"], r["low"], r["close"], r.get("tick_volume", 0)) for r in rates], dtype=dtype)
+    payload = {"symbol": symbol, "timeframe": TIMEFRAME_MAP[tf_key], "n_candles": n_candles, "start_pos": start_pos}
+    for attempt in range(retries):
+        try:
+            resp = requests.post(url, json=payload, timeout=120)
+            resp.raise_for_status()
+            data = resp.json()
+            rates = data.get("rates", [])
+            if not rates:
+                return None
+            dtype = [("time", "i8"), ("open", "f8"), ("high", "f8"), ("low", "f8"), ("close", "f8"), ("tick_volume", "i8")]
+            return np.array([(r["time"], r["open"], r["high"], r["low"], r["close"], r.get("tick_volume", 0)) for r in rates], dtype=dtype)
+        except Exception as e:
+            print(f"    Attempt {attempt+1} failed: {e}")
+            if attempt == retries - 1:
+                return None
+    return None
 
 DEFAULT_SYMBOL = "XAUUSD"
 DEFAULT_DAYS = 30
 DEFAULT_LOT = 0.01
 DEFAULT_BALANCE = 10000.0
 M1_LOOKBACK = 100
-MAX_BARS = 50000
+MAX_BARS = 40000
 
 INSTRUMENT = {
     "XAUUSD":  {"pip": 0.01,    "contract": 100},
@@ -69,32 +76,97 @@ DEFAULT_SL = 500
 DEFAULT_TP = 600
 
 
+def fetch_rates_range(symbol, tf_key, date_from, date_to, mt5_api_url):
+    url = f"{mt5_api_url.rstrip('/')}/get_rates_range"
+    payload = {
+        "symbol": symbol,
+        "timeframe": TIMEFRAME_MAP[tf_key],
+        "date_from": date_from.strftime("%Y-%m-%d"),
+        "date_to": date_to.strftime("%Y-%m-%d"),
+    }
+    for attempt in range(3):
+        try:
+            resp = requests.post(url, json=payload, timeout=120)
+            resp.raise_for_status()
+            data = resp.json()
+            rates = data.get("rates", [])
+            if not rates:
+                return None
+            dtype = [("time", "i8"), ("open", "f8"), ("high", "f8"), ("low", "f8"), ("close", "f8"), ("tick_volume", "i8")]
+            return np.array([(r["time"], r["open"], r["high"], r["low"], r["close"], r.get("tick_volume", 0)) for r in rates], dtype=dtype)
+        except Exception as e:
+            print(f"    Attempt {attempt+1} failed: {e}")
+            if attempt == 2:
+                return None
+    return None
+
+
 def fetch_data(symbol, strategy, days, mt5_api_url):
+    from datetime import timedelta
+    import math
+
     need_m1 = strategy.requires_m1
     need_m5 = strategy.requires_m5
     need_m15 = strategy.requires_m15
     need_h1 = strategy.requires_h1
 
-    dfs = {}
-
-    tf_map = {
-        "m1": (need_m1, MAX_BARS),
-        "m5": (need_m5, MAX_BARS),
-        "m15": (need_m15, MAX_BARS),
-        "h1": (need_h1, MAX_BARS),
+    bars_per_day = {
+        "m1": 1440,
+        "m5": 288,
+        "m15": 96,
+        "h1": 24,
     }
 
-    for tf_key, (needed, n_candles) in tf_map.items():
+    dfs = {}
+    tf_map = {
+        "m1": need_m1,
+        "m5": need_m5,
+        "m15": need_m15,
+        "h1": need_h1,
+    }
+
+    now = datetime.now()
+    date_to = now
+    date_from = now - timedelta(days=days)
+
+    for tf_key, needed in tf_map.items():
         if not needed:
             continue
-        print(f"  Fetching {tf_key.upper()} via {mt5_api_url}...")
-        raw = fetch_rates(symbol, tf_key, n_candles, mt5_api_url)
-        if raw is None or len(raw) == 0:
+
+        bpd = bars_per_day[tf_key]
+        total_bars = days * bpd
+
+        if total_bars <= MAX_BARS:
+            print(f"  Fetching {tf_key.upper()} ({date_from.date()} -> {date_to.date()})...")
+            raw = fetch_rates_range(symbol, tf_key, date_from, date_to, mt5_api_url)
+            if raw is None or len(raw) == 0:
+                raise ValueError(f"No {tf_key.upper()} data for {symbol}")
+            all_raw = [raw]
+        else:
+            chunk_days = math.ceil(MAX_BARS / bpd * 0.9)
+            n_chunks = math.ceil(days / chunk_days)
+            print(f"  Fetching {tf_key.upper()} in {n_chunks} chunks ({days} days, ~{total_bars} bars)...")
+            all_raw = []
+            cursor_from = date_from
+            for ci in range(n_chunks):
+                cursor_to = min(cursor_from + timedelta(days=chunk_days), date_to)
+                print(f"    Chunk {ci+1}/{n_chunks}: {cursor_from.date()} -> {cursor_to.date()}")
+                raw = fetch_rates_range(symbol, tf_key, cursor_from, cursor_to, mt5_api_url)
+                if raw is not None and len(raw) > 0:
+                    all_raw.append(raw)
+                else:
+                    print(f"    Chunk {ci+1} returned no data, skipping.")
+                cursor_from = cursor_to + timedelta(days=1)
+                if cursor_from >= date_to:
+                    break
+
+        combined = np.concatenate(all_raw) if all_raw else None
+        if combined is None or len(combined) == 0:
             raise ValueError(f"No {tf_key.upper()} data for {symbol}")
-        df = pd.DataFrame(raw)
+
+        df = pd.DataFrame(combined)
         df["time"] = pd.to_datetime(df["time"], unit="s")
-        cutoff = datetime.now() - timedelta(days=days)
-        df = df[df["time"] >= pd.Timestamp(cutoff)].reset_index(drop=True)
+        df = df.drop_duplicates(subset="time").sort_values("time").reset_index(drop=True)
         print(f"  {tf_key.upper()}: {len(df)} bars ({df['time'].iloc[0]} -> {df['time'].iloc[-1]})")
         dfs[tf_key] = df
 

@@ -720,12 +720,13 @@ def get_rates(payload: dict = Body(...)):
     symbol = payload.get("symbol")
     timeframe = payload.get("timeframe")
     n_candles = payload.get("n_candles", 100)
+    start_pos = payload.get("start_pos", 0)
 
     if not symbol or timeframe is None:
         raise HTTPException(status_code=400, detail="Missing symbol or timeframe")
 
     # 1. Recupero dati da MT5
-    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, n_candles)
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, start_pos, n_candles)
 
     if rates is None or len(rates) == 0:
         return {"rates": []}
@@ -738,6 +739,35 @@ def get_rates(payload: dict = Body(...)):
     rates_list = json.loads(df.to_json(orient="records"))
 
     return {"rates": rates_list}
+
+
+@app.post("/get_rates_range")
+def get_rates_range(payload: dict = Body(...)):
+    """
+    Ritorna dati storici in un range di date.
+    Payload: {"symbol": "XAUUSD", "timeframe": 1, "date_from": "2025-01-01", "date_to": "2025-07-01"}
+    """
+    symbol = payload.get("symbol")
+    timeframe = payload.get("timeframe")
+    date_from = payload.get("date_from")
+    date_to = payload.get("date_to")
+
+    if not symbol or timeframe is None or not date_from or not date_to:
+        raise HTTPException(status_code=400, detail="Missing symbol, timeframe, date_from, or date_to")
+
+    dt_from = datetime.strptime(date_from, "%Y-%m-%d")
+    dt_to = datetime.strptime(date_to, "%Y-%m-%d")
+
+    rates = mt5.copy_rates_range(symbol, timeframe, dt_from, dt_to)
+
+    if rates is None or len(rates) == 0:
+        return {"rates": []}
+
+    df = pd.DataFrame(rates)
+    rates_list = json.loads(df.to_json(orient="records"))
+
+    return {"rates": rates_list}
+
 
 # -----------------------
 # BLOCCO DI AVVIO
