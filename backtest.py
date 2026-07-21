@@ -12,7 +12,7 @@ TIMEFRAME_MAP = {
     "m1": 1,
     "m5": 5,
     "m15": 15,
-    "h1": 60,
+    "h1": 16385,
 }
 
 def _get_session_label(ts):
