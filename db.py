@@ -1521,6 +1521,7 @@ class BacktestRequest(PydanticBaseModel):
     lot: float = 0.01
     balance: float = 10000.0
     trader_id: int | None = None
+    direction: str = "both"
 
 @router.post("/backtest")
 def run_backtest_endpoint(req: BacktestRequest):
@@ -1579,6 +1580,7 @@ def run_backtest_endpoint(req: BacktestRequest):
                 mt5_api_url=mt5_api_url,
                 cancel_flag=lambda: backtest_sessions.get(session_id, {}).get("cancelled", False),
                 progress_callback=on_progress,
+                direction=req.direction,
             )
             with backtest_lock:
                 if session_id in backtest_sessions:

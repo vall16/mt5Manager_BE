@@ -173,7 +173,7 @@ def fetch_data(symbol, strategy, days, mt5_api_url):
     return dfs
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None):
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both"):
     trades = []
     position = None
 
@@ -419,9 +419,9 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 continue
 
             direction = None
-            if buy:
+            if buy and direction_filter in ("buy", "both"):
                 direction = "buy"
-            elif sell:
+            elif sell and direction_filter in ("sell", "both"):
                 direction = "sell"
 
             if direction:
@@ -595,14 +595,14 @@ def compute_summary(trades, balance, initial_balance, days=None):
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both"):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
 
     try:
         dfs = fetch_data(symbol, strategy, days, mt5_api_url)
-        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction)
         summary_data = compute_summary(trades, final_bal, balance, days)
 
         serializable_trades = []
