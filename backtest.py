@@ -59,7 +59,9 @@ INSTRUMENT = {
     "GBPJPY":  {"pip": 0.01,   "contract": 1000},
     "AUDJPY":  {"pip": 0.01,   "contract": 1000},
     "EURUSD":  {"pip": 0.0001, "contract": 100000},
+    "MSFT":    {"pip": 0.01,   "contract": 100},
     "MSFT.NAS": {"pip": 0.01,   "contract": 100},
+    "NVDA":    {"pip": 0.01,   "contract": 100},
     "NVDA.NAS": {"pip": 0.01,   "contract": 100},
 }
 
