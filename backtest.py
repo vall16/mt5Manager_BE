@@ -409,7 +409,7 @@ def summary(trades, balance, initial_balance):
         print(f"{t['time']} | {t['type']:5} | {t['exit']:10} | PnL: {t['pnl']:8.2f} | Bal: {t['balance']:.2f}")
 
 
-def compute_summary(trades, balance, initial_balance):
+def compute_summary(trades, balance, initial_balance, days=None):
     from zoneinfo import ZoneInfo
 
     wins = [t for t in trades if t["pnl"] > 0]
@@ -491,8 +491,8 @@ def compute_summary(trades, balance, initial_balance):
 
     hour_sorted = dict(sorted(hour_stats.items()))
 
-    days_span = 1
-    if len(trades) >= 2:
+    days_span = days or 1
+    if not days and len(trades) >= 2:
         try:
             first = pd.Timestamp(trades[0]["time"])
             last = pd.Timestamp(trades[-1]["time"])
@@ -531,7 +531,7 @@ def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, can
     try:
         dfs = fetch_data(symbol, strategy, days, mt5_api_url)
         trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback)
-        summary_data = compute_summary(trades, final_bal, balance)
+        summary_data = compute_summary(trades, final_bal, balance, days)
 
         serializable_trades = []
         for t in trades:

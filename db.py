@@ -11,6 +11,7 @@ from mysql.connector import Error as MySQLError
 import requests
 from models import LoginRequest, LoginResponse, ServerRequest, TraderServersUpdate,Trader, Newtrader,UserResponse, ServerResponse
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 # import MetaTrader5 as mt5
@@ -1615,4 +1616,42 @@ def cancel_backtest(session_id: str):
             return JSONResponse(status_code=404, content={"error": "Session not found"})
         session["cancelled"] = True
     return {"status": "cancelling"}
+
+
+@router.post("/backtest/{session_id}/analyze")
+def analyze_backtest_endpoint(session_id: str):
+    with backtest_lock:
+        session = backtest_sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
+    if session["status"] != "done":
+        return JSONResponse(status_code=400, content={"error": "Backtest non completato"})
+    result = session.get("result")
+    if not result or result.get("error"):
+        return JSONResponse(status_code=400, content={"error": "Nessun risultato da analizzare"})
+
+    try:
+        from ai_backtest import analyze_backtest
+        strategy_name = result.get("strategy", "")
+        symbol = result.get("symbol", "")
+        days = result.get("days", 30)
+        lot = result.get("lot", 0.01)
+        balance = result.get("initial_balance", 10000)
+
+        strategies_obj = __import__("trading_signals_multi2", fromlist=["STRATEGIES"]).STRATEGIES
+        strat = strategies_obj.get(strategy_name)
+        sl_tp_info = "default"
+        if strat:
+            from trading_signals_multi2 import Indicators
+            ind = Indicators()
+            ind.atr_m5_val = 100
+            ind.volatilty_expansion = True
+            ind.is_spike = False
+            sl_tp, tp_tp = strat.get_dynamic_sl_tp(ind)
+            sl_tp_info = f"SL={sl_tp or 500}, TP={tp_tp or 600}"
+
+        analysis = analyze_backtest(result, strategy_name, symbol, days, lot, balance, sl_tp_info)
+        return {"analysis": analysis}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"Errore AI: {str(e)}"})
 
