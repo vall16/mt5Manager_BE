@@ -489,11 +489,22 @@ def compute_summary(trades, balance, initial_balance):
 
     hour_sorted = dict(sorted(hour_stats.items()))
 
+    days_span = 1
+    if len(trades) >= 2:
+        try:
+            first = pd.Timestamp(trades[0]["time"])
+            last = pd.Timestamp(trades[-1]["time"])
+            days_span = max((last - first).days, 1)
+        except Exception:
+            pass
+    trades_per_day = round(len(trades) / days_span, 1) if trades else 0
+
     return {
         "total_trades": len(trades),
         "wins": len(wins),
         "losses": len(losses),
         "win_rate": round(win_rate, 1),
+        "trades_per_day": trades_per_day,
         "gross_profit": round(gross_profit, 2),
         "gross_loss": round(gross_loss, 2),
         "net_pnl": round(gross_profit + gross_loss, 2),
