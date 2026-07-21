@@ -1529,19 +1529,25 @@ def run_backtest_endpoint(req: BacktestRequest):
         return JSONResponse(status_code=400, content={"error": f"Unknown strategy: {req.strategy}"})
 
     mt5_api_url = None
+    trader_name = None
+    trader_login = None
+    trader_server = None
     if req.trader_id:
         conn = get_connection()
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                SELECT ss.ip, ss.port
+                SELECT t.name, ss.ip, ss.port, ss.user, ss.server
                 FROM traders t
                 JOIN servers ss ON ss.id = t.slave_server_id
                 WHERE t.id = %s
             """, (req.trader_id,))
             row = cursor.fetchone()
-            if row and row[0] and row[1]:
-                mt5_api_url = f"http://{row[0]}:{row[1]}"
+            if row and row[1] and row[2]:
+                trader_name = row[0]
+                mt5_api_url = f"http://{row[1]}:{row[2]}"
+                trader_login = row[3]
+                trader_server = row[4]
         finally:
             cursor.close()
             conn.close()
@@ -1552,7 +1558,7 @@ def run_backtest_endpoint(req: BacktestRequest):
     session_id = str(uuid.uuid4())[:8]
 
     with backtest_lock:
-        backtest_sessions[session_id] = {"status": "running", "result": None, "cancelled": False, "progress": 0, "trades_count": 0, "balance": 0}
+        backtest_sessions[session_id] = {"status": "running", "result": None, "cancelled": False, "progress": 0, "trades_count": 0, "balance": 0, "mt5_url": mt5_api_url, "trader_name": trader_name, "trader_login": trader_login, "trader_server": trader_server}
 
     def _run():
         def on_progress(pct, trades_count, balance):
@@ -1598,7 +1604,7 @@ def get_backtest_status(session_id: str):
         session = backtest_sessions.get(session_id)
     if not session:
         return JSONResponse(status_code=404, content={"error": "Session not found"})
-    return {"status": session["status"], "result": session["result"], "progress": session.get("progress", 0), "trades_count": session.get("trades_count", 0), "balance": session.get("balance", 0)}
+    return {"status": session["status"], "result": session["result"], "progress": session.get("progress", 0), "trades_count": session.get("trades_count", 0), "balance": session.get("balance", 0), "mt5_url": session.get("mt5_url"), "trader_name": session.get("trader_name"), "trader_login": session.get("trader_login"), "trader_server": session.get("trader_server")}
 
 
 @router.post("/backtest/{session_id}/cancel")
