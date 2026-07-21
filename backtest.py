@@ -204,7 +204,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         primary_df = df_m1
         primary_times = m1_times
         lookback = M1_LOOKBACK
-        entry_step = 15
+        entry_step = 1
     elif use_m15:
         primary_df = df_m15
         primary_times = m15_times
