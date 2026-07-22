@@ -485,12 +485,25 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         return False
 
     def get_dynamic_sl_tp(self, ind: Indicators):
-        if ind.atr_m5_val <= 12:
-            return 1000, 1500
-        return None, None
+        # ── PRECEDENTE: SL/TP fissi solo sotto soglia ATR ──
+        # if ind.atr_m5_val <= 12:
+        #     return 1000, 1500
+        # return None, None
+        # ── NUOVO: SL/TP dinamici basati su ATR (2× SL, 3× TP) ──
+        atr = ind.atr_m5_val
+        if atr <= 0:
+            return None, None
+        sl = int(atr * 2.0 * 100)
+        tp = int(atr * 3.0 * 100)
+        sl = max(500, min(sl, 2000))
+        tp = max(sl + 100, min(tp, 3000))
+        return sl, tp
 
     def get_log_details(self, ind: Indicators) -> str:
-        return f"(ATR M5: {ind.atr_m5_val:.1f})"
+        atr = ind.atr_m5_val
+        sl_dyn = int(atr * 2.0 * 100) if atr > 0 else 0
+        tp_dyn = int(atr * 3.0 * 100) if atr > 0 else 0
+        return f"(ATR M5: {atr:.1f} SL:{sl_dyn} TP:{tp_dyn})"
 
     def get_log_header(self, ind: Indicators) -> str:
         details = self.get_log_details(ind)
