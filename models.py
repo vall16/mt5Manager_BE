@@ -83,6 +83,9 @@ class Trader(BaseModel):
     # 🆕 Blocco notturno
     block_night_trading: bool = False
 
+    # 🆕 Direction filter (buy/sell/both)
+    direction_filter: str = "both"
+
 
 class Newtrader(BaseModel):
     

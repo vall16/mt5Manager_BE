@@ -313,13 +313,16 @@ class SignalStrategy:
                     has_sell = False
                     break
 
+        # ── direction filter ──
+        direction_filter = getattr(trader, 'direction_filter', 'both')
+
         # ── decisione ──
         new_signal = "HOLD"
         log_details = self.get_log_details(ind)
         header = self.get_log_header(ind)
         log(trader_id, f"{header} | {trader.name} | {symbol}")
 
-        if self.buy_condition(ind):
+        if self.buy_condition(ind) and direction_filter in ("buy", "both"):
             new_signal = "BUY"
             log(trader_id, f"🔥 BUY signal per {symbol} {log_details}")
 
@@ -328,7 +331,7 @@ class SignalStrategy:
                     close_slave_position(trader_id)
                 send_order(trader_id, "buy")
 
-        elif self.sell_condition(ind):
+        elif self.sell_condition(ind) and direction_filter in ("sell", "both"):
             new_signal = "SELL"
             log(trader_id, f"🔻 SELL signal per {symbol} {log_details}")
 
