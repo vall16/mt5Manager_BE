@@ -457,17 +457,16 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
 
     print(f"\nDEBUG: evaluated={_dbg_evaluated} buy_signals={_dbg_buy_signals} sell_signals={_dbg_sell_signals}")
 
-    _dbg_cond = {"ema_cross": 0, "macd": 0, "hma_rising": 0, "macro": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
-    _dbg_cond_sell = {"ema_cross": 0, "macd": 0, "hma_falling": 0, "macro_down": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
-    _dbg_nan = {"rsi": 0, "hma_m5": 0, "atr": 0, "macd": 0}
-    _dbg_sample = 0
-    import math
-    for i in range(start_idx, total):
-        ts = primary_times[i]
-        row = primary_df.iloc[i]
-        price = row["close"]
-        ind2 = Indicators()
-        if use_m1:
+    if use_m1:
+        import math
+        _dbg_cond = {"ema_cross": 0, "macd": 0, "hma_rising": 0, "macro": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
+        _dbg_cond_sell = {"ema_cross": 0, "macd": 0, "hma_falling": 0, "macro_down": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
+        _dbg_nan = {"rsi": 0, "hma_m5": 0, "atr": 0, "macd": 0}
+        _dbg_sample = 0
+        for i in range(start_idx, total):
+            ts = primary_times[i]
+            row = primary_df.iloc[i]
+            ind2 = Indicators()
             ind2.ema_fast = row["ema9"]
             ind2.ema_slow = row["ema21"]
             ind2.rsi_m1 = row["rsi14"]
@@ -494,62 +493,62 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 else:
                     ind2.trend_macro_up = False
 
-        if _dbg_sample < 5 and i % 1000 == 0:
-            _dbg_sample += 1
-            print(f"  SAMPLE bar {i}: ema_fast={ind2.ema_fast:.5f} ema_slow={ind2.ema_slow:.5f} "
-                  f"macd={ind2.macd:.6f} macd_sig={ind2.macd_sig:.6f} "
-                  f"hma_m5={ind2.hma_m5:.5f} hma_m5_prev={ind2.hma_m5_prev:.5f} "
-                  f"trend={ind2.trend_macro_up} rsi={ind2.rsi_m1:.2f} "
-                  f"vol_exp={ind2.volatilty_expansion} spike={ind2.is_spike}")
+            if _dbg_sample < 5 and i % 1000 == 0:
+                _dbg_sample += 1
+                print(f"  SAMPLE bar {i}: ema_fast={ind2.ema_fast:.5f} ema_slow={ind2.ema_slow:.5f} "
+                      f"macd={ind2.macd:.6f} macd_sig={ind2.macd_sig:.6f} "
+                      f"hma_m5={ind2.hma_m5:.5f} hma_m5_prev={ind2.hma_m5_prev:.5f} "
+                      f"trend={ind2.trend_macro_up} rsi={ind2.rsi_m1:.2f} "
+                      f"vol_exp={ind2.volatilty_expansion} spike={ind2.is_spike}")
 
-        try:
-            if not (ind2.ema_fast > ind2.ema_slow):
-                _dbg_cond["ema_cross"] += 1
-            if not (ind2.macd > ind2.macd_sig):
-                _dbg_cond["macd"] += 1
-            if not (ind2.hma_m5 > ind2.hma_m5_prev):
-                _dbg_cond["hma_rising"] += 1
-            if not ind2.trend_macro_up:
-                _dbg_cond["macro"] += 1
-            if not (40 < ind2.rsi_m1 < 68):
-                _dbg_cond["rsi"] += 1
-            if not ind2.volatilty_expansion:
-                _dbg_cond["vol_exp"] += 1
-            if ind2.is_spike:
-                _dbg_cond["no_spike"] += 1
-            if not (ind2.ema_fast < ind2.ema_slow):
-                _dbg_cond_sell["ema_cross"] += 1
-            if not (ind2.macd < ind2.macd_sig):
-                _dbg_cond_sell["macd"] += 1
-            if not (ind2.hma_m5 < ind2.hma_m5_prev):
-                _dbg_cond_sell["hma_falling"] += 1
-            if ind2.trend_macro_up:
-                _dbg_cond_sell["macro_down"] += 1
-            if not (32 < ind2.rsi_m1 < 60):
-                _dbg_cond_sell["rsi"] += 1
-            if not ind2.volatilty_expansion:
-                _dbg_cond_sell["vol_exp"] += 1
-            if ind2.is_spike:
-                _dbg_cond_sell["no_spike"] += 1
-            if math.isnan(ind2.rsi_m1):
-                _dbg_nan["rsi"] += 1
-            if math.isnan(ind2.hma_m5):
-                _dbg_nan["hma_m5"] += 1
-            if math.isnan(ind2.macd):
-                _dbg_nan["macd"] += 1
-        except Exception:
-            pass
+            try:
+                if not (ind2.ema_fast > ind2.ema_slow):
+                    _dbg_cond["ema_cross"] += 1
+                if not (ind2.macd > ind2.macd_sig):
+                    _dbg_cond["macd"] += 1
+                if not (ind2.hma_m5 > ind2.hma_m5_prev):
+                    _dbg_cond["hma_rising"] += 1
+                if not ind2.trend_macro_up:
+                    _dbg_cond["macro"] += 1
+                if not (40 < ind2.rsi_m1 < 68):
+                    _dbg_cond["rsi"] += 1
+                if not ind2.volatilty_expansion:
+                    _dbg_cond["vol_exp"] += 1
+                if ind2.is_spike:
+                    _dbg_cond["no_spike"] += 1
+                if not (ind2.ema_fast < ind2.ema_slow):
+                    _dbg_cond_sell["ema_cross"] += 1
+                if not (ind2.macd < ind2.macd_sig):
+                    _dbg_cond_sell["macd"] += 1
+                if not (ind2.hma_m5 < ind2.hma_m5_prev):
+                    _dbg_cond_sell["hma_falling"] += 1
+                if ind2.trend_macro_up:
+                    _dbg_cond_sell["macro_down"] += 1
+                if not (32 < ind2.rsi_m1 < 60):
+                    _dbg_cond_sell["rsi"] += 1
+                if not ind2.volatilty_expansion:
+                    _dbg_cond_sell["vol_exp"] += 1
+                if ind2.is_spike:
+                    _dbg_cond_sell["no_spike"] += 1
+                if math.isnan(ind2.rsi_m1):
+                    _dbg_nan["rsi"] += 1
+                if math.isnan(ind2.hma_m5):
+                    _dbg_nan["hma_m5"] += 1
+                if math.isnan(ind2.macd):
+                    _dbg_nan["macd"] += 1
+            except Exception:
+                pass
 
-    total_bars = total - start_idx
-    print(f"\n  BUY conditions BLOCKING (how many bars fail each):")
-    for k, v in _dbg_cond.items():
-        pct = v / total_bars * 100 if total_bars else 0
-        print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
-    print(f"  SELL conditions BLOCKING:")
-    for k, v in _dbg_cond_sell.items():
-        pct = v / total_bars * 100 if total_bars else 0
-        print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
-    print(f"  NaN values: {_dbg_nan}")
+        total_bars = total - start_idx
+        print(f"\n  BUY conditions BLOCKING (how many bars fail each):")
+        for k, v in _dbg_cond.items():
+            pct = v / total_bars * 100 if total_bars else 0
+            print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
+        print(f"  SELL conditions BLOCKING:")
+        for k, v in _dbg_cond_sell.items():
+            pct = v / total_bars * 100 if total_bars else 0
+            print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
+        print(f"  NaN values: {_dbg_nan}")
 
     print(f"\nFinal balance: {balance:.2f}")
     return trades, balance

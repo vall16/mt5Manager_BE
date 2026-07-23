@@ -788,7 +788,7 @@ class NvdaStrategy(SignalStrategy):
             rsi=compute_rsi(df, 14).iloc[-1],
             hma=compute_hma(df).iloc[-1],
             hma_prev=compute_hma(df).iloc[-2],
-            volume_ok=volume_now > volume_avg * 1.3 if volume_avg > 0 else True,
+            volume_ok=volume_now > volume_avg * 1.0 if volume_avg > 0 else True,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
