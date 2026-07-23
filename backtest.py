@@ -294,6 +294,9 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
     total = len(primary_df)
     start_idx = lookback
     print_steps = max(total // 20, 1)
+    _dbg_buy_signals = 0
+    _dbg_sell_signals = 0
+    _dbg_evaluated = 0
 
     for i in range(start_idx, total):
         if cancel_flag and cancel_flag():
@@ -366,6 +369,10 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         ind.ema_short = df_m5.iloc[idx_m5]["ema5"]
                         ind.ema_long = df_m5.iloc[idx_m5]["ema15"]
                         ind.rsi = df_m5.iloc[idx_m5]["rsi14"]
+                    else:
+                        ind.hma_m5 = 0
+                        ind.hma_m5_prev = 0
+                        ind.atr_m5_val = 0
 
                 if use_m15:
                     idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
@@ -380,6 +387,9 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         vol_now = df_m15.iloc[idx_m15]["tick_volume"]
                         vol_avg = df_m15.iloc[idx_m15]["vol_avg"]
                         ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
+                    else:
+                        ind.trend_macro_up = False
+                        ind.trend_macro_50_up = False
 
                 if use_h1:
                     idx_h1 = int(h1_end.searchsorted(ts, side="right")) - 1
@@ -415,8 +425,16 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             try:
                 buy = strategy.buy_condition(ind)
                 sell = strategy.sell_condition(ind)
-            except Exception:
+            except Exception as e:
+                if i == start_idx or i % 5000 == 0:
+                    print(f"  WARN condition eval @ bar {i}: {type(e).__name__}: {e}")
                 continue
+
+            _dbg_evaluated += 1
+            if buy:
+                _dbg_buy_signals += 1
+            if sell:
+                _dbg_sell_signals += 1
 
             direction = None
             if buy and direction_filter in ("buy", "both"):
@@ -436,6 +454,102 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 position = (price, direction, sl_price, tp_price)
                 log = strategy.get_log_details(ind) if hasattr(strategy, "get_log_details") else ""
                 print(f"{ts_str} ENTRY {direction.upper()} @ {price:.2f} SL={sl_price:.2f} TP={tp_price:.2f} | {log}")
+
+    print(f"\nDEBUG: evaluated={_dbg_evaluated} buy_signals={_dbg_buy_signals} sell_signals={_dbg_sell_signals}")
+
+    _dbg_cond = {"ema_cross": 0, "macd": 0, "hma_rising": 0, "macro": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
+    _dbg_cond_sell = {"ema_cross": 0, "macd": 0, "hma_falling": 0, "macro_down": 0, "rsi": 0, "vol_exp": 0, "no_spike": 0}
+    _dbg_nan = {"rsi": 0, "hma_m5": 0, "atr": 0, "macd": 0}
+    _dbg_sample = 0
+    import math
+    for i in range(start_idx, total):
+        ts = primary_times[i]
+        row = primary_df.iloc[i]
+        price = row["close"]
+        ind2 = Indicators()
+        if use_m1:
+            ind2.ema_fast = row["ema9"]
+            ind2.ema_slow = row["ema21"]
+            ind2.rsi_m1 = row["rsi14"]
+            ind2.macd = row["macd"]
+            ind2.macd_sig = row["macd_sig"]
+            ind2.volatilty_expansion = row["atr"] > row["atr_ma10"]
+            ind2.is_spike = row["is_spike"]
+            ind2.atr_m1 = row["atr"]
+            if use_m5:
+                idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
+                if idx_m5 >= 30:
+                    ind2.hma_m5 = df_m5.iloc[idx_m5]["hma"]
+                    ind2.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
+                    ind2.atr_m5_val = df_m5.iloc[idx_m5]["atr_m5"]
+                else:
+                    ind2.hma_m5 = 0
+                    ind2.hma_m5_prev = 0
+                    ind2.atr_m5_val = 0
+            if use_m15:
+                idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
+                if idx_m15 >= 30:
+                    price_m15 = df_m15.iloc[idx_m15]["close"]
+                    ind2.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
+                else:
+                    ind2.trend_macro_up = False
+
+        if _dbg_sample < 5 and i % 1000 == 0:
+            _dbg_sample += 1
+            print(f"  SAMPLE bar {i}: ema_fast={ind2.ema_fast:.5f} ema_slow={ind2.ema_slow:.5f} "
+                  f"macd={ind2.macd:.6f} macd_sig={ind2.macd_sig:.6f} "
+                  f"hma_m5={ind2.hma_m5:.5f} hma_m5_prev={ind2.hma_m5_prev:.5f} "
+                  f"trend={ind2.trend_macro_up} rsi={ind2.rsi_m1:.2f} "
+                  f"vol_exp={ind2.volatilty_expansion} spike={ind2.is_spike}")
+
+        try:
+            if not (ind2.ema_fast > ind2.ema_slow):
+                _dbg_cond["ema_cross"] += 1
+            if not (ind2.macd > ind2.macd_sig):
+                _dbg_cond["macd"] += 1
+            if not (ind2.hma_m5 > ind2.hma_m5_prev):
+                _dbg_cond["hma_rising"] += 1
+            if not ind2.trend_macro_up:
+                _dbg_cond["macro"] += 1
+            if not (40 < ind2.rsi_m1 < 68):
+                _dbg_cond["rsi"] += 1
+            if not ind2.volatilty_expansion:
+                _dbg_cond["vol_exp"] += 1
+            if ind2.is_spike:
+                _dbg_cond["no_spike"] += 1
+            if not (ind2.ema_fast < ind2.ema_slow):
+                _dbg_cond_sell["ema_cross"] += 1
+            if not (ind2.macd < ind2.macd_sig):
+                _dbg_cond_sell["macd"] += 1
+            if not (ind2.hma_m5 < ind2.hma_m5_prev):
+                _dbg_cond_sell["hma_falling"] += 1
+            if ind2.trend_macro_up:
+                _dbg_cond_sell["macro_down"] += 1
+            if not (32 < ind2.rsi_m1 < 60):
+                _dbg_cond_sell["rsi"] += 1
+            if not ind2.volatilty_expansion:
+                _dbg_cond_sell["vol_exp"] += 1
+            if ind2.is_spike:
+                _dbg_cond_sell["no_spike"] += 1
+            if math.isnan(ind2.rsi_m1):
+                _dbg_nan["rsi"] += 1
+            if math.isnan(ind2.hma_m5):
+                _dbg_nan["hma_m5"] += 1
+            if math.isnan(ind2.macd):
+                _dbg_nan["macd"] += 1
+        except Exception:
+            pass
+
+    total_bars = total - start_idx
+    print(f"\n  BUY conditions BLOCKING (how many bars fail each):")
+    for k, v in _dbg_cond.items():
+        pct = v / total_bars * 100 if total_bars else 0
+        print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
+    print(f"  SELL conditions BLOCKING:")
+    for k, v in _dbg_cond_sell.items():
+        pct = v / total_bars * 100 if total_bars else 0
+        print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
+    print(f"  NaN values: {_dbg_nan}")
 
     print(f"\nFinal balance: {balance:.2f}")
     return trades, balance

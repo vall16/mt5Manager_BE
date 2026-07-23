@@ -15,6 +15,7 @@ from mt5_routes import router as mt5_router
 # from trading_signals_multi import router as trade_router_multi
 # try:
 from trading_signals_multi2 import router as trade_router_multi
+from adaptive_routes import router as adaptive_router
 # except ImportError as e:
 #     import sys
 #     print(f"ERRORE CRITICO: {e}", file=sys.stderr)
@@ -66,6 +67,7 @@ app.include_router(db_router, prefix="/db", tags=["Database"])
 app.include_router(mt5_router, prefix="/mt5", tags=["MetaTrader5"])
 # app.include_router(trade_router, prefix="/trade", tags=["AppTrader5"])
 app.include_router(trade_router_multi, prefix="/trade", tags=["AppTrader5"])
+app.include_router(adaptive_router, prefix="/adaptive", tags=["AdaptiveAgent"])
 
 
 # --- ERROR HANDLERS ---

@@ -18,6 +18,7 @@ from indicators.ta import (
 )
 import pandas as pd
 import requests
+import adaptive_routes
 
 # ─────────────────────── GLOBAL STATE ───────────────────────
 
@@ -282,6 +283,18 @@ class SignalStrategy:
 
         # ── SL/TP dinamico ──
         effective_sl, effective_tp = self.get_dynamic_sl_tp(ind)
+
+        # ── adaptive override: se agent attivo, usa i suoi parametri ──
+        agent = adaptive_routes.get_agent(trader_id)
+        if agent and ind.atr_m5_val > 0:
+            p = agent.get_params()
+            adaptive_sl = int(ind.atr_m5_val * p["sl_atr_factor"] * 100)
+            adaptive_tp = int(ind.atr_m5_val * p["tp_atr_factor"] * 100)
+            adaptive_sl = max(500, min(adaptive_sl, 2000))
+            adaptive_tp = max(adaptive_sl + 100, min(adaptive_tp, 3000))
+            effective_sl = adaptive_sl
+            effective_tp = adaptive_tp
+
         with sessions_lock:
             if trader_id in sessions:
                 sessions[trader_id]["effective_sl"] = effective_sl
@@ -297,6 +310,19 @@ class SignalStrategy:
         except Exception as e:
             log(trader_id, f"Slave non raggiungibile: {e}")
             return
+
+        # ── adaptive agent: rileva trade chiusi ──
+        agent = adaptive_routes.get_agent(trader_id)
+        if agent:
+            closed = agent.detect_closed_trades(positions)
+            for c in closed:
+                # profit non disponibile qui, usa 0 come placeholder
+                # il profit reale viene registrato quando il trade sparisce
+                agent.on_trade_closed(0, ind.atr_m5_val if hasattr(ind, 'atr_m5_val') else 0, "")
+                log(trader_id, f"🧬 Adaptive: trade chiuso rilevato ticket={c.get('ticket')}")
+            if agent.should_analyze():
+                new_params = agent.adjust()
+                log(trader_id, f"🧬 Adaptive: params aggiornati → SL={new_params['sl_atr_factor']} TP={new_params['tp_atr_factor']}")
 
         has_buy = any(p["symbol"] == symbol and p["type"] == 0 for p in positions)
         has_sell = any(p["symbol"] == symbol and p["type"] == 1 for p in positions)
