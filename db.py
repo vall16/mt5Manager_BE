@@ -1331,6 +1331,11 @@ def open_order_on_slave(payload: OrderPayload):
                     }
 
         tick = resp_tick.json()
+        if "error" in tick or "bid" not in tick or "ask" not in tick:
+            log(f"⚠️ Tick non valido per {symbol}: {tick}")
+            return {"status": "ko", "message": f"Tick non valido: {tick}",
+                    "logs": "\n".join(logs)}
+
         log(f"📈 Tick ricevuto: BID={tick['bid']} ASK={tick['ask']}")
 
         price = tick["ask"] if order_type.lower() == "buy" else tick["bid"]
