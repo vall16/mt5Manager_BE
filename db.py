@@ -520,6 +520,7 @@ def get_traders():
             "selected_signal": row.get("selected_signal"),
             "custom_signal_interval": row.get("custom_signal_interval"),
             "selected_symbol": row.get("selected_symbol"),
+            "sessions_filter": row.get("sessions_filter", "ASIA,LONDON,NY-LON,NY,OFF"),
             "created_at": row.get("created_at").isoformat() if row.get("created_at") else None,
             "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else None,
         })
@@ -656,6 +657,10 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
     if update.selected_symbol is not None:
         fields.append("selected_symbol = %s")
         values.append(update.selected_symbol)
+
+    if update.sessions_filter is not None:
+        fields.append("sessions_filter = %s")
+        values.append(update.sessions_filter)
 
 
 

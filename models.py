@@ -86,6 +86,9 @@ class Trader(BaseModel):
     # 🆕 Direction filter (buy/sell/both)
     direction_filter: str = "both"
 
+    # 🆕 Session filter (ASIA,LONDON,NY-LON,NY,OFF)
+    sessions_filter: str = "ASIA,LONDON,NY-LON,NY,OFF"
+
 
 class Newtrader(BaseModel):
     
@@ -147,5 +150,8 @@ class TraderServersUpdate(BaseModel):
     selected_signal: str | None = None
     custom_signal_interval: int | None = None
     selected_symbol: str | None = None
+
+    # 🆕 session filter
+    sessions_filter: str | None = None
 
 

@@ -81,6 +81,21 @@ def is_night_time() -> bool:
     return 0 <= hour < 5
 
 
+def get_current_session() -> str:
+    now = datetime.now(ZoneInfo("Europe/Rome"))
+    h, m = now.hour, now.minute
+    if 1 <= h < 9:
+        return "ASIA"
+    elif 9 <= h < 14:
+        return "LONDON"
+    elif 14 <= h < 17 or (h == 17 and m < 30):
+        return "NY-LON"
+    elif (h == 17 and m >= 30) or 18 <= h < 22:
+        return "NY"
+    else:
+        return "OFF"
+
+
 # ─────────────────────── SEND ORDER (unified) ───────────────────────
 
 def send_order(trader_id: int, direction: str):
@@ -250,6 +265,15 @@ class SignalStrategy:
         if block_night and is_night_time():
             log(trader_id, f"🌙 Blocco notturno attivo — trading sospeso (22:00-09:00)")
             return
+
+        # ── filtro sessioni ──
+        sessions_filter = getattr(trader, 'sessions_filter', None)
+        if sessions_filter:
+            allowed = [s.strip() for s in sessions_filter.split(",") if s.strip()]
+            current = get_current_session()
+            if allowed and current not in allowed:
+                log(trader_id, f"⏸ Sessione {current} non permessa — trading saltato")
+                return
 
         # ── fetch dati ──
         df_m1 = get_data(symbol, 1, 100, slave_url) if self.requires_m1 else None
