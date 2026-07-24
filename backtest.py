@@ -173,7 +173,82 @@ def fetch_data(symbol, strategy, days, mt5_api_url):
     return dfs
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both"):
+def precompute_indicators(dfs):
+    df_m1 = dfs.get("m1")
+    df_m5 = dfs.get("m5")
+    df_m15 = dfs.get("m15")
+    df_h1 = dfs.get("h1")
+
+    if df_m1 is not None:
+        df_m1["ema9"] = compute_ema(df_m1, 9)
+        df_m1["ema21"] = compute_ema(df_m1, 21)
+        df_m1["rsi14"] = compute_rsi(df_m1, 14)
+        macd, macd_sig = compute_macd(df_m1)
+        df_m1["macd"] = macd
+        df_m1["macd_sig"] = macd_sig
+        atr_s = compute_atr(df_m1)
+        df_m1["atr"] = atr_s
+        df_m1["atr_ma10"] = atr_s.rolling(10).mean()
+        df_m1["candle_body"] = (df_m1["close"] - df_m1["open"]).abs()
+        df_m1["is_spike"] = df_m1["candle_body"] > (df_m1["atr"] * 3)
+
+    if df_m5 is not None:
+        hma = compute_hma(df_m5)
+        df_m5["hma"] = hma
+        df_m5["hma_prev"] = hma.shift(1)
+        df_m5["prev_close"] = df_m5["close"].shift(1)
+        df_m5["tr"] = pd.concat([
+            df_m5["high"] - df_m5["low"],
+            (df_m5["high"] - df_m5["prev_close"]).abs(),
+            (df_m5["low"] - df_m5["prev_close"]).abs()
+        ], axis=1).max(axis=1)
+        df_m5["atr_m5"] = df_m5["tr"].rolling(14).mean()
+        df_m5["ema5"] = compute_ema(df_m5, 5)
+        df_m5["ema15"] = compute_ema(df_m5, 15)
+        df_m5["ema20"] = compute_ema(df_m5, 20)
+        df_m5["rsi14"] = compute_rsi(df_m5, 14)
+        df_m5["vol_avg"] = df_m5["tick_volume"].rolling(20).mean()
+
+    if df_m15 is not None:
+        df_m15["ema50"] = compute_ema(df_m15, 50)
+        df_m15["ema200"] = compute_ema(df_m15, 200)
+        df_m15["ema5"] = compute_ema(df_m15, 5)
+        df_m15["ema20_m15"] = compute_ema(df_m15, 20)
+        hma15 = compute_hma(df_m15)
+        df_m15["hma"] = hma15
+        df_m15["hma_prev"] = hma15.shift(1)
+        df_m15["rsi14"] = compute_rsi(df_m15, 14)
+        df_m15["vol_avg"] = df_m15["tick_volume"].rolling(20).mean()
+        df_m15["prev_close"] = df_m15["close"].shift(1)
+        df_m15["tr_m15"] = pd.concat([
+            df_m15["high"] - df_m15["low"],
+            (df_m15["high"] - df_m15["prev_close"]).abs(),
+            (df_m15["low"] - df_m15["prev_close"]).abs()
+        ], axis=1).max(axis=1)
+        df_m15["atr_m15"] = df_m15["tr_m15"].rolling(14).mean()
+
+    if df_h1 is not None:
+        tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
+        df_h1["tenkan"] = tenkan
+        df_h1["kijun"] = kijun
+        df_h1["senkou_a"] = senkou_a
+        df_h1["senkou_b"] = senkou_b
+        df_h1["chikou"] = chikou
+        hma_h1 = compute_hma(df_h1)
+        df_h1["hma"] = hma_h1
+        df_h1["hma_prev"] = hma_h1.shift(1)
+        df_h1["rsi14"] = compute_rsi(df_h1, 14)
+        df_h1["prev_close"] = df_h1["close"].shift(1)
+        df_h1["tr"] = pd.concat([
+            df_h1["high"] - df_h1["low"],
+            (df_h1["high"] - df_h1["prev_close"]).abs(),
+            (df_h1["low"] - df_h1["prev_close"]).abs()
+        ], axis=1).max(axis=1)
+        df_h1["atr_h1"] = df_h1["tr"].rolling(14).mean()
+        df_h1["vol_avg"] = df_h1["tick_volume"].rolling(20).mean()
+
+
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both", skip_indicators=False):
     trades = []
     position = None
 
@@ -207,76 +282,31 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
     pip = instr["pip"]
     contract = instr["contract"]
 
-    print("Pre-calcolo indicatori...")
+    if not skip_indicators:
+        print("Pre-calcolo indicatori...")
+        precompute_indicators(dfs)
+
+    # Pre-extract numpy arrays for fast O(1) lookup (avoids df.iloc creating Series per call)
+    m1_arr = {}
     if use_m1:
-        df_m1["ema9"] = compute_ema(df_m1, 9)
-        df_m1["ema21"] = compute_ema(df_m1, 21)
-        df_m1["rsi14"] = compute_rsi(df_m1, 14)
-        macd, macd_sig = compute_macd(df_m1)
-        df_m1["macd"] = macd
-        df_m1["macd_sig"] = macd_sig
-        atr_s = compute_atr(df_m1)
-        df_m1["atr"] = atr_s
-        df_m1["atr_ma10"] = atr_s.rolling(10).mean()
-        df_m1["candle_body"] = (df_m1["close"] - df_m1["open"]).abs()
-        df_m1["is_spike"] = df_m1["candle_body"] > (df_m1["atr"] * 3)
+        for col in ["ema9", "ema21", "rsi14", "macd", "macd_sig", "atr", "atr_ma10", "is_spike"]:
+            m1_arr[col] = df_m1[col].values
 
+    m5_arr = {}
     if use_m5:
-        hma = compute_hma(df_m5)
-        df_m5["hma"] = hma
-        df_m5["hma_prev"] = hma.shift(1)
-        df_m5["prev_close"] = df_m5["close"].shift(1)
-        df_m5["tr"] = df_m5.apply(lambda r: max(
-            r["high"] - r["low"],
-            abs(r["high"] - r["prev_close"]),
-            abs(r["low"] - r["prev_close"])
-        ), axis=1)
-        df_m5["atr_m5"] = df_m5["tr"].rolling(14).mean()
-        df_m5["ema5"] = compute_ema(df_m5, 5)
-        df_m5["ema15"] = compute_ema(df_m5, 15)
-        df_m5["ema20"] = compute_ema(df_m5, 20)
-        df_m5["rsi14"] = compute_rsi(df_m5, 14)
-        df_m5["vol_avg"] = df_m5["tick_volume"].rolling(20).mean()
+        for col in ["hma", "hma_prev", "atr_m5", "ema5", "ema15", "ema20", "rsi14"]:
+            m5_arr[col] = df_m5[col].values
 
+    m15_arr = {}
     if use_m15:
-        df_m15["ema50"] = compute_ema(df_m15, 50)
-        df_m15["ema200"] = compute_ema(df_m15, 200)
-        df_m15["ema5"] = compute_ema(df_m15, 5)
-        df_m15["ema20_m15"] = compute_ema(df_m15, 20)
-        hma15 = compute_hma(df_m15)
-        df_m15["hma"] = hma15
-        df_m15["hma_prev"] = hma15.shift(1)
-        df_m15["rsi14"] = compute_rsi(df_m15, 14)
-        df_m15["vol_avg"] = df_m15["tick_volume"].rolling(20).mean()
-        df_m15["prev_close"] = df_m15["close"].shift(1)
-        df_m15["tr_m15"] = df_m15.apply(lambda r: max(
-            r["high"] - r["low"],
-            abs(r["high"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"],
-            abs(r["low"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"]
-        ), axis=1)
-        df_m15["atr_m15"] = df_m15["tr_m15"].rolling(14).mean()
+        for col in ["close", "ema50", "ema5", "ema20_m15", "ema200", "hma", "hma_prev",
+                     "atr_m15", "rsi14", "tick_volume", "vol_avg"]:
+            m15_arr[col] = df_m15[col].values
 
+    h1_arr = {}
     if use_h1:
-        tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
-        df_h1["tenkan"] = tenkan
-        df_h1["kijun"] = kijun
-        df_h1["senkou_a"] = senkou_a
-        df_h1["senkou_b"] = senkou_b
-        df_h1["chikou"] = chikou
-
-    if use_h1:
-        hma_h1 = compute_hma(df_h1)
-        df_h1["hma"] = hma_h1
-        df_h1["hma_prev"] = hma_h1.shift(1)
-        df_h1["rsi14"] = compute_rsi(df_h1, 14)
-        df_h1["prev_close"] = df_h1["close"].shift(1)
-        df_h1["tr"] = df_h1.apply(lambda r: max(
-            r["high"] - r["low"],
-            abs(r["high"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"],
-            abs(r["low"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"]
-        ), axis=1)
-        df_h1["atr_h1"] = df_h1["tr"].rolling(14).mean()
-        df_h1["vol_avg"] = df_h1["tick_volume"].rolling(20).mean()
+        for col in ["close", "tenkan", "kijun", "senkou_a", "senkou_b", "chikou", "hma", "hma_prev", "rsi14"]:
+            h1_arr[col] = df_h1[col].values
 
     print("Esecuzione backtest...")
     if use_m1:
@@ -298,6 +328,13 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         print("Nessun timeframe primario disponibile")
         return trades, balance
 
+    # Pre-extract primary df columns as numpy arrays
+    pri_arr = {
+        "low": primary_df["low"].values,
+        "high": primary_df["high"].values,
+        "close": primary_df["close"].values,
+    }
+
     total = len(primary_df)
     start_idx = lookback
     print_steps = max(total // 20, 1)
@@ -310,10 +347,9 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             break
 
         ts = primary_times[i]
-        row = primary_df.iloc[i]
-        low = row["low"]
-        high = row["high"]
-        price = row["close"]
+        low = pri_arr["low"][i]
+        high = pri_arr["high"][i]
+        price = pri_arr["close"][i]
         ts_str = str(ts)
 
         if i % print_steps == 0:
@@ -357,17 +393,16 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 if use_m15:
                     idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
                     if idx_m15 >= 30:
-                        price_m15 = df_m15.iloc[idx_m15]["close"]
-                        hold_ind.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
-                        hold_ind.hma = df_m15.iloc[idx_m15]["hma"]
-                        hold_ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
-                        hold_ind.ema_short = df_m15.iloc[idx_m15]["ema5"]
-                        hold_ind.ema_long = df_m15.iloc[idx_m15]["ema20_m15"]
+                        hold_ind.trend_macro_up = m15_arr["close"][idx_m15] > m15_arr["ema50"][idx_m15]
+                        hold_ind.hma = m15_arr["hma"][idx_m15]
+                        hold_ind.hma_prev = m15_arr["hma_prev"][idx_m15]
+                        hold_ind.ema_short = m15_arr["ema5"][idx_m15]
+                        hold_ind.ema_long = m15_arr["ema20_m15"][idx_m15]
                 if use_m5:
                     idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
                     if idx_m5 >= 30:
-                        hold_ind.hma_m5 = df_m5.iloc[idx_m5]["hma"]
-                        hold_ind.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
+                        hold_ind.hma_m5 = m5_arr["hma"][idx_m5]
+                        hold_ind.hma_m5_prev = m5_arr["hma_prev"][idx_m5]
 
                 has_buy = direction == "buy"
                 has_sell = direction == "sell"
@@ -388,25 +423,25 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             ind.session_label = _get_session_label(ts)
 
             if use_m1:
-                ind.ema_fast = row["ema9"]
-                ind.ema_slow = row["ema21"]
-                ind.rsi_m1 = row["rsi14"]
-                ind.macd = row["macd"]
-                ind.macd_sig = row["macd_sig"]
-                ind.volatilty_expansion = row["atr"] > row["atr_ma10"]
+                ind.ema_fast = m1_arr["ema9"][i]
+                ind.ema_slow = m1_arr["ema21"][i]
+                ind.rsi_m1 = m1_arr["rsi14"][i]
+                ind.macd = m1_arr["macd"][i]
+                ind.macd_sig = m1_arr["macd_sig"][i]
+                ind.volatilty_expansion = m1_arr["atr"][i] > m1_arr["atr_ma10"][i]
                 ind.volatility_expansion = ind.volatilty_expansion
-                ind.is_spike = row["is_spike"]
-                ind.atr_m1 = row["atr"]
+                ind.is_spike = m1_arr["is_spike"][i]
+                ind.atr_m1 = m1_arr["atr"][i]
 
                 if use_m5:
                     idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
                     if idx_m5 >= 30:
-                        ind.hma_m5 = df_m5.iloc[idx_m5]["hma"]
-                        ind.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
-                        ind.atr_m5_val = df_m5.iloc[idx_m5]["atr_m5"]
-                        ind.ema_short = df_m5.iloc[idx_m5]["ema5"]
-                        ind.ema_long = df_m5.iloc[idx_m5]["ema15"]
-                        ind.rsi = df_m5.iloc[idx_m5]["rsi14"]
+                        ind.hma_m5 = m5_arr["hma"][idx_m5]
+                        ind.hma_m5_prev = m5_arr["hma_prev"][idx_m5]
+                        ind.atr_m5_val = m5_arr["atr_m5"][idx_m5]
+                        ind.ema_short = m5_arr["ema5"][idx_m5]
+                        ind.ema_long = m5_arr["ema15"][idx_m5]
+                        ind.rsi = m5_arr["rsi14"][idx_m5]
                     else:
                         ind.hma_m5 = 0
                         ind.hma_m5_prev = 0
@@ -415,21 +450,21 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 if use_m15:
                     idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
                     if idx_m15 >= 30:
-                        price_m15 = df_m15.iloc[idx_m15]["close"]
-                        ind.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
-                        ind.trend_macro_50_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
-                        ind.ema_short = getattr(ind, "ema_short", None) or df_m15.iloc[idx_m15]["ema5"]
-                        ind.ema_long = getattr(ind, "ema_long", None) or df_m15.iloc[idx_m15]["ema20_m15"]
-                        ind.ema_long200 = df_m15.iloc[idx_m15]["ema200"]
-                        ind.hma = df_m15.iloc[idx_m15]["hma"]
-                        ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
-                        ind.atr_m15 = df_m15.iloc[idx_m15]["atr_m15"]
-                        ind.ema_short_prev = df_m15.iloc[idx_m15 - 1]["ema5"] if idx_m15 >= 1 else None
-                        ind.ema_long_prev = df_m15.iloc[idx_m15 - 1]["ema20_m15"] if idx_m15 >= 1 else None
-                        ind.price_prev = df_m15.iloc[idx_m15 - 1]["close"] if idx_m15 >= 1 else None
-                        ind.rsi_prev = df_m15.iloc[idx_m15 - 1]["rsi14"] if idx_m15 >= 1 else None
-                        vol_now = df_m15.iloc[idx_m15]["tick_volume"]
-                        vol_avg = df_m15.iloc[idx_m15]["vol_avg"]
+                        price_m15 = m15_arr["close"][idx_m15]
+                        ind.trend_macro_up = price_m15 > m15_arr["ema50"][idx_m15]
+                        ind.trend_macro_50_up = price_m15 > m15_arr["ema50"][idx_m15]
+                        ind.ema_short = getattr(ind, "ema_short", None) or m15_arr["ema5"][idx_m15]
+                        ind.ema_long = getattr(ind, "ema_long", None) or m15_arr["ema20_m15"][idx_m15]
+                        ind.ema_long200 = m15_arr["ema200"][idx_m15]
+                        ind.hma = m15_arr["hma"][idx_m15]
+                        ind.hma_prev = m15_arr["hma_prev"][idx_m15]
+                        ind.atr_m15 = m15_arr["atr_m15"][idx_m15]
+                        ind.ema_short_prev = m15_arr["ema5"][idx_m15 - 1] if idx_m15 >= 1 else None
+                        ind.ema_long_prev = m15_arr["ema20_m15"][idx_m15 - 1] if idx_m15 >= 1 else None
+                        ind.price_prev = m15_arr["close"][idx_m15 - 1] if idx_m15 >= 1 else None
+                        ind.rsi_prev = m15_arr["rsi14"][idx_m15 - 1] if idx_m15 >= 1 else None
+                        vol_now = m15_arr["tick_volume"][idx_m15]
+                        vol_avg = m15_arr["vol_avg"][idx_m15]
                         ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
                     else:
                         ind.trend_macro_up = False
@@ -438,41 +473,40 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 if use_h1:
                     idx_h1 = int(h1_end.searchsorted(ts, side="right")) - 1
                     if idx_h1 >= 60:
-                        ind.tenkan = df_h1.iloc[idx_h1]["tenkan"]
-                        ind.kijun = df_h1.iloc[idx_h1]["kijun"]
-                        ind.senkou_a = df_h1.iloc[idx_h1]["senkou_a"]
-                        ind.senkou_b = df_h1.iloc[idx_h1]["senkou_b"]
-                        ind.chikou = df_h1.iloc[idx_h1]["chikou"]
-                        ind.price = df_h1.iloc[idx_h1]["close"]
+                        ind.tenkan = h1_arr["tenkan"][idx_h1]
+                        ind.kijun = h1_arr["kijun"][idx_h1]
+                        ind.senkou_a = h1_arr["senkou_a"][idx_h1]
+                        ind.senkou_b = h1_arr["senkou_b"][idx_h1]
+                        ind.chikou = h1_arr["chikou"][idx_h1]
+                        ind.price = h1_arr["close"][idx_h1]
             elif use_h1:
-                ind.tenkan = row.get("tenkan")
-                ind.kijun = row.get("kijun")
-                ind.senkou_a = row.get("senkou_a")
-                ind.senkou_b = row.get("senkou_b")
-                ind.chikou = row.get("chikou")
+                ind.tenkan = h1_arr.get("tenkan", np.array([]))[i] if "tenkan" in h1_arr else None
+                ind.kijun = h1_arr.get("kijun", np.array([]))[i] if "kijun" in h1_arr else None
+                ind.senkou_a = h1_arr.get("senkou_a", np.array([]))[i] if "senkou_a" in h1_arr else None
+                ind.senkou_b = h1_arr.get("senkou_b", np.array([]))[i] if "senkou_b" in h1_arr else None
+                ind.chikou = h1_arr.get("chikou", np.array([]))[i] if "chikou" in h1_arr else None
                 ind.price = price
-                ind.rsi = row.get("rsi14")
-                ind.hma = row.get("hma")
-                ind.hma_prev = row.get("hma_prev")
+                ind.rsi = h1_arr["rsi14"][i]
+                ind.hma = h1_arr["hma"][i]
+                ind.hma_prev = h1_arr["hma_prev"][i]
             elif use_m15:
-                ind.ema_short = row.get("ema5")
-                ind.ema_long = row.get("ema20_m15")
-                ind.ema_long200 = row.get("ema200")
-                ind.rsi = row.get("rsi14")
-                ind.hma = row.get("hma")
-                ind.hma_prev = row.get("hma_prev")
-                ind.atr_m15 = row.get("atr_m15")
-                vol_now = row.get("tick_volume", 0)
-                vol_avg = row.get("vol_avg")
+                ind.ema_short = m15_arr["ema5"][i]
+                ind.ema_long = m15_arr["ema20_m15"][i]
+                ind.ema_long200 = m15_arr["ema200"][i]
+                ind.rsi = m15_arr["rsi14"][i]
+                ind.hma = m15_arr["hma"][i]
+                ind.hma_prev = m15_arr["hma_prev"][i]
+                ind.atr_m15 = m15_arr["atr_m15"][i]
+                vol_now = m15_arr["tick_volume"][i]
+                vol_avg = m15_arr["vol_avg"][i]
                 ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
-                ind.trend_macro_up = price > row.get("ema50", price) if pd.notna(row.get("ema50")) else None
+                ind.trend_macro_up = price > m15_arr["ema50"][i] if pd.notna(m15_arr["ema50"][i]) else None
                 ind.trend_macro_50_up = ind.trend_macro_up
                 if i > 0:
-                    prev_row = df_m15.iloc[i - 1]
-                    ind.ema_short_prev = prev_row.get("ema5")
-                    ind.ema_long_prev = prev_row.get("ema20_m15")
-                    ind.price_prev = prev_row.get("close")
-                    ind.rsi_prev = prev_row.get("rsi14")
+                    ind.ema_short_prev = m15_arr["ema5"][i - 1]
+                    ind.ema_long_prev = m15_arr["ema20_m15"][i - 1]
+                    ind.price_prev = m15_arr["close"][i - 1]
+                    ind.rsi_prev = m15_arr["rsi14"][i - 1]
                 else:
                     ind.ema_short_prev = None
                     ind.ema_long_prev = None
@@ -522,22 +556,21 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         _dbg_sample = 0
         for i in range(start_idx, total):
             ts = primary_times[i]
-            row = primary_df.iloc[i]
             ind2 = Indicators()
-            ind2.ema_fast = row["ema9"]
-            ind2.ema_slow = row["ema21"]
-            ind2.rsi_m1 = row["rsi14"]
-            ind2.macd = row["macd"]
-            ind2.macd_sig = row["macd_sig"]
-            ind2.volatilty_expansion = row["atr"] > row["atr_ma10"]
-            ind2.is_spike = row["is_spike"]
-            ind2.atr_m1 = row["atr"]
+            ind2.ema_fast = m1_arr["ema9"][i]
+            ind2.ema_slow = m1_arr["ema21"][i]
+            ind2.rsi_m1 = m1_arr["rsi14"][i]
+            ind2.macd = m1_arr["macd"][i]
+            ind2.macd_sig = m1_arr["macd_sig"][i]
+            ind2.volatilty_expansion = m1_arr["atr"][i] > m1_arr["atr_ma10"][i]
+            ind2.is_spike = m1_arr["is_spike"][i]
+            ind2.atr_m1 = m1_arr["atr"][i]
             if use_m5:
                 idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
                 if idx_m5 >= 30:
-                    ind2.hma_m5 = df_m5.iloc[idx_m5]["hma"]
-                    ind2.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
-                    ind2.atr_m5_val = df_m5.iloc[idx_m5]["atr_m5"]
+                    ind2.hma_m5 = m5_arr["hma"][idx_m5]
+                    ind2.hma_m5_prev = m5_arr["hma_prev"][idx_m5]
+                    ind2.atr_m5_val = m5_arr["atr_m5"][idx_m5]
                 else:
                     ind2.hma_m5 = 0
                     ind2.hma_m5_prev = 0
@@ -545,8 +578,8 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             if use_m15:
                 idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
                 if idx_m15 >= 30:
-                    price_m15 = df_m15.iloc[idx_m15]["close"]
-                    ind2.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
+                    price_m15 = m15_arr["close"][idx_m15]
+                    ind2.trend_macro_up = price_m15 > m15_arr["ema50"][idx_m15]
                 else:
                     ind2.trend_macro_up = False
 
@@ -765,14 +798,17 @@ def compute_summary(trades, balance, initial_balance, days=None):
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both"):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both", pre_fetched_dfs=None, skip_indicators=False):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
 
     try:
-        dfs = fetch_data(symbol, strategy, days, mt5_api_url)
-        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction)
+        if pre_fetched_dfs is not None:
+            dfs = pre_fetched_dfs
+        else:
+            dfs = fetch_data(symbol, strategy, days, mt5_api_url)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction, skip_indicators=skip_indicators)
         summary_data = compute_summary(trades, final_bal, balance, days)
 
         serializable_trades = []

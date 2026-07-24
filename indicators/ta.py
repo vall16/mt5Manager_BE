@@ -50,26 +50,22 @@ import numpy as np
 def compute_hma(df, period=16):
     """
     Calcola l'Hull Moving Average (HMA) su una serie 'close'.
-
-    Args:
-        df (DataFrame): dati OHLC con colonna 'close'
-        period (int): periodo della HMA (tipico: 16, 20, 21)
-
-    Returns:
-        pd.Series: serie HMA
+    WMA vettoriali via rolling sums (nessun lambda/apply).
     """
+    close = df['close']
     half_period = int(period / 2)
     sqrt_period = int(np.sqrt(period))
 
-    # WMA ponderata
-    def wma(series, n):
-        weights = np.arange(1, n + 1)
-        return series.rolling(n).apply(lambda x: np.dot(x, weights)/weights.sum(), raw=True)
+    def wma_fast(series, n):
+        cumsum = series.cumsum()
+        S_full = cumsum - cumsum.shift(n, fill_value=0)
+        S_back = cumsum.shift(n, fill_value=0) - cumsum.shift(2 * n, fill_value=0)
+        tri = n * (n + 1) / 2.0
+        return (S_full - S_back) / tri
 
-    wma_half = wma(df['close'], half_period)
-    wma_full = wma(df['close'], period)
-
-    hma = wma(2 * wma_half - wma_full, sqrt_period)
+    wma_half = wma_fast(close, half_period)
+    wma_full = wma_fast(close, period)
+    hma = wma_fast(2 * wma_half - wma_full, sqrt_period)
     return hma
 
 def compute_adx(df, period=14):
