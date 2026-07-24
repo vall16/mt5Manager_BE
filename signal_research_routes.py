@@ -109,6 +109,8 @@ def _run_optimization(session_id: str, config: dict):
                 direction="buy",
                 pre_fetched_dfs=strategy_dfs[strategy],
                 skip_indicators=True,
+                sl_pts=sl,
+                tp_pts=tp,
             )
 
             summary = result.get("summary", {})

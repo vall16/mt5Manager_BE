@@ -248,7 +248,7 @@ def precompute_indicators(dfs):
         df_h1["vol_avg"] = df_h1["tick_volume"].rolling(20).mean()
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both", skip_indicators=False):
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both", skip_indicators=False, sl_pts_override=None, tp_pts_override=None):
     trades = []
     position = None
 
@@ -534,11 +534,16 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 direction = "sell"
 
             if direction:
-                sl_pts, tp_pts = strategy.get_dynamic_sl_tp(ind)
-                if sl_pts is None:
-                    sl_pts = DEFAULT_SL
-                if tp_pts is None:
-                    tp_pts = DEFAULT_TP
+                if sl_pts_override is not None:
+                    sl_pts = sl_pts_override
+                else:
+                    sl_pts_dyn, _ = strategy.get_dynamic_sl_tp(ind)
+                    sl_pts = sl_pts_dyn if sl_pts_dyn is not None else DEFAULT_SL
+                if tp_pts_override is not None:
+                    tp_pts = tp_pts_override
+                else:
+                    _, tp_pts_dyn = strategy.get_dynamic_sl_tp(ind)
+                    tp_pts = tp_pts_dyn if tp_pts_dyn is not None else DEFAULT_TP
 
                 sl_price = price - (sl_pts * pip) if direction == "buy" else price + (sl_pts * pip)
                 tp_price = price + (tp_pts * pip) if direction == "buy" else price - (tp_pts * pip)
@@ -798,7 +803,7 @@ def compute_summary(trades, balance, initial_balance, days=None):
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both", pre_fetched_dfs=None, skip_indicators=False):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both", pre_fetched_dfs=None, skip_indicators=False, sl_pts=None, tp_pts=None):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
@@ -808,7 +813,7 @@ def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, can
             dfs = pre_fetched_dfs
         else:
             dfs = fetch_data(symbol, strategy, days, mt5_api_url)
-        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction, skip_indicators=skip_indicators)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction, skip_indicators=skip_indicators, sl_pts_override=sl_pts, tp_pts_override=tp_pts)
         summary_data = compute_summary(trades, final_bal, balance, days)
 
         serializable_trades = []
