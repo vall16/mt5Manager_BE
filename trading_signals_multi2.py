@@ -806,23 +806,55 @@ class NvdaStrategy(SignalStrategy):
         volume_avg = df["tick_volume"].rolling(20).mean().iloc[-1]
         volume_now = df["tick_volume"].iloc[-1]
 
+        prev_close = df["close"].shift(1)
+        tr = df.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - prev_close.iloc[r.name]) if pd.notna(prev_close.iloc[r.name]) else r["high"] - r["low"],
+            abs(r["low"] - prev_close.iloc[r.name]) if pd.notna(prev_close.iloc[r.name]) else r["high"] - r["low"]
+        ), axis=1)
+        atr_m15 = tr.rolling(14).mean().iloc[-1]
+
+        ema5 = compute_ema(df, 5)
+        ema13 = compute_ema(df, 13)
+        ema20 = compute_ema(df, 20)
+        ema50 = compute_ema(df, 50)
+
         return Indicators(
-            ema_short=compute_ema(df, 5).iloc[-1],
-            ema_long=compute_ema(df, 20).iloc[-1],
+            ema_short=ema5.iloc[-1],
+            ema_long=ema20.iloc[-1],
+            ema13=ema13.iloc[-1],
+            ema_long200=compute_ema(df, 200).iloc[-1],
+            ema_short_prev=ema5.iloc[-2],
+            ema_long_prev=ema20.iloc[-2],
             rsi=compute_rsi(df, 14).iloc[-1],
+            rsi_prev=compute_rsi(df, 14).iloc[-2],
             hma=compute_hma(df).iloc[-1],
             hma_prev=compute_hma(df).iloc[-2],
+            trend_macro_up=df["close"].iloc[-1] > ema50.iloc[-1],
+            price_prev=df["close"].iloc[-2],
             volume_ok=volume_now > volume_avg * 1.0 if volume_avg > 0 else True,
+            atr_m15=atr_m15,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
-        return (
-            ind.trend_macro_up
+        rsi_bounce = (
+            ind.rsi_prev is not None
+            and ind.rsi_prev < 35
+            and ind.rsi > 35
             and ind.ema_short > ind.ema_long
-            and ind.hma > ind.hma_prev
-            and 35 < ind.rsi < 72
-            and ind.volume_ok
         )
+        ema_rsi_mid = (
+            40 < ind.rsi < 65
+            and ind.ema_short > getattr(ind, 'ema13', ind.ema_long)
+        )
+        pullback = (
+            ind.price_prev is not None
+            and ind.ema_long_prev is not None
+            and ind.price_prev <= ind.ema_long_prev
+            and ind.ema_short > ind.ema_long
+            and ind.rsi < 55
+        )
+        return rsi_bounce or ema_rsi_mid or pullback
 
     def sell_condition(self, ind: Indicators) -> bool:
         return False
@@ -834,15 +866,16 @@ class NvdaStrategy(SignalStrategy):
         return False
 
     def on_hold_action(self, ind, has_buy, has_sell, prev_signal):
-        if has_buy and not ind.trend_macro_up and ind.hma < ind.hma_prev:
+        if has_buy and ind.ema_short < ind.ema_long:
             return "close_buy"
         return None
 
     def get_dynamic_sl_tp(self, ind: Indicators):
-        return 400, 900
+        return 150, 500
 
     def get_log_details(self, ind: Indicators) -> str:
-        return f"(Trend:{'UP' if ind.trend_macro_up else 'DOWN'} RSI:{ind.rsi:.0f})"
+        atr = getattr(ind, 'atr_m15', 0) or 0
+        return f"(EMA5>{ind.ema_short:.1f} EMA20>{ind.ema_long:.1f} RSI:{ind.rsi:.0f} ATR:{atr:.2f})"
 
     def get_log_header(self, ind: Indicators) -> str:
         return f"S-I-G-N-A-L [{self.name}] | {self.get_log_details(ind)}"

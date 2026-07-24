@@ -248,6 +248,13 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         df_m15["hma_prev"] = hma15.shift(1)
         df_m15["rsi14"] = compute_rsi(df_m15, 14)
         df_m15["vol_avg"] = df_m15["tick_volume"].rolling(20).mean()
+        df_m15["prev_close"] = df_m15["close"].shift(1)
+        df_m15["tr_m15"] = df_m15.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"],
+            abs(r["low"] - r["prev_close"]) if pd.notna(r["prev_close"]) else r["high"] - r["low"]
+        ), axis=1)
+        df_m15["atr_m15"] = df_m15["tr_m15"].rolling(14).mean()
 
     if use_h1:
         tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
@@ -354,6 +361,8 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         hold_ind.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
                         hold_ind.hma = df_m15.iloc[idx_m15]["hma"]
                         hold_ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
+                        hold_ind.ema_short = df_m15.iloc[idx_m15]["ema5"]
+                        hold_ind.ema_long = df_m15.iloc[idx_m15]["ema20_m15"]
                 if use_m5:
                     idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
                     if idx_m5 >= 30:
@@ -411,8 +420,14 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         ind.trend_macro_50_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
                         ind.ema_short = getattr(ind, "ema_short", None) or df_m15.iloc[idx_m15]["ema5"]
                         ind.ema_long = getattr(ind, "ema_long", None) or df_m15.iloc[idx_m15]["ema20_m15"]
+                        ind.ema_long200 = df_m15.iloc[idx_m15]["ema200"]
                         ind.hma = df_m15.iloc[idx_m15]["hma"]
                         ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
+                        ind.atr_m15 = df_m15.iloc[idx_m15]["atr_m15"]
+                        ind.ema_short_prev = df_m15.iloc[idx_m15 - 1]["ema5"] if idx_m15 >= 1 else None
+                        ind.ema_long_prev = df_m15.iloc[idx_m15 - 1]["ema20_m15"] if idx_m15 >= 1 else None
+                        ind.price_prev = df_m15.iloc[idx_m15 - 1]["close"] if idx_m15 >= 1 else None
+                        ind.rsi_prev = df_m15.iloc[idx_m15 - 1]["rsi14"] if idx_m15 >= 1 else None
                         vol_now = df_m15.iloc[idx_m15]["tick_volume"]
                         vol_avg = df_m15.iloc[idx_m15]["vol_avg"]
                         ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
@@ -442,14 +457,27 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             elif use_m15:
                 ind.ema_short = row.get("ema5")
                 ind.ema_long = row.get("ema20_m15")
+                ind.ema_long200 = row.get("ema200")
                 ind.rsi = row.get("rsi14")
                 ind.hma = row.get("hma")
                 ind.hma_prev = row.get("hma_prev")
+                ind.atr_m15 = row.get("atr_m15")
                 vol_now = row.get("tick_volume", 0)
                 vol_avg = row.get("vol_avg")
                 ind.volume_ok = vol_now > vol_avg * 1.2 if pd.notna(vol_avg) and vol_avg > 0 else True
                 ind.trend_macro_up = price > row.get("ema50", price) if pd.notna(row.get("ema50")) else None
                 ind.trend_macro_50_up = ind.trend_macro_up
+                if i > 0:
+                    prev_row = df_m15.iloc[i - 1]
+                    ind.ema_short_prev = prev_row.get("ema5")
+                    ind.ema_long_prev = prev_row.get("ema20_m15")
+                    ind.price_prev = prev_row.get("close")
+                    ind.rsi_prev = prev_row.get("rsi14")
+                else:
+                    ind.ema_short_prev = None
+                    ind.ema_long_prev = None
+                    ind.price_prev = None
+                    ind.rsi_prev = None
 
             try:
                 buy = strategy.buy_condition(ind)
