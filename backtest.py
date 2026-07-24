@@ -345,6 +345,35 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                     trades.append({"time": ts, "type": "SELL", "exit": "TP", "pnl": gain, "balance": balance})
                     position = None
 
+            if position is not None and hasattr(strategy, 'on_hold_action'):
+                hold_ind = Indicators()
+                if use_m15:
+                    idx_m15 = int(m15_end.searchsorted(ts, side="right")) - 1
+                    if idx_m15 >= 30:
+                        price_m15 = df_m15.iloc[idx_m15]["close"]
+                        hold_ind.trend_macro_up = price_m15 > df_m15.iloc[idx_m15]["ema50"]
+                        hold_ind.hma = df_m15.iloc[idx_m15]["hma"]
+                        hold_ind.hma_prev = df_m15.iloc[idx_m15]["hma_prev"]
+                if use_m5:
+                    idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
+                    if idx_m5 >= 30:
+                        hold_ind.hma_m5 = df_m5.iloc[idx_m5]["hma"]
+                        hold_ind.hma_m5_prev = df_m5.iloc[idx_m5]["hma_prev"]
+
+                has_buy = direction == "buy"
+                has_sell = direction == "sell"
+                action = strategy.on_hold_action(hold_ind, has_buy, has_sell, None)
+                if action in ("close_buy", "close_sell"):
+                    close_dir = "buy" if action == "close_buy" else "sell"
+                    if direction == "buy":
+                        pnl = (price - entry) * lot * contract
+                    else:
+                        pnl = (entry - price) * lot * contract
+                    balance += pnl
+                    print(f"{ts_str} {action.upper()} @ {price:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    trades.append({"time": ts, "type": direction.upper(), "exit": "HOLD_EXIT", "pnl": pnl, "balance": balance})
+                    position = None
+
         if position is None and i % entry_step == 0:
             ind = Indicators()
             ind.session_label = _get_session_label(ts)

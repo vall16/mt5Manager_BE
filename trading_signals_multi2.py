@@ -817,25 +817,35 @@ class NvdaStrategy(SignalStrategy):
 
     def buy_condition(self, ind: Indicators) -> bool:
         return (
-            ind.ema_short > ind.ema_long
+            ind.trend_macro_up
+            and ind.ema_short > ind.ema_long
             and ind.hma > ind.hma_prev
-            and 35 < ind.rsi < 78
+            and 35 < ind.rsi < 72
             and ind.volume_ok
         )
 
     def sell_condition(self, ind: Indicators) -> bool:
-        return (
-            ind.ema_short < ind.ema_long
-            and ind.hma < ind.hma_prev
-            and 22 < ind.rsi < 62
-            and ind.volume_ok
-        )
+        return False
 
     def reverse_on_buy(self, has_sell: bool) -> bool:
         return False
 
     def reverse_on_sell(self, has_buy: bool) -> bool:
         return False
+
+    def on_hold_action(self, ind, has_buy, has_sell, prev_signal):
+        if has_buy and not ind.trend_macro_up and ind.hma < ind.hma_prev:
+            return "close_buy"
+        return None
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        return 400, 900
+
+    def get_log_details(self, ind: Indicators) -> str:
+        return f"(Trend:{'UP' if ind.trend_macro_up else 'DOWN'} RSI:{ind.rsi:.0f})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        return f"S-I-G-N-A-L [{self.name}] | {self.get_log_details(ind)}"
 
 
 class SuperUsdJpyStrategy(SignalStrategy):
