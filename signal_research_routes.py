@@ -2,13 +2,14 @@
 Signal Research API — ottimizzazione SL/TP per multiple strategie.
 """
 import uuid
+import io
 import threading
 import logging
 from itertools import product
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 router = APIRouter()
 
@@ -269,3 +270,117 @@ def cancel_research(session_id: str):
             return JSONResponse(status_code=404, content={"error": "Session not found"})
         session["cancelled"] = True
     return {"status": "cancelling"}
+
+
+# ── PDF Export ──────────────────────────────────────────────────
+
+class PdfExportRequest(BaseModel):
+    symbol: str
+    days: int
+    lot: float
+    balance: float
+    sl_min: int
+    sl_max: int
+    sl_step: int
+    tp_min: int
+    tp_max: int
+    tp_step: int
+    strategies: List[str]
+    results: List[dict]
+
+
+@router.post("/signal-research/export-pdf")
+def export_pdf(req: PdfExportRequest):
+    from fpdf import FPDF
+
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.cell(0, 12, "Signal Research Report", new_x="LMARGIN", new_y="NEXT")
+
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_text_color(120)
+    from datetime import datetime
+    pdf.cell(0, 6, f"Generato: {datetime.now().strftime('%d/%m/%Y %H:%M')}", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(0)
+
+    # Parameters
+    pdf.ln(4)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Parametri di Ricerca", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    params = [
+        ("Symbol", req.symbol),
+        ("Days", str(req.days)),
+        ("Lot", str(req.lot)),
+        ("Balance", f"${req.balance}"),
+        ("SL Range", f"{req.sl_min} - {req.sl_max} (step {req.sl_step})"),
+        ("TP Range", f"{req.tp_min} - {req.tp_max} (step {req.tp_step})"),
+        ("Strategie", ", ".join(req.strategies)),
+        ("Combinazioni testate", str(len(req.results))),
+    ]
+    for label, value in params:
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.cell(45, 6, f"{label}:")
+        pdf.set_font("Helvetica", "", 10)
+        pdf.cell(0, 6, value, new_x="LMARGIN", new_y="NEXT")
+
+    # Top 3 table
+    pdf.ln(6)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Top 3 Risultati Migliori", new_x="LMARGIN", new_y="NEXT")
+
+    headers = ["#", "Strategy", "SL", "TP", "Trades", "Win%", "Return%", "MaxDD%", "Sharpe"]
+    col_w = [8, 35, 18, 18, 18, 20, 22, 22, 18]
+
+    pdf.set_fill_color(50, 50, 50)
+    pdf.set_text_color(255)
+    pdf.set_font("Helvetica", "B", 9)
+    for i, h in enumerate(headers):
+        pdf.cell(col_w[i], 7, h, border=1, fill=True, align="C")
+    pdf.ln()
+    pdf.set_text_color(0)
+    pdf.set_font("Helvetica", "", 9)
+
+    top3 = req.results[:3]
+    medal_colors = [(255, 248, 220), (240, 240, 240), (255, 240, 230)]
+
+    for idx, r in enumerate(top3):
+        bg = medal_colors[idx] if idx < 3 else (255, 255, 255)
+        pdf.set_fill_color(*bg)
+        vals = [
+            str(idx + 1), r.get("strategy", ""), str(r.get("sl", "")),
+            str(r.get("tp", "")), str(r.get("trades", "")),
+            f"{r.get('win_rate', 0):.1f}",
+            f"{r.get('return_pct', 0):+.1f}",
+            f"{r.get('max_dd', 0):.1f}",
+            f"{r.get('sharpe', 0):.2f}",
+        ]
+        for i, v in enumerate(vals):
+            pdf.cell(col_w[i], 7, v, border=1, fill=True, align="C")
+        pdf.ln()
+
+    # Recommendation
+    if top3:
+        best = top3[0]
+        pdf.ln(6)
+        pdf.set_font("Helvetica", "B", 10)
+        if best.get("sharpe", 0) >= 1.5 and best.get("return_pct", 0) >= 10:
+            pdf.set_text_color(0, 130, 0)
+            rec = f"Forte raccomandazione: {best['strategy']} SL={best['sl']} TP={best['tp']}"
+        elif best.get("sharpe", 0) >= 1 and best.get("return_pct", 0) >= 5:
+            pdf.set_text_color(0, 100, 200)
+            rec = f"Raccomandata: {best['strategy']} SL={best['sl']} TP={best['tp']}"
+        else:
+            pdf.set_text_color(200, 0, 0)
+            rec = f"Usa con cautela: {best['strategy']} SL={best['sl']} TP={best['tp']}"
+        pdf.cell(0, 7, rec, new_x="LMARGIN", new_y="NEXT")
+
+    # Stream PDF back
+    pdf_bytes = pdf.output()
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=signal_research_{req.symbol}_{req.days}d.pdf"},
+    )
