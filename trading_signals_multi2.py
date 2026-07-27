@@ -124,12 +124,19 @@ def send_order(trader_id: int, direction: str):
         return
 
     pip_value = float(sym_info.get("point", 0.00001))
-    sl_points = effective_sl if effective_sl is not None else trader.sl
+    use_signal_sl_tp = getattr(trader, 'use_signal_sl_tp', False)
+
+    if use_signal_sl_tp:
+        sl_points = trader.sl
+        tp_points = trader.tp
+    else:
+        sl_points = effective_sl if effective_sl is not None else trader.sl
+
     use_profit_tp = getattr(trader, 'use_profit_tp', False)
     profit_tp_value = getattr(trader, 'profit_tp_value', None)
     if use_profit_tp and profit_tp_value and profit_tp_value > 0:
         tp_points = None
-    else:
+    elif not use_signal_sl_tp:
         tp_points = effective_tp if effective_tp is not None else trader.tp
 
     if direction == "buy":

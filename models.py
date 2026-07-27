@@ -89,6 +89,9 @@ class Trader(BaseModel):
     # 🆕 Session filter (ASIA,LONDON,NY-LON,NY,OFF)
     sessions_filter: str = "ASIA,LONDON,NY-LON,NY,OFF"
 
+    # 🆕 Forza SL/TP dal form
+    use_signal_sl_tp: bool = False
+
 
 class Newtrader(BaseModel):
     
