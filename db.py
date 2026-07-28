@@ -179,6 +179,23 @@ def run_migrations():
     except Exception as e:
         log(f"⚠️ Migration slave_orders saltata: {e}")
 
+    # Migration: aggiungi sessions_filter se manca
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SHOW COLUMNS FROM traders WHERE Field='sessions_filter'")
+        if not cursor.fetchone():
+            log("🔧 Migration: aggiungo colonna sessions_filter a traders...")
+            cursor.execute("ALTER TABLE traders ADD COLUMN sessions_filter VARCHAR(255) DEFAULT 'ASIA,LONDON,NY-LON,NY,OFF'")
+            conn.commit()
+            log("✅ Migration completata: sessions_filter aggiunta")
+        else:
+            log("✅ Migration sessions_filter già applicata")
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        log(f"⚠️ Migration sessions_filter saltata: {e}")
+
 # funz che recupera il trader corrente
 def get_trader(cursor, trader_id):
     cursor.execute("""

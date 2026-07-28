@@ -125,6 +125,7 @@ def send_order(trader_id: int, direction: str):
 
     pip_value = float(sym_info.get("point", 0.00001))
     use_signal_sl_tp = getattr(trader, 'use_signal_sl_tp', False)
+    log(trader_id, f"🔍 use_signal_sl_tp={use_signal_sl_tp} | trader.sl={trader.sl} | trader.tp={trader.tp} | effective_sl={effective_sl} | effective_tp={effective_tp}")
 
     if use_signal_sl_tp:
         sl_points = trader.sl

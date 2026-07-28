@@ -5,8 +5,10 @@ certifi==2025.10.5
 charset-normalizer==3.4.4
 click==8.3.0
 colorama==0.4.6
+defusedxml==0.7.1
 fastapi==0.118.3
 fastapi-utils==0.8.0
+fpdf2==2.8.7
 git-filter-repo==2.47.0
 openai==1.82.0
 h11==0.16.0

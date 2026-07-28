@@ -31,6 +31,7 @@ class SignalResearchRequest(BaseModel):
     tp_max: int = 1200
     tp_step: int = 100
     strategies: List[str]
+    direction: str = "both"
     trader_id: Optional[int] = None
 
 
@@ -60,9 +61,14 @@ def _run_optimization(session_id: str, config: dict):
     mt5_api_url = config["mt5_api_url"]
     symbol = config["symbol"]
     days = config["days"]
+    direction = config.get("direction", "both")
     sl_range = list(range(config["sl_min"], config["sl_max"] + 1, config["sl_step"]))
     tp_range = list(range(config["tp_min"], config["tp_max"] + 1, config["tp_step"]))
-    all_combos = [(s, sl, tp) for s in config["strategies"] for sl, tp in product(sl_range, tp_range) if tp > sl]
+
+    # Direction: "buy", "sell", or "both" (separate buy+sell)
+    directions = ["buy", "sell"] if direction == "both" else [direction]
+
+    all_combos = [(s, sl, tp, d) for s in config["strategies"] for sl, tp in product(sl_range, tp_range) if tp > sl for d in directions]
     total = len(all_combos)
 
     cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
@@ -87,11 +93,11 @@ def _run_optimization(session_id: str, config: dict):
         strategy_dfs[sname] = dfs_cache[tf_key]
 
     # Update total after filtering invalid strategies
-    valid_combos = [(s, sl, tp) for s, sl, tp in all_combos if strategy_dfs.get(s) is not None]
+    valid_combos = [(s, sl, tp, d) for s, sl, tp, d in all_combos if strategy_dfs.get(s) is not None]
     total = len(valid_combos)
 
     results = []
-    for idx, (strategy, sl, tp) in enumerate(valid_combos):
+    for idx, (strategy, sl, tp, dirn) in enumerate(valid_combos):
         if cancel():
             with research_lock:
                 if session_id in research_sessions:
@@ -107,7 +113,7 @@ def _run_optimization(session_id: str, config: dict):
                 balance=config["balance"],
                 mt5_api_url=mt5_api_url,
                 cancel_flag=cancel,
-                direction="buy",
+                direction=dirn,
                 pre_fetched_dfs=strategy_dfs[strategy],
                 skip_indicators=True,
                 sl_pts=sl,
@@ -153,6 +159,7 @@ def _run_optimization(session_id: str, config: dict):
                 "strategy": strategy,
                 "sl": sl,
                 "tp": tp,
+                "direction": dirn,
                 "max_hold": 30,
                 "trades": total_trades,
                 "win_rate": round(win_rate, 1),
@@ -231,6 +238,7 @@ def start_signal_research(req: SignalResearchRequest):
         "tp_max": req.tp_max,
         "tp_step": req.tp_step,
         "strategies": req.strategies,
+        "direction": req.direction,
         "mt5_api_url": mt5_api_url,
     }
 
@@ -331,8 +339,8 @@ def export_pdf(req: PdfExportRequest):
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 8, "Top 3 Risultati Migliori", new_x="LMARGIN", new_y="NEXT")
 
-    headers = ["#", "Strategy", "SL", "TP", "Trades", "Win%", "Return%", "MaxDD%", "Sharpe"]
-    col_w = [8, 35, 18, 18, 18, 20, 22, 22, 18]
+    headers = ["#", "Strategy", "SL", "TP", "Dir", "Trades", "Win%", "Return%", "MaxDD%", "Sharpe"]
+    col_w = [8, 32, 16, 16, 14, 16, 18, 20, 20, 16]
 
     pdf.set_fill_color(50, 50, 50)
     pdf.set_text_color(255)
@@ -351,7 +359,7 @@ def export_pdf(req: PdfExportRequest):
         pdf.set_fill_color(*bg)
         vals = [
             str(idx + 1), r.get("strategy", ""), str(r.get("sl", "")),
-            str(r.get("tp", "")), str(r.get("trades", "")),
+            str(r.get("tp", "")), r.get("direction", "?").upper(), str(r.get("trades", "")),
             f"{r.get('win_rate', 0):.1f}",
             f"{r.get('return_pct', 0):+.1f}",
             f"{r.get('max_dd', 0):.1f}",
