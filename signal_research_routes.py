@@ -118,6 +118,7 @@ def _run_optimization(session_id: str, config: dict):
                 skip_indicators=True,
                 sl_pts=sl,
                 tp_pts=tp,
+                verbose=False,
             )
 
             summary = result.get("summary", {})

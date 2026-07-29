@@ -248,7 +248,8 @@ def precompute_indicators(dfs):
         df_h1["vol_avg"] = df_h1["tick_volume"].rolling(20).mean()
 
 
-def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both", skip_indicators=False, sl_pts_override=None, tp_pts_override=None):
+def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress_callback=None, direction_filter="both", skip_indicators=False, sl_pts_override=None, tp_pts_override=None, verbose=True):
+    _print = print if verbose else lambda *a, **k: None
     trades = []
     position = None
 
@@ -283,7 +284,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
     contract = instr["contract"]
 
     if not skip_indicators:
-        print("Pre-calcolo indicatori...")
+        _print("Pre-calcolo indicatori...")
         precompute_indicators(dfs)
 
     # Pre-extract numpy arrays for fast O(1) lookup (avoids df.iloc creating Series per call)
@@ -308,7 +309,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         for col in ["close", "tenkan", "kijun", "senkou_a", "senkou_b", "chikou", "hma", "hma_prev", "rsi14"]:
             h1_arr[col] = df_h1[col].values
 
-    print("Esecuzione backtest...")
+    _print("Esecuzione backtest...")
     if use_m1:
         primary_df = df_m1
         primary_times = m1_times
@@ -325,7 +326,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         lookback = 78
         entry_step = 1
     else:
-        print("Nessun timeframe primario disponibile")
+        _print("Nessun timeframe primario disponibile")
         return trades, balance
 
     # Pre-extract primary df columns as numpy arrays
@@ -354,7 +355,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
 
         if i % print_steps == 0:
             pct = (i - start_idx) / max(total - start_idx, 1) * 100
-            print(f"  ... {pct:.0f}% ({i}/{total}) | Trades: {len(trades)} | Bal: {balance:.2f}")
+            _print(f"  ... {pct:.0f}% ({i}/{total}) | Trades: {len(trades)} | Bal: {balance:.2f}")
             if progress_callback:
                 progress_callback(round(pct), len(trades), round(balance, 2))
 
@@ -365,26 +366,26 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 if low <= sl:
                     pnl = (sl - entry) * lot * contract
                     balance += pnl
-                    print(f"{ts_str} BUY SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    _print(f"{ts_str} BUY SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
                     trades.append({"time": ts, "type": "BUY", "exit": "SL", "pnl": pnl, "balance": balance})
                     position = None
                 elif high >= tp:
                     gain = (tp - entry) * lot * contract
                     balance += gain
-                    print(f"{ts_str} BUY TP @ {tp:.2f} | PnL: {gain:.2f} | Bal: {balance:.2f}")
+                    _print(f"{ts_str} BUY TP @ {tp:.2f} | PnL: {gain:.2f} | Bal: {balance:.2f}")
                     trades.append({"time": ts, "type": "BUY", "exit": "TP", "pnl": gain, "balance": balance})
                     position = None
             else:
                 if high >= sl:
                     pnl = (entry - sl) * lot * contract
                     balance += pnl
-                    print(f"{ts_str} SELL SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    _print(f"{ts_str} SELL SL @ {sl:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
                     trades.append({"time": ts, "type": "SELL", "exit": "SL", "pnl": pnl, "balance": balance})
                     position = None
                 elif low <= tp:
                     gain = (entry - tp) * lot * contract
                     balance += gain
-                    print(f"{ts_str} SELL TP @ {tp:.2f} | PnL: {gain:.2f} | Bal: {balance:.2f}")
+                    _print(f"{ts_str} SELL TP @ {tp:.2f} | PnL: {gain:.2f} | Bal: {balance:.2f}")
                     trades.append({"time": ts, "type": "SELL", "exit": "TP", "pnl": gain, "balance": balance})
                     position = None
 
@@ -414,7 +415,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                     else:
                         pnl = (entry - price) * lot * contract
                     balance += pnl
-                    print(f"{ts_str} {action.upper()} @ {price:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
+                    _print(f"{ts_str} {action.upper()} @ {price:.2f} | PnL: {pnl:.2f} | Bal: {balance:.2f}")
                     trades.append({"time": ts, "type": direction.upper(), "exit": "HOLD_EXIT", "pnl": pnl, "balance": balance})
                     position = None
 
@@ -518,7 +519,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 sell = strategy.sell_condition(ind)
             except Exception as e:
                 if i == start_idx or i % 5000 == 0:
-                    print(f"  WARN condition eval @ bar {i}: {type(e).__name__}: {e}")
+                    _print(f"  WARN condition eval @ bar {i}: {type(e).__name__}: {e}")
                 continue
 
             _dbg_evaluated += 1
@@ -549,9 +550,9 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                 tp_price = price + (tp_pts * pip) if direction == "buy" else price - (tp_pts * pip)
                 position = (price, direction, sl_price, tp_price)
                 log = strategy.get_log_details(ind) if hasattr(strategy, "get_log_details") else ""
-                print(f"{ts_str} ENTRY {direction.upper()} @ {price:.2f} SL={sl_price:.2f} TP={tp_price:.2f} | {log}")
+                _print(f"{ts_str} ENTRY {direction.upper()} @ {price:.2f} SL={sl_price:.2f} TP={tp_price:.2f} | {log}")
 
-    print(f"\nDEBUG: evaluated={_dbg_evaluated} buy_signals={_dbg_buy_signals} sell_signals={_dbg_sell_signals}")
+    _print(f"\nDEBUG: evaluated={_dbg_evaluated} buy_signals={_dbg_buy_signals} sell_signals={_dbg_sell_signals}")
 
     if use_m1:
         import math
@@ -803,7 +804,7 @@ def compute_summary(trades, balance, initial_balance, days=None):
     }
 
 
-def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both", pre_fetched_dfs=None, skip_indicators=False, sl_pts=None, tp_pts=None):
+def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, cancel_flag=None, progress_callback=None, direction="both", pre_fetched_dfs=None, skip_indicators=False, sl_pts=None, tp_pts=None, verbose=True):
     strategy = STRATEGIES.get(strategy_name)
     if not strategy:
         return {"error": f"Unknown strategy: {strategy_name}"}
@@ -813,7 +814,7 @@ def run_backtest_api(strategy_name, symbol, days, lot, balance, mt5_api_url, can
             dfs = pre_fetched_dfs
         else:
             dfs = fetch_data(symbol, strategy, days, mt5_api_url)
-        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction, skip_indicators=skip_indicators, sl_pts_override=sl_pts, tp_pts_override=tp_pts)
+        trades, final_bal = run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=cancel_flag, progress_callback=progress_callback, direction_filter=direction, skip_indicators=skip_indicators, sl_pts_override=sl_pts, tp_pts_override=tp_pts, verbose=verbose)
         summary_data = compute_summary(trades, final_bal, balance, days)
 
         serializable_trades = []
