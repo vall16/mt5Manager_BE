@@ -676,8 +676,13 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
         values.append(update.selected_symbol)
 
     if update.sessions_filter is not None:
-        fields.append("sessions_filter = %s")
-        values.append(update.sessions_filter)
+        try:
+            cursor.execute("SHOW COLUMNS FROM traders WHERE Field='sessions_filter'")
+            if cursor.fetchone():
+                fields.append("sessions_filter = %s")
+                values.append(update.sessions_filter)
+        except Exception:
+            pass
 
 
 
