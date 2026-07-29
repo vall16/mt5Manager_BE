@@ -1291,6 +1291,52 @@ class IchimokuXauStrategy(SignalStrategy):
 
 # ─────────────────────── STRATEGY MAP ───────────────────────
 
+class ScalperM1Strategy(SignalStrategy):
+    name = "SCALPER_M1"
+    requires_m1 = True
+    requires_m5 = False
+    requires_m15 = False
+    requires_h1 = False
+
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
+        price = df_m1["close"].iloc[-2]
+        ema21 = compute_ema(df_m1, 21).iloc[-2]
+        atr = compute_atr(df_m1, 14).iloc[-2]
+        rsi = compute_rsi(df_m1, 14).iloc[-2]
+        return Indicators(
+            price=price,
+            ema21=ema21,
+            lower=ema21 - 2 * atr,
+            upper=ema21 + 2 * atr,
+            rsi=rsi,
+            atr=atr,
+        )
+
+    def buy_condition(self, ind: Indicators) -> bool:
+        if ind.price is None or ind.ema21 is None or ind.rsi is None:
+            return False
+        return ind.price < ind.ema21 and ind.rsi < 35
+
+    def sell_condition(self, ind: Indicators) -> bool:
+        if ind.price is None or ind.ema21 is None or ind.rsi is None:
+            return False
+        return ind.price > ind.ema21 and ind.rsi > 65
+
+    def reverse_on_buy(self, has_sell: bool) -> bool:
+        return False
+
+    def reverse_on_sell(self, has_buy: bool) -> bool:
+        return False
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        return 120, 250  # default per EURUSD M1: 12 pips SL, 25 pips TP
+
+    def get_log_details(self, ind: Indicators) -> str:
+        if ind.price is None:
+            return "(no data)"
+        return f"(EMA21: {ind.ema21:.5f} L:{ind.lower:.5f} U:{ind.upper:.5f} RSI:{ind.rsi:.1f})"
+
+
 STRATEGIES = {
     "BASE": NoReverseStrategy(close_on_hold=True),
     "BASE_NOHOLD": NoReverseStrategy(),
@@ -1306,6 +1352,7 @@ STRATEGIES = {
     "GBPUSD": GbpUsdStrategy(),
     "GBPJPY": GbpJpyStrategy(),
     "AUDJPY": AudJpyStrategy(),
+    "SCALPER_M1": ScalperM1Strategy(),
 }
 
 DEFAULT_STRATEGY = NoReverseStrategy(close_on_hold=True)

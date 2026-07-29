@@ -424,15 +424,21 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             ind.session_label = _get_session_label(ts)
 
             if use_m1:
+                ind.price = price
                 ind.ema_fast = m1_arr["ema9"][i]
                 ind.ema_slow = m1_arr["ema21"][i]
+                ind.ema21 = m1_arr["ema21"][i]
                 ind.rsi_m1 = m1_arr["rsi14"][i]
+                ind.rsi = m1_arr["rsi14"][i]
                 ind.macd = m1_arr["macd"][i]
                 ind.macd_sig = m1_arr["macd_sig"][i]
                 ind.volatilty_expansion = m1_arr["atr"][i] > m1_arr["atr_ma10"][i]
                 ind.volatility_expansion = ind.volatilty_expansion
                 ind.is_spike = m1_arr["is_spike"][i]
                 ind.atr_m1 = m1_arr["atr"][i]
+                ind.atr = m1_arr["atr"][i]
+                ind.lower = m1_arr["ema21"][i] - 2 * m1_arr["atr"][i]
+                ind.upper = m1_arr["ema21"][i] + 2 * m1_arr["atr"][i]
 
                 if use_m5:
                     idx_m5 = int(m5_end.searchsorted(ts, side="right")) - 1
@@ -565,6 +571,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             ind2 = Indicators()
             ind2.ema_fast = m1_arr["ema9"][i]
             ind2.ema_slow = m1_arr["ema21"][i]
+            ind2.ema21 = m1_arr["ema21"][i]
             ind2.rsi_m1 = m1_arr["rsi14"][i]
             ind2.macd = m1_arr["macd"][i]
             ind2.macd_sig = m1_arr["macd_sig"][i]
@@ -646,7 +653,12 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
             print(f"    {k:15s}: {v:6d} / {total_bars} ({pct:.1f}% blocked)")
         print(f"  NaN values: {_dbg_nan}")
 
-    print(f"\nFinal balance: {balance:.2f}")
+    print(f"\nFinal balance: {balance:.2f} | Trades: {len(trades)}")
+    if len(trades) == 0 and position is not None:
+        print(f"  WARNING: open position at end: entry={entry} dir={direction} sl={sl} tp={tp}")
+        # dump last 10 low/high values
+        for j in range(max(0, i-10), i+1):
+            print(f"    bar {j}: low={pri_arr['low'][j]:.5f} high={pri_arr['high'][j]:.5f} close={pri_arr['close'][j]:.5f}")
     return trades, balance
 
 
