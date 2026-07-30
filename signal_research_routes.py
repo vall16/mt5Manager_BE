@@ -291,6 +291,200 @@ def cancel_research(session_id: str):
     return {"status": "cancelling"}
 
 
+# ── Auto Discover ──────────────────────────────────────────────
+
+class AutoDiscoverRequest(BaseModel):
+    symbol: str
+    days: int = 90
+    lot: float = 0.01
+    balance: float = 1000
+    direction: str = "both"
+    target_return: float = 30.0
+
+
+def _get_sl_tp_ranges(symbol: str):
+    sym = symbol.upper()
+    if "XAU" in sym or "GOLD" in sym:
+        return 200, 800, 50, 400, 1600, 100
+    if sym in ("NVDA", "NVDA.NAS", "AMD", "TSLA", "AAPL"):
+        return 300, 1500, 100, 600, 3000, 200
+    if sym in ("MSFT", "MSFT.NAS", "AMZN", "GOOGL"):
+        return 200, 600, 50, 400, 1500, 100
+    if sym in ("EURUSD", "GBPUSD", "GBPJPY", "AUDJPY", "USDJPY"):
+        return 30, 200, 10, 60, 400, 20
+    return 100, 600, 50, 200, 1200, 100
+
+
+def _run_auto_discover(session_id: str, config: dict):
+    from backtest import run_backtest_api, fetch_data, precompute_indicators, STRATEGIES
+
+    mt5_api_url = config["mt5_api_url"]
+    symbol = config["symbol"]
+    days = config["days"]
+    direction = config.get("direction", "both")
+    sl_min, sl_max, sl_step, tp_min, tp_max, tp_step = _get_sl_tp_ranges(symbol)
+
+    sl_range = list(range(sl_min, sl_max + 1, sl_step))
+    tp_range = list(range(tp_min, tp_max + 1, tp_step))
+    directions = ["buy", "sell"] if direction == "both" else [direction]
+    cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
+
+    all_strategies = list(STRATEGIES.keys())
+    target = config.get("target_return", 30.0)
+
+    # Pass 1: fetch data for all strategies
+    viable = []
+    for sname in all_strategies:
+        if cancel():
+            with research_lock:
+                if session_id in research_sessions:
+                    research_sessions[session_id]["status"] = "cancelled"
+            return
+        strat = STRATEGIES.get(sname)
+        if not strat:
+            continue
+        print(f"[AutoDiscover] {sname} — fetching data...")
+        try:
+            dfs = fetch_data(symbol, strat, days, mt5_api_url)
+            precompute_indicators(dfs)
+            viable.append((sname, dfs))
+            print(f"[AutoDiscover] {sname} — OK")
+        except Exception as e:
+            print(f"[AutoDiscover] {sname} — skipped: {e}")
+
+    # Calculate total combos (for smooth progress)
+    all_combos_list = []
+    for sname, dfs in viable:
+        combos = [(sname, sl, tp, d) for sl, tp in product(sl_range, tp_range) if tp > sl for d in directions]
+        all_combos_list.extend(combos)
+
+    total = len(all_combos_list)
+    all_results = []
+    combo_idx = 0
+
+    for sname, sl, tp, dirn in all_combos_list:
+        if cancel():
+            return
+
+        try:
+            result = run_backtest_api(
+                strategy_name=sname, symbol=symbol, days=days,
+                lot=config["lot"], balance=config["balance"],
+                mt5_api_url=mt5_api_url, cancel_flag=cancel,
+                direction=dirn,
+                pre_fetched_dfs=[dfs for sn, dfs in viable if sn == sname][0],
+                skip_indicators=True, sl_pts=sl, tp_pts=tp, verbose=False,
+            )
+            summary = result.get("summary", {})
+            trades = result.get("trades", [])
+            net_pnl = summary.get("net_pnl", 0)
+            return_pct = (net_pnl / config["balance"] * 100) if config["balance"] else 0
+
+            peak = config["balance"]
+            max_dd_abs = 0
+            for t in trades:
+                bal = t.get("balance", config["balance"])
+                peak = max(peak, bal)
+                dd = bal - peak
+                if dd < max_dd_abs:
+                    max_dd_abs = dd
+            max_dd_pct = (max_dd_abs / config["balance"] * 100) if config["balance"] else 0
+
+            win_rate = summary.get("win_rate", 0)
+            avg_win = summary.get("avg_win", 0)
+            avg_loss = abs(summary.get("avg_loss", 1))
+            reward_risk = avg_win / avg_loss if avg_loss > 0 else 1
+            sharpe = (win_rate / 100 * reward_risk - (1 - win_rate / 100)) if win_rate else 0
+            total_trades = summary.get("total_trades", 0)
+
+            all_results.append({
+                "strategy": sname, "sl": sl, "tp": tp,
+                "direction": dirn, "trades": total_trades,
+                "win_rate": round(win_rate, 1),
+                "return_pct": round(return_pct, 1),
+                "max_dd": round(max_dd_pct, 1),
+                "sharpe": round(sharpe, 2),
+                "target_hit": return_pct >= target,
+            })
+        except Exception as e:
+            logging.error(f"[AutoDiscover] {sname} SL={sl} TP={tp}: {e}")
+            continue
+
+        combo_idx += 1
+        pct = int(combo_idx / total * 100) if total else 0
+        with research_lock:
+            if session_id in research_sessions:
+                research_sessions[session_id]["progress"] = pct
+
+    all_results.sort(key=lambda x: x["return_pct"], reverse=True)
+    target_hits = [r for r in all_results if r["target_hit"]]
+
+    with research_lock:
+        if session_id in research_sessions:
+            if research_sessions[session_id]["cancelled"]:
+                research_sessions[session_id]["status"] = "cancelled"
+            elif not all_results:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {
+                    "error": f"Nessuna strategia ha funzionato per {symbol}. Verifica che il simbolo sia supportato."
+                }
+            else:
+                research_sessions[session_id]["status"] = "done"
+                research_sessions[session_id]["result"] = {
+                    "results": all_results,
+                    "target_hits": [r["strategy"] for r in target_hits],
+                    "target_return": target,
+                }
+
+
+@router.post("/signal-research/auto-discover")
+def start_auto_discover(req: AutoDiscoverRequest):
+    mt5_api_url = None
+    from db import get_connection
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT ss.ip, ss.port
+            FROM traders t
+            JOIN servers ss ON ss.id = t.slave_server_id
+            LIMIT 1
+        """)
+        row = cursor.fetchone()
+        if row and row[0] and row[1]:
+            mt5_api_url = f"http://{row[0]}:{row[1]}"
+    finally:
+        cursor.close()
+        conn.close()
+
+    if not mt5_api_url:
+        return JSONResponse(status_code=400, content={"error": "No MT5 API URL found"})
+
+    session_id = str(uuid.uuid4())[:8]
+    config = {
+        "symbol": req.symbol,
+        "days": req.days,
+        "lot": req.lot,
+        "balance": req.balance,
+        "direction": req.direction,
+        "target_return": req.target_return,
+        "mt5_api_url": mt5_api_url,
+    }
+
+    with research_lock:
+        research_sessions[session_id] = {
+            "status": "running",
+            "result": None,
+            "cancelled": False,
+            "progress": 0,
+            "config": config,
+        }
+
+    t = threading.Thread(target=_run_auto_discover, args=(session_id, config), daemon=True)
+    t.start()
+    return {"session_id": session_id}
+
+
 # ── PDF Export ──────────────────────────────────────────────────
 
 class PdfExportRequest(BaseModel):
