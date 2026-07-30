@@ -76,6 +76,7 @@ def _run_optimization(session_id: str, config: dict):
     # Group strategies by timeframe requirements → fetch data once per group
     dfs_cache = {}
     strategy_dfs = {}
+    strategy_errors = {}
     for sname in config["strategies"]:
         strat = STRATEGIES.get(sname)
         if not strat:
@@ -90,7 +91,10 @@ def _run_optimization(session_id: str, config: dict):
             except Exception as e:
                 print(f"[SignalResearch] Error fetching data for {sname}: {e}")
                 dfs_cache[tf_key] = None
+                strategy_errors[sname] = str(e)
         strategy_dfs[sname] = dfs_cache[tf_key]
+        if dfs_cache[tf_key] is None:
+            strategy_errors.setdefault(sname, "Nessun dato disponibile per questa strategia sul simbolo selezionato")
 
     # Update total after filtering invalid strategies
     valid_combos = [(s, sl, tp, d) for s, sl, tp, d in all_combos if strategy_dfs.get(s) is not None]
@@ -187,6 +191,12 @@ def _run_optimization(session_id: str, config: dict):
         if session_id in research_sessions:
             if research_sessions[session_id]["cancelled"]:
                 research_sessions[session_id]["status"] = "cancelled"
+            elif not results and strategy_errors:
+                err_msgs = "; ".join(f"{s}: {e}" for s, e in strategy_errors.items())
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {
+                    "error": f"Nessun dato disponibile per le strategie selezionate su {symbol}. {err_msgs}"
+                }
             else:
                 research_sessions[session_id]["status"] = "done"
                 research_sessions[session_id]["result"] = {"results": results}
