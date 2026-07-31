@@ -1,0 +1,2 @@
+[31/07/2026 11:57] [AutoDiscover] Avvio ricerca automatica per XAUUSD (365 giorni)
+[31/07/2026 14:08] [AutoDiscover] Avvio ricerca automatica per XAUUSD (365 giorni)

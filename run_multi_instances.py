@@ -13,7 +13,8 @@ async def main():
             PROJECT_APP,
             host="0.0.0.0",
             port=port,
-            log_level="info"
+            log_level="info",
+            access_log=False
         )
         server = uvicorn.Server(config)
         servers.append(server.serve())

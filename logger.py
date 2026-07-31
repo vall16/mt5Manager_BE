@@ -47,7 +47,7 @@ def colorize_signal(text: str) -> str:
     )
 
 
-def log(message):
+def log(message, file="server_log.txt"):
     global logs
 
     def default_serializer(obj):
@@ -81,7 +81,7 @@ def log(message):
         colored = colorize_signal(line_to_print)
         print(colored, flush=True)
         # 3. SCRIVI SU FILE (SEMPRE SENZA COLORI)
-        with open("server_log.txt", "a", encoding="utf-8") as f:
+        with open(file, "a", encoding="utf-8") as f:
             f.write(line_to_print + "\n")
 
 

@@ -11,7 +11,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from logger import log as global_log
+
 router = APIRouter()
+
+AUTO_LOG_FILE = "auto_discover_log.txt"
 
 # Session storage
 research_sessions = {}
@@ -402,6 +406,7 @@ def _run_auto_discover(session_id: str, config: dict):
     from backtest import STRATEGIES
     strat = next(iter(STRATEGIES.values()))
     print(f"[AutoDiscover] Fetching {days} days of {symbol}...")
+    global_log(f"[AutoDiscover] Avvio ricerca automatica per {symbol} ({days} giorni)", file=AUTO_LOG_FILE)
     try:
         dfs = fetch_data(symbol, strat, days, mt5_api_url)
     except Exception as e:
@@ -494,6 +499,7 @@ def _run_auto_discover(session_id: str, config: dict):
             })
         except Exception as e:
             logging.error(f"[AutoDiscover] EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}")
+            global_log(f"[AutoDiscover] Errore EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}", file=AUTO_LOG_FILE)
             continue
 
         pct = int((i + 1) / total * 100)
@@ -520,6 +526,8 @@ def _run_auto_discover(session_id: str, config: dict):
                     "target_hits": [r["label"] for r in target_hits],
                     "target_return": target,
                 }
+
+    global_log(f"[AutoDiscover] Fine ricerca per {symbol}: {len(all_results)} combinazioni testate, {len(target_hits)} sopra il target", file=AUTO_LOG_FILE)
 
 
 @router.post("/signal-research/auto-discover")

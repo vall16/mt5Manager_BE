@@ -98,6 +98,6 @@ if __name__ == "__main__":
     HOST = os.getenv("API_HOST")  # default localhost
     PORT = int(os.getenv("API_PORT"))    # default 8080
 
-    uvicorn.run("main:app", host=HOST, port=PORT)
+    uvicorn.run("main:app", host=HOST, port=PORT, access_log=False)
     # uvicorn.run("main:app", host=HOST, port=PORT,reload=True  )
     
