@@ -315,91 +315,177 @@ def _get_sl_tp_ranges(symbol: str):
     return 100, 600, 50, 200, 1200, 100
 
 
+def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_overbought, sl_pts, tp_pts, direction, lot, balance, pip, contract):
+    import numpy as np
+    from indicators.ta import compute_ema, compute_rsi
+
+    close = df["close"].to_numpy(dtype=float)
+    low = df["low"].to_numpy(dtype=float)
+    high = df["high"].to_numpy(dtype=float)
+    times = df["time"].to_numpy()
+    ema_f = compute_ema(df, ema_fast).to_numpy(dtype=float)
+    ema_s = compute_ema(df, ema_slow).to_numpy(dtype=float)
+    rsi = compute_rsi(df, rsi_period).to_numpy(dtype=float)
+
+    trades = []
+    position = None
+    entry = dirn = sl_price = tp_price = 0.0
+    lookback = max(ema_slow, rsi_period) + 5
+    total = len(close)
+    lot_contract = lot * contract
+
+    for i in range(lookback, total):
+        price = close[i]
+        lo = low[i]
+        hi = high[i]
+
+        if position:
+            if dirn == 0:  # buy
+                if lo <= sl_price:
+                    pnl = (sl_price - entry) * lot_contract
+                    balance += pnl
+                    trades.append((times[i], "BUY", "SL", pnl, balance))
+                    position = None
+                elif hi >= tp_price:
+                    pnl = (tp_price - entry) * lot_contract
+                    balance += pnl
+                    trades.append((times[i], "BUY", "TP", pnl, balance))
+                    position = None
+            else:  # sell
+                if hi >= sl_price:
+                    pnl = (entry - sl_price) * lot_contract
+                    balance += pnl
+                    trades.append((times[i], "SELL", "SL", pnl, balance))
+                    position = None
+                elif lo <= tp_price:
+                    pnl = (entry - tp_price) * lot_contract
+                    balance += pnl
+                    trades.append((times[i], "SELL", "TP", pnl, balance))
+                    position = None
+
+        if position is None:
+            ef = ema_f[i]
+            es = ema_s[i]
+            rv = rsi[i]
+            if np.isnan(ef) or np.isnan(es) or np.isnan(rv):
+                continue
+
+            if (direction in ("buy", "both")) and ef > es and rv < rsi_oversold:
+                entry = price
+                dirn = 0
+                sl_price = price - sl_pts * pip
+                tp_price = price + tp_pts * pip
+                position = True
+            elif (direction in ("sell", "both")) and ef < es and rv > rsi_overbought:
+                entry = price
+                dirn = 1
+                sl_price = price + sl_pts * pip
+                tp_price = price - tp_pts * pip
+                position = True
+
+    return trades, balance
+
+
 def _run_auto_discover(session_id: str, config: dict):
-    from backtest import run_backtest_api, fetch_data, precompute_indicators, STRATEGIES
+    from backtest import fetch_data
+    from indicators.ta import compute_ema, compute_rsi
+    from backtest import INSTRUMENT
 
     mt5_api_url = config["mt5_api_url"]
     symbol = config["symbol"]
     days = config["days"]
     direction = config.get("direction", "both")
     sl_min, sl_max, sl_step, tp_min, tp_max, tp_step = _get_sl_tp_ranges(symbol)
+    cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
 
+    # Fetch data using first strategy that works
+    from backtest import STRATEGIES
+    strat = next(iter(STRATEGIES.values()))
+    print(f"[AutoDiscover] Fetching {days} days of {symbol}...")
+    try:
+        dfs = fetch_data(symbol, strat, days, mt5_api_url)
+    except Exception as e:
+        with research_lock:
+            if session_id in research_sessions:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {"error": f"Impossibile scaricare dati per {symbol}: {e}"}
+        return
+
+    df = dfs.get("m15") or dfs.get("m1") or dfs.get("m5")
+    if df is None:
+        with research_lock:
+            if session_id in research_sessions:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {"error": f"Nessun timeframe disponibile per {symbol}"}
+        return
+
+    instr = INSTRUMENT.get(symbol, {"pip": 0.01, "contract": 100})
+    pip = instr["pip"]
+    contract = instr["contract"]
+
+    # Parameter grid
+    ema_fast_vals = [5, 9, 15]
+    ema_slow_vals = [15, 30, 50]
+    rsi_oversold_vals = [35, 40, 45]
+    rsi_overbought_vals = [55, 60, 65]
     sl_range = list(range(sl_min, sl_max + 1, sl_step))
     tp_range = list(range(tp_min, tp_max + 1, tp_step))
     directions = ["buy", "sell"] if direction == "both" else [direction]
-    cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
-
-    all_strategies = list(STRATEGIES.keys())
     target = config.get("target_return", 30.0)
 
-    # Pass 1: fetch data for all strategies
-    viable = []
-    for sname in all_strategies:
+    all_combos = [(ef, es, ro, rb, sl, tp, d)
+                  for ef in ema_fast_vals
+                  for es in ema_slow_vals if es > ef
+                  for ro in rsi_oversold_vals
+                  for rb in rsi_overbought_vals if rb > ro
+                  for sl in sl_range
+                  for tp in tp_range if tp > sl
+                  for d in directions]
+
+    total = len(all_combos)
+    all_results = []
+
+    for i, (ef, es, ro, rb, sl, tp, dirn) in enumerate(all_combos):
         if cancel():
             with research_lock:
                 if session_id in research_sessions:
                     research_sessions[session_id]["status"] = "cancelled"
             return
-        strat = STRATEGIES.get(sname)
-        if not strat:
-            continue
-        print(f"[AutoDiscover] {sname} — fetching data...")
-        try:
-            dfs = fetch_data(symbol, strat, days, mt5_api_url)
-            precompute_indicators(dfs)
-            viable.append((sname, dfs))
-            print(f"[AutoDiscover] {sname} — OK")
-        except Exception as e:
-            print(f"[AutoDiscover] {sname} — skipped: {e}")
-
-    # Calculate total combos (for smooth progress)
-    all_combos_list = []
-    for sname, dfs in viable:
-        combos = [(sname, sl, tp, d) for sl, tp in product(sl_range, tp_range) if tp > sl for d in directions]
-        all_combos_list.extend(combos)
-
-    total = len(all_combos_list)
-    all_results = []
-    combo_idx = 0
-
-    for sname, sl, tp, dirn in all_combos_list:
-        if cancel():
-            return
 
         try:
-            result = run_backtest_api(
-                strategy_name=sname, symbol=symbol, days=days,
-                lot=config["lot"], balance=config["balance"],
-                mt5_api_url=mt5_api_url, cancel_flag=cancel,
-                direction=dirn,
-                pre_fetched_dfs=[dfs for sn, dfs in viable if sn == sname][0],
-                skip_indicators=True, sl_pts=sl, tp_pts=tp, verbose=False,
+            trades, final_bal = _run_generic_backtest(
+                df, ef, es, 14, ro, rb, sl, tp, dirn,
+                config["lot"], config["balance"], pip, contract,
             )
-            summary = result.get("summary", {})
-            trades = result.get("trades", [])
-            net_pnl = summary.get("net_pnl", 0)
-            return_pct = (net_pnl / config["balance"] * 100) if config["balance"] else 0
+            initial = config["balance"]
+            net_pnl = final_bal - initial
+            return_pct = (net_pnl / initial * 100) if initial else 0
 
-            peak = config["balance"]
+            wins = [t for t in trades if t[3] > 0]
+            losses = [t for t in trades if t[3] < 0]
+            win_rate = len(wins) / len(trades) * 100 if trades else 0
+            avg_win = sum(t[3] for t in wins) / len(wins) if wins else 0
+            avg_loss = abs(sum(t[3] for t in losses) / len(losses)) if losses else 0
+            reward_risk = avg_win / avg_loss if avg_loss > 0 else 1
+            sharpe = (win_rate / 100 * reward_risk - (1 - win_rate / 100)) if win_rate else 0
+
+            peak = initial
             max_dd_abs = 0
             for t in trades:
-                bal = t.get("balance", config["balance"])
+                bal = t[4]
                 peak = max(peak, bal)
                 dd = bal - peak
                 if dd < max_dd_abs:
                     max_dd_abs = dd
-            max_dd_pct = (max_dd_abs / config["balance"] * 100) if config["balance"] else 0
+            max_dd_pct = (max_dd_abs / initial * 100) if initial else 0
 
-            win_rate = summary.get("win_rate", 0)
-            avg_win = summary.get("avg_win", 0)
-            avg_loss = abs(summary.get("avg_loss", 1))
-            reward_risk = avg_win / avg_loss if avg_loss > 0 else 1
-            sharpe = (win_rate / 100 * reward_risk - (1 - win_rate / 100)) if win_rate else 0
-            total_trades = summary.get("total_trades", 0)
-
+            label = f"EMA{ef}/{es} RSI<{ro} RSI>{rb}"
             all_results.append({
-                "strategy": sname, "sl": sl, "tp": tp,
-                "direction": dirn, "trades": total_trades,
+                "label": label,
+                "ema_fast": ef, "ema_slow": es,
+                "rsi_oversold": ro, "rsi_overbought": rb,
+                "sl": sl, "tp": tp, "direction": dirn,
+                "trades": len(trades),
                 "win_rate": round(win_rate, 1),
                 "return_pct": round(return_pct, 1),
                 "max_dd": round(max_dd_pct, 1),
@@ -407,11 +493,10 @@ def _run_auto_discover(session_id: str, config: dict):
                 "target_hit": return_pct >= target,
             })
         except Exception as e:
-            logging.error(f"[AutoDiscover] {sname} SL={sl} TP={tp}: {e}")
+            logging.error(f"[AutoDiscover] EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}")
             continue
 
-        combo_idx += 1
-        pct = int(combo_idx / total * 100) if total else 0
+        pct = int((i + 1) / total * 100)
         with research_lock:
             if session_id in research_sessions:
                 research_sessions[session_id]["progress"] = pct
@@ -426,13 +511,13 @@ def _run_auto_discover(session_id: str, config: dict):
             elif not all_results:
                 research_sessions[session_id]["status"] = "error"
                 research_sessions[session_id]["result"] = {
-                    "error": f"Nessuna strategia ha funzionato per {symbol}. Verifica che il simbolo sia supportato."
+                    "error": f"Nessuna combinazione di parametri ha prodotto risultati per {symbol}."
                 }
             else:
                 research_sessions[session_id]["status"] = "done"
                 research_sessions[session_id]["result"] = {
                     "results": all_results,
-                    "target_hits": [r["strategy"] for r in target_hits],
+                    "target_hits": [r["label"] for r in target_hits],
                     "target_return": target,
                 }
 
