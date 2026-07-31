@@ -157,4 +157,7 @@ class TraderServersUpdate(BaseModel):
     # 🆕 session filter
     sessions_filter: str | None = None
 
+    # 🆕 direction filter
+    direction_filter: str | None = None
+
 

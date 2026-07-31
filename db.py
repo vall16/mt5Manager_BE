@@ -537,6 +537,7 @@ def get_traders():
             "selected_signal": row.get("selected_signal"),
             "custom_signal_interval": row.get("custom_signal_interval"),
             "selected_symbol": row.get("selected_symbol"),
+            "direction_filter": row.get("direction_filter") or "both",
             "sessions_filter": row.get("sessions_filter", "ASIA,LONDON,NY-LON,NY,OFF"),
             "created_at": row.get("created_at").isoformat() if row.get("created_at") else None,
             "updated_at": row.get("updated_at").isoformat() if row.get("updated_at") else None,
@@ -681,6 +682,15 @@ def update_trader_servers(trader_id: int, update: TraderServersUpdate):
             if cursor.fetchone():
                 fields.append("sessions_filter = %s")
                 values.append(update.sessions_filter)
+        except Exception:
+            pass
+
+    if update.direction_filter is not None:
+        try:
+            cursor.execute("SHOW COLUMNS FROM traders WHERE Field='direction_filter'")
+            if cursor.fetchone():
+                fields.append("direction_filter = %s")
+                values.append(update.direction_filter)
         except Exception:
             pass
 
