@@ -690,3 +690,110 @@ def export_pdf(req: PdfExportRequest):
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=signal_research_{req.symbol}_{req.days}d.pdf"},
     )
+
+
+# ── Auto Discover PDF Export ──────────────────────────────────
+
+class AutoDiscoverPdfRequest(BaseModel):
+    symbol: str
+    days: int
+    lot: float
+    balance: float
+    target_return: float
+    direction: str
+    results: List[dict]
+
+
+@router.post("/signal-research/auto-discover/export-pdf")
+def export_auto_discover_pdf(req: AutoDiscoverPdfRequest):
+    from fpdf import FPDF
+
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.cell(0, 12, "Auto Strategy Discovery Report", new_x="LMARGIN", new_y="NEXT")
+
+    pdf.set_font("Helvetica", "", 9)
+    pdf.set_text_color(120)
+    from datetime import datetime
+    pdf.cell(0, 6, f"Generato: {datetime.now().strftime('%d/%m/%Y %H:%M')}", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(0)
+
+    # Parameters
+    pdf.ln(4)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Parametri di Ricerca", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    params = [
+        ("Symbol", req.symbol),
+        ("Days", str(req.days)),
+        ("Lot", str(req.lot)),
+        ("Balance", f"${req.balance}"),
+        ("Direction", req.direction),
+        ("Target Return", f"{req.target_return}%"),
+        ("Combinazioni mostrate", str(len(req.results))),
+    ]
+    for label, value in params:
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.cell(45, 6, f"{label}:")
+        pdf.set_font("Helvetica", "", 10)
+        pdf.cell(0, 6, value, new_x="LMARGIN", new_y="NEXT")
+
+    # Top 10 table
+    pdf.ln(6)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Top 10 Risultati Migliori", new_x="LMARGIN", new_y="NEXT")
+
+    headers = ["#", "Label", "SL", "TP", "Dir", "Trades", "Win%", "Return%", "MaxDD%", "Sharpe"]
+    col_w = [8, 42, 14, 14, 12, 14, 16, 20, 20, 16]
+
+    pdf.set_fill_color(50, 50, 50)
+    pdf.set_text_color(255)
+    pdf.set_font("Helvetica", "B", 8)
+    for i, h in enumerate(headers):
+        pdf.cell(col_w[i], 7, h, border=1, fill=True, align="C")
+    pdf.ln()
+    pdf.set_text_color(0)
+    pdf.set_font("Helvetica", "", 8)
+
+    medal_colors = [(255, 248, 220), (240, 240, 240), (255, 240, 230)]
+
+    for idx, r in enumerate(req.results):
+        bg = medal_colors[idx] if idx < 3 else (255, 255, 255)
+        pdf.set_fill_color(*bg)
+        vals = [
+            str(idx + 1), r.get("label", ""), str(r.get("sl", "")),
+            str(r.get("tp", "")), r.get("direction", "?").upper(), str(r.get("trades", "")),
+            f"{r.get('win_rate', 0):.1f}",
+            f"{r.get('return_pct', 0):+.1f}",
+            f"{r.get('max_dd', 0):.1f}",
+            f"{r.get('sharpe', 0):.2f}",
+        ]
+        for i, v in enumerate(vals):
+            pdf.cell(col_w[i], 7, v, border=1, fill=True, align="C")
+        pdf.ln()
+
+    # Recommendation
+    if req.results:
+        best = req.results[0]
+        pdf.ln(6)
+        pdf.set_font("Helvetica", "B", 10)
+        if best.get("target_hit"):
+            pdf.set_text_color(0, 130, 0)
+            rec = f"Target raggiunto: {best['label']} SL={best['sl']} TP={best['tp']} → {best.get('return_pct', 0):.1f}%"
+        elif best.get("sharpe", 0) >= 1:
+            pdf.set_text_color(0, 100, 200)
+            rec = f"Raccomandata: {best['label']} SL={best['sl']} TP={best['tp']}"
+        else:
+            pdf.set_text_color(200, 0, 0)
+            rec = f"Usa con cautela: {best['label']} SL={best['sl']} TP={best['tp']}"
+        pdf.cell(0, 7, rec, new_x="LMARGIN", new_y="NEXT")
+
+    # Stream PDF back
+    pdf_bytes = pdf.output()
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=auto_discover_{req.symbol}_{req.days}d.pdf"},
+    )
