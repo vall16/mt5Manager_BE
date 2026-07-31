@@ -482,15 +482,15 @@ def _run_auto_discover(session_id: str, config: dict):
             label = f"EMA{ef}/{es} RSI<{ro} RSI>{rb}"
             all_results.append({
                 "label": label,
-                "ema_fast": ef, "ema_slow": es,
-                "rsi_oversold": ro, "rsi_overbought": rb,
-                "sl": sl, "tp": tp, "direction": dirn,
-                "trades": len(trades),
-                "win_rate": round(win_rate, 1),
-                "return_pct": round(return_pct, 1),
-                "max_dd": round(max_dd_pct, 1),
-                "sharpe": round(sharpe, 2),
-                "target_hit": return_pct >= target,
+                "ema_fast": int(ef), "ema_slow": int(es),
+                "rsi_oversold": int(ro), "rsi_overbought": int(rb),
+                "sl": int(sl), "tp": int(tp), "direction": dirn,
+                "trades": int(len(trades)),
+                "win_rate": float(round(win_rate, 1)),
+                "return_pct": float(round(return_pct, 1)),
+                "max_dd": float(round(max_dd_pct, 1)),
+                "sharpe": float(round(sharpe, 2)),
+                "target_hit": bool(return_pct >= target),
             })
         except Exception as e:
             logging.error(f"[AutoDiscover] EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}")
