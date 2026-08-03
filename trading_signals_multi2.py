@@ -96,6 +96,33 @@ def get_current_session() -> str:
         return "OFF"
 
 
+def fetch_closed_deals_profit(slave_url: str, symbol: str, days: int = 30) -> dict:
+    """
+    Recupera dall'history MT5 il profit reale dei trade chiusi.
+    Ritorna {position_id: profit} per i deal di chiusura (entry=1) del simbolo.
+    """
+    try:
+        resp = requests.get(f"{slave_url}/history", params={"days": days}, timeout=15)
+        if resp.status_code != 200:
+            return {}
+        deals = resp.json().get("deals", [])
+    except Exception:
+        return {}
+
+    profit_map = {}
+    for d in deals:
+        if d.get("symbol") != symbol:
+            continue
+        if d.get("entry") != 1:  # 1 = out (chiusura)
+            continue
+        if d.get("type") not in (0, 1):  # solo BUY/SELL
+            continue
+        pos_id = d.get("position_id")
+        if pos_id:
+            profit_map[pos_id] = float(d.get("profit", 0))
+    return profit_map
+
+
 # ─────────────────────── SEND ORDER (unified) ───────────────────────
 
 def send_order(trader_id: int, direction: str):
@@ -347,11 +374,13 @@ class SignalStrategy:
         agent = adaptive_routes.get_agent(trader_id)
         if agent:
             closed = agent.detect_closed_trades(positions)
-            for c in closed:
-                # profit non disponibile qui, usa 0 come placeholder
-                # il profit reale viene registrato quando il trade sparisce
-                agent.on_trade_closed(0, ind.atr_m5_val if hasattr(ind, 'atr_m5_val') else 0, "")
-                log(trader_id, f"🧬 Adaptive: trade chiuso rilevato ticket={c.get('ticket')}")
+            if closed:
+                profit_map = fetch_closed_deals_profit(slave_url, symbol)
+                for c in closed:
+                    # profit reale letto dall'history MT5 (entry=out), 0 se non trovato
+                    real_pnl = profit_map.get(c.get("ticket"), 0.0)
+                    agent.on_trade_closed(real_pnl, ind.atr_m5_val if hasattr(ind, 'atr_m5_val') else 0, "", c.get("ticket"))
+                    log(trader_id, f"🧬 Adaptive: trade chiuso rilevato ticket={c.get('ticket')} pnl={real_pnl:.2f}")
             if agent.should_analyze():
                 new_params = agent.adjust()
                 log(trader_id, f"🧬 Adaptive: params aggiornati → SL={new_params['sl_atr_factor']} TP={new_params['tp_atr_factor']}")

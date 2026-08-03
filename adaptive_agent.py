@@ -76,13 +76,14 @@ class AdaptiveAgent:
     #  REGISTRAZIONE TRADE
     # ------------------------------------------------------------------ #
 
-    def on_trade_closed(self, pnl: float, atr_at_entry: float, session: str = ""):
+    def on_trade_closed(self, pnl: float, atr_at_entry: float, session: str = "", ticket: Optional[int] = None):
         """
         Registra un trade chiuso. Chiamato dal polling loop quando
         un trade sparisce dalle posizioni aperte.
         """
         with self._lock:
             record = {
+                "ticket": ticket,
                 "pnl": round(pnl, 2),
                 "atr_at_entry": round(atr_at_entry, 4),
                 "session": session,

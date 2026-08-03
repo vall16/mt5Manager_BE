@@ -2,3 +2,5 @@
 [31/07/2026 14:08] [AutoDiscover] Avvio ricerca automatica per XAUUSD (365 giorni)
 [31/07/2026 15:35] [AutoDiscover] Avvio ricerca automatica per XAUUSD (10 giorni)
 [31/07/2026 15:47] [AutoDiscover] Fine ricerca per XAUUSD: 20736 combinazioni testate, 0 sopra il target
+[31/07/2026 17:23] [AutoDiscover] Avvio ricerca automatica per NVDA.NAS (360 giorni)
+[31/07/2026 20:55] [AutoDiscover] Fine ricerca per NVDA.NAS: 20016 combinazioni testate, 0 sopra il target
