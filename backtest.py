@@ -6,8 +6,8 @@ import requests
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from trading_signals_multi2 import STRATEGIES, Indicators
-from indicators.ta import compute_ema, compute_rsi, compute_macd, compute_atr, compute_hma, compute_ichimoku
+from trading_signals_multi2 import STRATEGIES, Indicators, compute_regime, REGIME_WINDOW
+from indicators.ta import compute_ema, compute_rsi, compute_macd, compute_atr, compute_hma, compute_ichimoku, compute_rolling_percentile
 
 TIMEFRAME_MAP = {
     "m1": 1,
@@ -226,6 +226,7 @@ def precompute_indicators(dfs):
             (df_m15["low"] - df_m15["prev_close"]).abs()
         ], axis=1).max(axis=1)
         df_m15["atr_m15"] = df_m15["tr_m15"].rolling(14).mean()
+        df_m15["atr_m15_pct"] = compute_rolling_percentile(df_m15["atr_m15"], REGIME_WINDOW)
 
     if df_h1 is not None:
         tenkan, kijun, senkou_a, senkou_b, chikou = compute_ichimoku(df_h1)
@@ -301,7 +302,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
     m15_arr = {}
     if use_m15:
         for col in ["close", "ema50", "ema5", "ema20_m15", "ema200", "hma", "hma_prev",
-                     "atr_m15", "rsi14", "tick_volume", "vol_avg"]:
+                     "atr_m15", "atr_m15_pct", "rsi14", "tick_volume", "vol_avg"]:
             m15_arr[col] = df_m15[col].values
 
     h1_arr = {}
@@ -466,6 +467,8 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         ind.hma = m15_arr["hma"][idx_m15]
                         ind.hma_prev = m15_arr["hma_prev"][idx_m15]
                         ind.atr_m15 = m15_arr["atr_m15"][idx_m15]
+                        ind.atr_m15_pct = m15_arr["atr_m15_pct"][idx_m15]
+                        ind.regime = compute_regime(ind.atr_m15_pct, getattr(ind, "is_spike", False))
                         ind.ema_short_prev = m15_arr["ema5"][idx_m15 - 1] if idx_m15 >= 1 else None
                         ind.ema_long_prev = m15_arr["ema20_m15"][idx_m15 - 1] if idx_m15 >= 1 else None
                         ind.price_prev = m15_arr["close"][idx_m15 - 1] if idx_m15 >= 1 else None
@@ -476,6 +479,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                     else:
                         ind.trend_macro_up = False
                         ind.trend_macro_50_up = False
+                        ind.regime = "NORMAL"
 
                 if use_h1:
                     idx_h1 = int(h1_end.searchsorted(ts, side="right")) - 1

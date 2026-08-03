@@ -14,7 +14,7 @@ from models import Trader
 from indicators.ta import (
     compute_ema, compute_rsi, compute_macd, compute_atr,
     compute_bollinger, compute_hma, compute_adx,
-    compute_ichimoku
+    compute_ichimoku, compute_rolling_percentile
 )
 import pandas as pd
 import requests
@@ -225,6 +225,30 @@ def log(trader_id: int, msg: str):
             sessions[trader_id].setdefault("logs", []).append(f"[{ts}] {msg}")
 
 
+# ─────────────────────── REGIME DI VOLATILITÀ ───────────────────────
+
+REGIME_WINDOW = 192  # finestra percentile ATR M15 (~2 giorni)
+
+
+def compute_regime(atr_m15_pct, is_spike=False):
+    """Classifica lo stato di volatilità: RANGE | NORMAL | TREND | NEWS."""
+    if is_spike:
+        return "NEWS"
+    if atr_m15_pct is None or pd.isna(atr_m15_pct):
+        return "NORMAL"
+    if atr_m15_pct > 0.90:
+        return "NEWS"
+    if atr_m15_pct > 0.75:
+        return "TREND"
+    if atr_m15_pct > 0.25:
+        return "NORMAL"
+    return "RANGE"
+
+
+def regime_ok(regime: str) -> bool:
+    return regime in ("TREND", "NORMAL")
+
+
 # ─────────────────────── STRATEGY BASE CLASS ───────────────────────
 
 class Indicators:
@@ -284,7 +308,7 @@ class SignalStrategy:
         now = now_str()
 
         # ── skip duplicato M1 ──
-        if self.requires_m1:
+        if self.requires_m1 and not getattr(self, "live_candle", False):
             current_ts = datetime.now().replace(second=0, microsecond=0)
             if session.get("last_processed_m1") == current_ts:
                 return
@@ -313,7 +337,7 @@ class SignalStrategy:
         # ── fetch dati ──
         df_m1 = get_data(symbol, 1, 100, slave_url) if self.requires_m1 else None
         df_m5 = get_data(symbol, 5, 100, slave_url) if self.requires_m5 else None
-        df_m15 = get_data(symbol, 15, 50, slave_url) if self.requires_m15 else None
+        df_m15 = get_data(symbol, 15, 300, slave_url) if self.requires_m15 else None
         df_h1 = get_data(symbol, 16385, 120, slave_url) if self.requires_h1 else None
 
         if self.requires_m1 and (df_m1 is None or df_m1.empty):
@@ -428,12 +452,13 @@ class SignalStrategy:
                 send_order(trader_id, "sell")
 
         else:
-            log(trader_id, f"🔥 HOLD signal per {symbol} {log_details}")
             action = self.on_hold_action(ind, has_buy, has_sell, prev_signal)
             if action == "close_buy":
                 close_slave_position(trader_id)
             elif action == "close_sell":
                 close_slave_position(trader_id)
+            if not getattr(self, "quiet_holds", False):
+                log(trader_id, f"🔥 HOLD signal per {symbol} {log_details}")
 
         with sessions_lock:
             if trader_id in sessions:
@@ -500,6 +525,9 @@ class SuperXauNoCloseStrategy(SignalStrategy):
     requires_m5 = True
     requires_m15 = True
 
+    def __init__(self, regime_filter=True):
+        self.regime_filter = regime_filter
+
     def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
         ema_fast = compute_ema(df_m1, 9).iloc[-2]
         ema_slow = compute_ema(df_m1, 21).iloc[-2]
@@ -529,6 +557,11 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         ), axis=1)
         atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
 
+        # ── Regime di volatilità (percentile ATR M15) ──
+        atr_m15_series = compute_atr(df_m15)
+        atr_m15_pct = compute_rolling_percentile(atr_m15_series, REGIME_WINDOW).iloc[-2]
+        regime = compute_regime(atr_m15_pct, is_spike)
+
         return Indicators(
             ema_fast=ema_fast,
             ema_slow=ema_slow,
@@ -541,6 +574,8 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             volatilty_expansion=volatilty_expansion,
             is_spike=is_spike,
             atr_m5_val=atr_m5_val,
+            atr_m15_pct=atr_m15_pct,
+            regime=regime,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
@@ -552,11 +587,142 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             and 45 < ind.rsi_m1 < 70
             and ind.volatilty_expansion
             and not ind.is_spike
+            and (not self.regime_filter or regime_ok(ind.regime))
         )
 
     def sell_condition(self, ind: Indicators) -> bool:
         return (
             ind.ema_fast < ind.ema_slow
+            and ind.macd < ind.macd_sig
+            and ind.hma_m5 < ind.hma_m5_prev
+            and not ind.trend_macro_up
+            and 30 < ind.rsi_m1 < 55
+            and ind.volatilty_expansion
+            and not ind.is_spike
+            and (not self.regime_filter or regime_ok(ind.regime))
+        )
+
+    def reverse_on_buy(self, has_sell: bool) -> bool:
+        return False
+
+    def reverse_on_sell(self, has_buy: bool) -> bool:
+        return False
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        # ── SL/TP proporzionali al regime (2× SL, 3× TP in TREND) ──
+        regime = getattr(ind, "regime", "NORMAL")
+        if not regime_ok(regime):
+            return None, None
+        atr = ind.atr_m5_val
+        if atr <= 0:
+            return None, None
+        if regime == "TREND":
+            sl_f, tp_f = 2.0, 3.0
+        else:
+            sl_f, tp_f = 1.5, 2.2
+        sl = int(atr * sl_f * 100)
+        tp = int(atr * tp_f * 100)
+        sl = max(500, min(sl, 2000))
+        tp = max(sl + 100, min(tp, 3000))
+        return sl, tp
+
+    def get_log_details(self, ind: Indicators) -> str:
+        atr = ind.atr_m5_val
+        sl_dyn = int(atr * 2.0 * 100) if atr > 0 else 0
+        tp_dyn = int(atr * 3.0 * 100) if atr > 0 else 0
+        return f"(ATR M5: {atr:.1f} SL:{sl_dyn} TP:{tp_dyn} REG:{getattr(ind, 'regime', 'NORMAL')})"
+
+    def get_log_header(self, ind: Indicators) -> str:
+        details = self.get_log_details(ind)
+        return f"S-I-G-N-A-L [{self.name}] | {details}"
+
+
+class SuperXauLiveStrategy(SignalStrategy):
+    """
+    SUPER LIVE: stessa logica di SUPER ma scatta sulla candela M1 IN
+    FORMAZIONE (crossover EMA9 live) invece che su candela chiusa.
+    Pensata per polling ad alta frequenza (es. 5-15s): la candela live
+    viene rivalutata a ogni poll, quindi il segnale può scattare in tempo reale.
+    """
+    name = "SUPER_LIVE"
+    requires_m1 = True
+    requires_m5 = True
+    requires_m15 = True
+    live_candle = True
+    quiet_holds = True
+
+    def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
+        ema9 = compute_ema(df_m1, 9)
+        ema21 = compute_ema(df_m1, 21)
+
+        price_live = df_m1["close"].iloc[-1]
+        price_prev = df_m1["close"].iloc[-2]
+        ema_fast = ema9.iloc[-1]
+        ema_fast_prev = ema9.iloc[-2]
+        ema_slow = ema21.iloc[-1]
+
+        rsi_m1 = compute_rsi(df_m1, 14).iloc[-1]
+        macd, macd_sig = compute_macd(df_m1)
+
+        hma_m5 = compute_hma(df_m5).iloc[-1]
+        hma_m5_prev = compute_hma(df_m5).iloc[-2]
+
+        ema_m15 = compute_ema(df_m15, 50).iloc[-1]
+        price_m15 = df_m15["close"].iloc[-1]
+
+        atr_series = compute_atr(df_m1)
+        atr = atr_series.iloc[-1]
+        volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-1]
+
+        candle_body = abs(df_m1["close"].iloc[-1] - df_m1["open"].iloc[-1])
+        is_spike = candle_body > (atr * 3)
+
+        # ATR M5 (per SL/TP) — usa l'ultima candela M5 chiusa
+        df_m5_tmp = df_m5.copy()
+        df_m5_tmp["prev_close"] = df_m5_tmp["close"].shift(1)
+        df_m5_tmp["tr"] = df_m5_tmp.apply(lambda r: max(
+            r["high"] - r["low"],
+            abs(r["high"] - r["prev_close"]),
+            abs(r["low"] - r["prev_close"])
+        ), axis=1)
+        atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
+
+        return Indicators(
+            ema_fast=ema_fast,
+            ema_fast_prev=ema_fast_prev,
+            ema_slow=ema_slow,
+            price_live=price_live,
+            price_prev=price_prev,
+            rsi_m1=rsi_m1,
+            macd=macd.iloc[-1],
+            macd_sig=macd_sig.iloc[-1],
+            hma_m5=hma_m5,
+            hma_m5_prev=hma_m5_prev,
+            trend_macro_up=price_m15 > ema_m15,
+            volatilty_expansion=volatilty_expansion,
+            is_spike=is_spike,
+            atr_m5_val=atr_m5_val,
+        )
+
+    def buy_condition(self, ind: Indicators) -> bool:
+        # cross fresco: prezzo sopra EMA9 sulla candela live, sotto alla chiusa
+        return (
+            ind.price_live > ind.ema_fast
+            and ind.price_prev <= ind.ema_fast_prev
+            and ind.ema_fast > ind.ema_slow
+            and ind.macd > ind.macd_sig
+            and ind.hma_m5 > ind.hma_m5_prev
+            and ind.trend_macro_up
+            and 45 < ind.rsi_m1 < 70
+            and ind.volatilty_expansion
+            and not ind.is_spike
+        )
+
+    def sell_condition(self, ind: Indicators) -> bool:
+        return (
+            ind.price_live < ind.ema_fast
+            and ind.price_prev >= ind.ema_fast_prev
+            and ind.ema_fast < ind.ema_slow
             and ind.macd < ind.macd_sig
             and ind.hma_m5 < ind.hma_m5_prev
             and not ind.trend_macro_up
@@ -572,24 +738,20 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         return False
 
     def get_dynamic_sl_tp(self, ind: Indicators):
-        # ── PRECEDENTE: SL/TP fissi solo sotto soglia ATR ──
-        # if ind.atr_m5_val <= 12:
-        #     return 1000, 1500
-        # return None, None
-        # ── NUOVO: SL/TP dinamici basati su ATR (2× SL, 3× TP) ──
+        # entri prima (candela live) → SL/TP più stretti: 1.5× / 2.5× ATR M5
         atr = ind.atr_m5_val
         if atr <= 0:
             return None, None
-        sl = int(atr * 2.0 * 100)
-        tp = int(atr * 3.0 * 100)
-        sl = max(500, min(sl, 2000))
-        tp = max(sl + 100, min(tp, 3000))
+        sl = int(atr * 1.5 * 100)
+        tp = int(atr * 2.5 * 100)
+        sl = max(400, min(sl, 1500))
+        tp = max(sl + 100, min(tp, 2500))
         return sl, tp
 
     def get_log_details(self, ind: Indicators) -> str:
         atr = ind.atr_m5_val
-        sl_dyn = int(atr * 2.0 * 100) if atr > 0 else 0
-        tp_dyn = int(atr * 3.0 * 100) if atr > 0 else 0
+        sl_dyn = int(atr * 1.5 * 100) if atr > 0 else 0
+        tp_dyn = int(atr * 2.5 * 100) if atr > 0 else 0
         return f"(ATR M5: {atr:.1f} SL:{sl_dyn} TP:{tp_dyn})"
 
     def get_log_header(self, ind: Indicators) -> str:
@@ -602,6 +764,9 @@ class SuperXauProStrategy(SignalStrategy):
     requires_m1 = True
     requires_m5 = True
     requires_m15 = True
+
+    def __init__(self, regime_filter=True):
+        self.regime_filter = regime_filter
 
     def _get_session_params(self):
         now = datetime.now(ZoneInfo("Europe/Rome"))
@@ -705,6 +870,11 @@ class SuperXauProStrategy(SignalStrategy):
         ), axis=1)
         atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
 
+        # ── Regime di volatilità (percentile ATR M15) ──
+        atr_m15_series = compute_atr(df_m15)
+        atr_m15_pct = compute_rolling_percentile(atr_m15_series, REGIME_WINDOW).iloc[-2]
+        regime = compute_regime(atr_m15_pct, is_spike)
+
         return Indicators(
             ema_fast=ema_fast,
             ema_slow=ema_slow,
@@ -719,6 +889,8 @@ class SuperXauProStrategy(SignalStrategy):
             is_spike=is_spike,
             atr_m5_val=atr_m5_val,
             atr_m1=atr,
+            atr_m15_pct=atr_m15_pct,
+            regime=regime,
             session_label=params["label"],
         )
 
@@ -729,6 +901,8 @@ class SuperXauProStrategy(SignalStrategy):
             return False
         # 2) Multi-timeframe: EMA50 M15 deve confermare
         if not ind.trend_macro_50_up:
+            return False
+        if self.regime_filter and not regime_ok(ind.regime):
             return False
         return (
             ind.ema_fast > ind.ema_slow
@@ -747,6 +921,8 @@ class SuperXauProStrategy(SignalStrategy):
         # 2) Multi-timeframe: EMA50 M15 deve confermare
         if ind.trend_macro_50_up:
             return False
+        if self.regime_filter and not regime_ok(ind.regime):
+            return False
         return (
             ind.ema_fast < ind.ema_slow
             and ind.macd < ind.macd_sig
@@ -764,11 +940,15 @@ class SuperXauProStrategy(SignalStrategy):
 
     def get_dynamic_sl_tp(self, ind: Indicators):
         params = self._get_session_params()
+        regime = getattr(ind, "regime", "NORMAL")
+        if not regime_ok(regime):
+            return None, None
         atr = ind.atr_m5_val
         if atr <= 0:
             return None, None
-        sl = int(atr * params["sl_atr_factor"] * 10)
-        tp = int(atr * params["tp_atr_factor"] * 10)
+        scale = 1.0 if regime == "TREND" else 0.8
+        sl = int(atr * params["sl_atr_factor"] * 10 * scale)
+        tp = int(atr * params["tp_atr_factor"] * 10 * scale)
         sl = max(300, min(sl, 2000))
         tp = max(sl + 100, min(tp, 3000))
         return sl, tp
@@ -782,7 +962,7 @@ class SuperXauProStrategy(SignalStrategy):
         return None
 
     def get_log_details(self, ind: Indicators) -> str:
-        return f"(ATR:{ind.atr_m5_val:.1f} S:{ind.session_label} RSI:{ind.rsi_m1:.0f} Trend:{'UP' if ind.trend_macro_up else 'DOWN'})"
+        return f"(ATR:{ind.atr_m5_val:.1f} S:{ind.session_label} RSI:{ind.rsi_m1:.0f} Trend:{'UP' if ind.trend_macro_up else 'DOWN'} REG:{getattr(ind, 'regime', 'NORMAL')})"
 
     def get_log_header(self, ind: Indicators) -> str:
         details = self.get_log_details(ind)
@@ -1374,6 +1554,7 @@ STRATEGIES = {
     "EURUSD_NOHOLD": EurUsdStrategy(),
     "SUPER": SuperXauNoCloseStrategy(),
     "SUPER_PRO": SuperXauProStrategy(),
+    "SUPER_LIVE": SuperXauLiveStrategy(),
     "ICHIMOKU": IchimokuXauStrategy(),
     "MSFT": MsftStrategy(),
     "NVDA": NvdaStrategy(),

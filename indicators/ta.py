@@ -25,6 +25,16 @@ def compute_atr(df, period=14):
     tr = df['high'] - df['low']
     atr = tr.rolling(period).mean()
     return atr
+
+def compute_rolling_percentile(series, window):
+    """
+    Percentile mobile del valore corrente rispetto agli ultimi `window` valori.
+    Usa solo dati passati/attuali (nessun lookahead).
+    Ritorna NaN finché la finestra non è piena.
+    """
+    def _pct(x):
+        return float(np.mean(x <= x[-1]))
+    return series.rolling(window).apply(_pct, raw=True)
 def compute_bollinger(df, period=20, num_std=2):
     """
     Calcola le Bollinger Bands.
