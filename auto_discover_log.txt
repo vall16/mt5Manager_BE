@@ -4,3 +4,15 @@
 [31/07/2026 15:47] [AutoDiscover] Fine ricerca per XAUUSD: 20736 combinazioni testate, 0 sopra il target
 [31/07/2026 17:23] [AutoDiscover] Avvio ricerca automatica per NVDA.NAS (360 giorni)
 [31/07/2026 20:55] [AutoDiscover] Fine ricerca per NVDA.NAS: 20016 combinazioni testate, 0 sopra il target
+[04/08/2026 11:32] [AutoDiscover] Avvio ricerca automatica per GBPUSD (365 giorni)
+[04/08/2026 11:50] [AutoDiscover] Avvio ricerca automatica per MSFT.NAS (180 giorni), walk-forward 70/30, min_trade=20
+[04/08/2026 11:50] [AutoDiscover] Split walk-forward: 6484 bar in-sample, 2779 bar out-of-sample, spread=3.0 pips
+[04/08/2026 12:06] [AutoDiscover] Avvio ricerca automatica per MSFT.NAS (180 giorni), walk-forward 70/30, min_trade=20
+[04/08/2026 12:06] [AutoDiscover] Split walk-forward: 6484 bar in-sample, 2779 bar out-of-sample, spread=3.0 pips
+[04/08/2026 12:19] [AutoDiscover] Fine ricerca per MSFT.NAS: 12885 combinazioni sopra min_trade, 15 validate OOS, 0 sopra il target
+[04/08/2026 12:22] [AutoDiscover] Avvio ricerca automatica per MSFT.NAS (365 giorni), walk-forward 70/30, min_trade=20
+[04/08/2026 12:22] [AutoDiscover] Split walk-forward: 13295 bar in-sample, 5699 bar out-of-sample, spread=3.0 pips
+[04/08/2026 12:23] [AutoDiscover] Avvio ricerca automatica per XAUUSD (365 giorni), walk-forward 70/30, min_trade=20
+[04/08/2026 12:23] [AutoDiscover] Split walk-forward: 49608 bar in-sample, 21261 bar out-of-sample, spread=25.0 pips
+[04/08/2026 12:23] [AutoDiscover] Avvio ricerca automatica per XAUUSD (365 giorni), walk-forward 70/30, min_trade=20
+[04/08/2026 12:23] [AutoDiscover] Split walk-forward: 49608 bar in-sample, 21261 bar out-of-sample, spread=25.0 pips

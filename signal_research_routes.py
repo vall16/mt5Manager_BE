@@ -304,6 +304,57 @@ class AutoDiscoverRequest(BaseModel):
     balance: float = 1000
     direction: str = "both"
     target_return: float = 30.0
+    min_trades: int = 20
+    volume_filter: bool = False
+    sessions_filter: str = ""
+    use_spread: bool = True
+
+
+# Spread stimato in pips (usato solo nel backtest auto, per non sovrastimare i rendimenti)
+SPREAD_PIPS = {
+    "XAUUSD": 25.0,
+    "EURUSD": 1.0,
+    "GBPUSD": 1.2,
+    "USDJPY": 0.5,
+    "GBPJPY": 1.2,
+    "AUDJPY": 0.8,
+    "MSFT": 3.0,
+    "MSFT.NAS": 3.0,
+    "NVDA": 3.0,
+    "NVDA.NAS": 3.0,
+}
+
+
+def _summarize_trades(trades, initial):
+    net_pnl = sum(t[3] for t in trades)
+    return_pct = net_pnl / initial * 100 if initial else 0
+    wins = [t for t in trades if t[3] > 0]
+    losses = [t for t in trades if t[3] < 0]
+    win_rate = len(wins) / len(trades) * 100 if trades else 0
+    avg_win = sum(t[3] for t in wins) / len(wins) if wins else 0
+    avg_loss = abs(sum(t[3] for t in losses) / len(losses)) if losses else 0
+    reward_risk = avg_win / avg_loss if avg_loss > 0 else 1
+    sharpe = (win_rate / 100 * reward_risk - (1 - win_rate / 100)) if win_rate else 0
+
+    peak = initial
+    max_dd_abs = 0
+    for t in trades:
+        bal = t[4]
+        peak = max(peak, bal)
+        dd = bal - peak
+        if dd < max_dd_abs:
+            max_dd_abs = dd
+    max_dd_pct = max_dd_abs / initial * 100 if initial else 0
+
+    return {
+        "trades": len(trades),
+        "win_rate": win_rate,
+        "return_pct": return_pct,
+        "max_dd": max_dd_pct,
+        "sharpe": sharpe,
+        "avg_win": avg_win,
+        "avg_loss": avg_loss,
+    }
 
 
 def _get_sl_tp_ranges(symbol: str):
@@ -319,18 +370,39 @@ def _get_sl_tp_ranges(symbol: str):
     return 100, 600, 50, 200, 1200, 100
 
 
-def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_overbought, sl_pts, tp_pts, direction, lot, balance, pip, contract):
+def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_overbought, sl_pts, tp_pts, direction, lot, balance, pip, contract, spread_pips=0.0, volume_filter=False, sessions=None, ema_cache=None, rsi_arr=None, sess_arr=None, vol_ok_arr=None):
     import numpy as np
+    import pandas as pd
     from indicators.ta import compute_ema, compute_rsi
+    from backtest import _get_session_label
 
     close = df["close"].to_numpy(dtype=float)
     low = df["low"].to_numpy(dtype=float)
     high = df["high"].to_numpy(dtype=float)
     times = df["time"].to_numpy()
-    ema_f = compute_ema(df, ema_fast).to_numpy(dtype=float)
-    ema_s = compute_ema(df, ema_slow).to_numpy(dtype=float)
-    rsi = compute_rsi(df, rsi_period).to_numpy(dtype=float)
 
+    if ema_cache is None:
+        ema_cache = {}
+    if ema_fast not in ema_cache:
+        ema_cache[ema_fast] = compute_ema(df, ema_fast).to_numpy(dtype=float)
+    if ema_slow not in ema_cache:
+        ema_cache[ema_slow] = compute_ema(df, ema_slow).to_numpy(dtype=float)
+    ema_f = ema_cache[ema_fast]
+    ema_s = ema_cache[ema_slow]
+
+    if rsi_arr is None:
+        rsi_arr = compute_rsi(df, rsi_period).to_numpy(dtype=float)
+    rsi = rsi_arr
+
+    if vol_ok_arr is None and volume_filter:
+        vol = df["tick_volume"].to_numpy(dtype=float)
+        vol_avg = pd.Series(vol).rolling(20).mean().to_numpy()
+        vol_ok_arr = np.nan_to_num(vol > vol_avg)
+
+    if sess_arr is None and sessions:
+        sess_arr = [_get_session_label(t) for t in times]
+
+    cost = spread_pips * pip * contract * lot
     trades = []
     position = None
     entry = dirn = sl_price = tp_price = 0.0
@@ -373,6 +445,10 @@ def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_
             rv = rsi[i]
             if np.isnan(ef) or np.isnan(es) or np.isnan(rv):
                 continue
+            if sess_arr is not None and sess_arr[i] not in sessions:
+                continue
+            if vol_ok_arr is not None and not vol_ok_arr[i]:
+                continue
 
             if (direction in ("buy", "both")) and ef > es and rv < rsi_oversold:
                 entry = price
@@ -380,33 +456,36 @@ def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_
                 sl_price = price - sl_pts * pip
                 tp_price = price + tp_pts * pip
                 position = True
+                balance -= cost
             elif (direction in ("sell", "both")) and ef < es and rv > rsi_overbought:
                 entry = price
                 dirn = 1
                 sl_price = price + sl_pts * pip
                 tp_price = price - tp_pts * pip
                 position = True
+                balance -= cost
 
     return trades, balance
 
 
 def _run_auto_discover(session_id: str, config: dict):
-    from backtest import fetch_data
-    from indicators.ta import compute_ema, compute_rsi
-    from backtest import INSTRUMENT
+    from backtest import fetch_data, INSTRUMENT, STRATEGIES
 
     mt5_api_url = config["mt5_api_url"]
     symbol = config["symbol"]
     days = config["days"]
     direction = config.get("direction", "both")
+    min_trades = config.get("min_trades", 20)
+    volume_filter = config.get("volume_filter", False)
+    use_spread = config.get("use_spread", True)
+    sessions = [s.strip() for s in config.get("sessions_filter", "").split(",") if s.strip()] or None
     sl_min, sl_max, sl_step, tp_min, tp_max, tp_step = _get_sl_tp_ranges(symbol)
     cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
 
     # Fetch data using first strategy that works
-    from backtest import STRATEGIES
     strat = next(iter(STRATEGIES.values()))
     print(f"[AutoDiscover] Fetching {days} days of {symbol}...")
-    global_log(f"[AutoDiscover] Avvio ricerca automatica per {symbol} ({days} giorni)", file=AUTO_LOG_FILE)
+    global_log(f"[AutoDiscover] Avvio ricerca automatica per {symbol} ({days} giorni), walk-forward 70/30, min_trade={min_trades}", file=AUTO_LOG_FILE)
     try:
         dfs = fetch_data(symbol, strat, days, mt5_api_url)
     except Exception as e:
@@ -427,6 +506,18 @@ def _run_auto_discover(session_id: str, config: dict):
     instr = INSTRUMENT.get(symbol, {"pip": 0.01, "contract": 100})
     pip = instr["pip"]
     contract = instr["contract"]
+    spread_pips = SPREAD_PIPS.get(symbol.upper(), 0.0) if use_spread else 0.0
+    target = config.get("target_return", 30.0)
+    initial = config["balance"]
+
+    # Walk-forward split 70/30 (in-sample per ottimizzare, out-of-sample per validare)
+    split = max(1, int(len(df) * 0.70))
+    df_is = df.iloc[:split].reset_index(drop=True)
+    df_oos = df.iloc[split:].reset_index(drop=True)
+    global_log(
+        f"[AutoDiscover] Split walk-forward: {len(df_is)} bar in-sample, {len(df_oos)} bar out-of-sample, spread={spread_pips} pips",
+        file=AUTO_LOG_FILE,
+    )
 
     # Parameter grid
     ema_fast_vals = [5, 9, 15]
@@ -436,7 +527,6 @@ def _run_auto_discover(session_id: str, config: dict):
     sl_range = list(range(sl_min, sl_max + 1, sl_step))
     tp_range = list(range(tp_min, tp_max + 1, tp_step))
     directions = ["buy", "sell"] if direction == "both" else [direction]
-    target = config.get("target_return", 30.0)
 
     all_combos = [(ef, es, ro, rb, sl, tp, d)
                   for ef in ema_fast_vals
@@ -447,9 +537,33 @@ def _run_auto_discover(session_id: str, config: dict):
                   for tp in tp_range if tp > sl
                   for d in directions]
 
-    total = len(all_combos)
-    all_results = []
+    # Precalcola indicatori e filtri una sola volta per split (grande speedup)
+    from indicators.ta import compute_ema, compute_rsi
+    from backtest import _get_session_label
+    import numpy as np
+    import pandas as pd
 
+    def _prepare_cache(dfx):
+        periods = set(ema_fast_vals) | set(ema_slow_vals)
+        ema_cache = {p: compute_ema(dfx, p).to_numpy(dtype=float) for p in periods}
+        rsi_arr = compute_rsi(dfx, 14).to_numpy(dtype=float)
+        vol_arr = None
+        if volume_filter:
+            vol = dfx["tick_volume"].to_numpy(dtype=float)
+            vol_avg = pd.Series(vol).rolling(20).mean().to_numpy()
+            vol_arr = np.nan_to_num(vol > vol_avg)
+        sess_arr = None
+        if sessions:
+            sess_arr = [_get_session_label(t) for t in dfx["time"].to_numpy()]
+        return ema_cache, rsi_arr, vol_arr, sess_arr
+
+    cache_is = _prepare_cache(df_is)
+    cache_oos = _prepare_cache(df_oos)
+
+    total = len(all_combos)
+    is_results = []
+
+    # FASE 1: ottimizzazione sul campione in-sample
     for i, (ef, es, ro, rb, sl, tp, dirn) in enumerate(all_combos):
         if cancel():
             with research_lock:
@@ -459,44 +573,15 @@ def _run_auto_discover(session_id: str, config: dict):
 
         try:
             trades, final_bal = _run_generic_backtest(
-                df, ef, es, 14, ro, rb, sl, tp, dirn,
-                config["lot"], config["balance"], pip, contract,
+                df_is, ef, es, 14, ro, rb, sl, tp, dirn,
+                config["lot"], initial, pip, contract,
+                spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
+                ema_cache=cache_is[0], rsi_arr=cache_is[1], vol_ok_arr=cache_is[2], sess_arr=cache_is[3],
             )
-            initial = config["balance"]
-            net_pnl = final_bal - initial
-            return_pct = (net_pnl / initial * 100) if initial else 0
-
-            wins = [t for t in trades if t[3] > 0]
-            losses = [t for t in trades if t[3] < 0]
-            win_rate = len(wins) / len(trades) * 100 if trades else 0
-            avg_win = sum(t[3] for t in wins) / len(wins) if wins else 0
-            avg_loss = abs(sum(t[3] for t in losses) / len(losses)) if losses else 0
-            reward_risk = avg_win / avg_loss if avg_loss > 0 else 1
-            sharpe = (win_rate / 100 * reward_risk - (1 - win_rate / 100)) if win_rate else 0
-
-            peak = initial
-            max_dd_abs = 0
-            for t in trades:
-                bal = t[4]
-                peak = max(peak, bal)
-                dd = bal - peak
-                if dd < max_dd_abs:
-                    max_dd_abs = dd
-            max_dd_pct = (max_dd_abs / initial * 100) if initial else 0
-
-            label = f"EMA{ef}/{es} RSI<{ro} RSI>{rb}"
-            all_results.append({
-                "label": label,
-                "ema_fast": int(ef), "ema_slow": int(es),
-                "rsi_oversold": int(ro), "rsi_overbought": int(rb),
-                "sl": int(sl), "tp": int(tp), "direction": dirn,
-                "trades": int(len(trades)),
-                "win_rate": float(round(win_rate, 1)),
-                "return_pct": float(round(return_pct, 1)),
-                "max_dd": float(round(max_dd_pct, 1)),
-                "sharpe": float(round(sharpe, 2)),
-                "target_hit": bool(return_pct >= target),
-            })
+            metrics = _summarize_trades(trades, initial)
+            if metrics["trades"] < min_trades:
+                continue
+            is_results.append((metrics, (ef, es, ro, rb, sl, tp, dirn)))
         except Exception as e:
             logging.error(f"[AutoDiscover] EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}")
             global_log(f"[AutoDiscover] Errore EMA{ef}/{es} RSI<{ro} RSI>{rb} SL={sl} TP={tp}: {e}", file=AUTO_LOG_FILE)
@@ -507,27 +592,66 @@ def _run_auto_discover(session_id: str, config: dict):
             if session_id in research_sessions:
                 research_sessions[session_id]["progress"] = pct
 
-    all_results.sort(key=lambda x: x["return_pct"], reverse=True)
-    target_hits = [r for r in all_results if r["target_hit"]]
+    # Prendi i migliori in-sample (per rendimento) e validali out-of-sample
+    is_results.sort(key=lambda x: -x[0]["return_pct"])
+    top = is_results[:15]
+
+    results = []
+    for metrics, (ef, es, ro, rb, sl, tp, dirn) in top:
+        try:
+            trades_oos, final_bal_oos = _run_generic_backtest(
+                df_oos, ef, es, 14, ro, rb, sl, tp, dirn,
+                config["lot"], initial, pip, contract,
+                spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
+                ema_cache=cache_oos[0], rsi_arr=cache_oos[1], vol_ok_arr=cache_oos[2], sess_arr=cache_oos[3],
+            )
+            oos = _summarize_trades(trades_oos, initial)
+        except Exception as e:
+            logging.error(f"[AutoDiscover] OOS EMA{ef}/{es} SL={sl} TP={tp}: {e}")
+            continue
+
+        label = f"EMA{ef}/{es} RSI<{ro} RSI>{rb}"
+        results.append({
+            "label": label,
+            "ema_fast": int(ef), "ema_slow": int(es),
+            "rsi_oversold": int(ro), "rsi_overbought": int(rb),
+            "sl": int(sl), "tp": int(tp), "direction": dirn,
+            # in-sample
+            "trades": int(metrics["trades"]),
+            "win_rate": float(round(metrics["win_rate"], 1)),
+            "return_pct": float(round(metrics["return_pct"], 1)),
+            "max_dd": float(round(metrics["max_dd"], 1)),
+            "sharpe": float(round(metrics["sharpe"], 2)),
+            # out-of-sample (validazione)
+            "oos_trades": int(oos["trades"]),
+            "oos_win_rate": float(round(oos["win_rate"], 1)),
+            "oos_return_pct": float(round(oos["return_pct"], 1)),
+            "oos_max_dd": float(round(oos["max_dd"], 1)),
+            "oos_sharpe": float(round(oos["sharpe"], 2)),
+            "target_hit": bool(oos["return_pct"] >= target),
+        })
+
+    results.sort(key=lambda r: -(r["oos_return_pct"] if r["oos_trades"] else -999))
+    target_hits = [r for r in results if r["target_hit"]]
 
     with research_lock:
         if session_id in research_sessions:
             if research_sessions[session_id]["cancelled"]:
                 research_sessions[session_id]["status"] = "cancelled"
-            elif not all_results:
+            elif not results:
                 research_sessions[session_id]["status"] = "error"
                 research_sessions[session_id]["result"] = {
-                    "error": f"Nessuna combinazione di parametri ha prodotto risultati per {symbol}."
+                    "error": f"Nessuna combinazione ha raggiunto il minimo di {min_trades} trade per {symbol}."
                 }
             else:
                 research_sessions[session_id]["status"] = "done"
                 research_sessions[session_id]["result"] = {
-                    "results": all_results,
+                    "results": results,
                     "target_hits": [r["label"] for r in target_hits],
                     "target_return": target,
                 }
 
-    global_log(f"[AutoDiscover] Fine ricerca per {symbol}: {len(all_results)} combinazioni testate, {len(target_hits)} sopra il target", file=AUTO_LOG_FILE)
+    global_log(f"[AutoDiscover] Fine ricerca per {symbol}: {len(is_results)} combinazioni sopra min_trade, {len(results)} validate OOS, {len(target_hits)} sopra il target", file=AUTO_LOG_FILE)
 
 
 @router.post("/signal-research/auto-discover")
@@ -745,8 +869,8 @@ def export_auto_discover_pdf(req: AutoDiscoverPdfRequest):
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 8, "Top 10 Risultati Migliori", new_x="LMARGIN", new_y="NEXT")
 
-    headers = ["#", "Label", "SL", "TP", "Dir", "Trades", "Win%", "Return%", "MaxDD%", "Sharpe"]
-    col_w = [8, 42, 14, 14, 12, 14, 16, 20, 20, 16]
+    headers = ["#", "Label", "SL", "TP", "Dir", "Trades", "Win%", "Ret IS%", "Ret OOS%", "MaxDD%", "Sharpe"]
+    col_w = [8, 36, 12, 12, 12, 14, 14, 18, 18, 18, 14]
 
     pdf.set_fill_color(50, 50, 50)
     pdf.set_text_color(255)
@@ -767,6 +891,7 @@ def export_auto_discover_pdf(req: AutoDiscoverPdfRequest):
             str(r.get("tp", "")), r.get("direction", "?").upper(), str(r.get("trades", "")),
             f"{r.get('win_rate', 0):.1f}",
             f"{r.get('return_pct', 0):+.1f}",
+            f"{r.get('oos_return_pct', r.get('return_pct', 0)):+.1f}",
             f"{r.get('max_dd', 0):.1f}",
             f"{r.get('sharpe', 0):.2f}",
         ]
@@ -781,7 +906,7 @@ def export_auto_discover_pdf(req: AutoDiscoverPdfRequest):
         pdf.set_font("Helvetica", "B", 10)
         if best.get("target_hit"):
             pdf.set_text_color(0, 130, 0)
-            rec = f"Target raggiunto: {best['label']} SL={best['sl']} TP={best['tp']} → {best.get('return_pct', 0):.1f}%"
+            rec = f"Target raggiunto: {best['label']} SL={best['sl']} TP={best['tp']} → OOS {best.get('oos_return_pct', best.get('return_pct', 0)):+.1f}%"
         elif best.get("sharpe", 0) >= 1:
             pdf.set_text_color(0, 100, 200)
             rec = f"Raccomandata: {best['label']} SL={best['sl']} TP={best['tp']}"

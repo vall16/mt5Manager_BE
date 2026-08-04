@@ -972,28 +972,28 @@ class SuperXauProStrategy(SignalStrategy):
 class MsftStrategy(SignalStrategy):
     name = "MSFT"
     requires_m1 = False
-    requires_m5 = False
-    requires_m15 = True
+    requires_m5 = True
+    requires_m15 = False
 
     def compute_indicators(self, df_m1, df_m5, df_m15, df_h1=None):
-        df = df_m15
+        df = df_m5
         volume_avg = df["tick_volume"].rolling(20).mean().iloc[-1]
         volume_now = df["tick_volume"].iloc[-1]
 
         return Indicators(
             ema_short=compute_ema(df, 5).iloc[-1],
-            ema_long=compute_ema(df, 20).iloc[-1],
+            ema_long=compute_ema(df, 15).iloc[-1],
             rsi=compute_rsi(df, 14).iloc[-1],
             hma=compute_hma(df).iloc[-1],
             hma_prev=compute_hma(df).iloc[-2],
-            volume_ok=volume_now > volume_avg * 1.2 if volume_avg > 0 else True,
+            volume_ok=volume_now > volume_avg * 0.8 if volume_avg > 0 else True,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
         return (
             ind.ema_short > ind.ema_long
             and ind.hma > ind.hma_prev
-            and 40 < ind.rsi < 75
+            and 35 < ind.rsi < 80
             and ind.volume_ok
         )
 
@@ -1001,9 +1001,15 @@ class MsftStrategy(SignalStrategy):
         return (
             ind.ema_short < ind.ema_long
             and ind.hma < ind.hma_prev
-            and 25 < ind.rsi < 60
+            and 20 < ind.rsi < 65
             and ind.volume_ok
         )
+
+    def get_dynamic_sl_tp(self, ind: Indicators):
+        return 120, 250
+
+    def get_log_details(self, ind: Indicators) -> str:
+        return f"(EMA5:{ind.ema_short:.2f} EMA15:{ind.ema_long:.2f} RSI:{ind.rsi:.1f})"
 
     def reverse_on_buy(self, has_sell: bool) -> bool:
         return False

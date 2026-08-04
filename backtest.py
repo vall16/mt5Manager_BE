@@ -57,6 +57,7 @@ DEFAULT_DAYS = 30
 DEFAULT_LOT = 0.01
 DEFAULT_BALANCE = 10000.0
 M1_LOOKBACK = 100
+M5_LOOKBACK = 60
 MAX_BARS = 40000
 
 INSTRUMENT = {
@@ -296,7 +297,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
 
     m5_arr = {}
     if use_m5:
-        for col in ["hma", "hma_prev", "atr_m5", "ema5", "ema15", "ema20", "rsi14"]:
+        for col in ["hma", "hma_prev", "atr_m5", "ema5", "ema15", "ema20", "rsi14", "tick_volume", "vol_avg"]:
             m5_arr[col] = df_m5[col].values
 
     m15_arr = {}
@@ -315,6 +316,11 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
         primary_df = df_m1
         primary_times = m1_times
         lookback = M1_LOOKBACK
+        entry_step = 1
+    elif use_m5:
+        primary_df = df_m5
+        primary_times = m5_times
+        lookback = M5_LOOKBACK
         entry_step = 1
     elif use_m15:
         primary_df = df_m15
@@ -523,6 +529,17 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                     ind.ema_long_prev = None
                     ind.price_prev = None
                     ind.rsi_prev = None
+            elif use_m5:
+                ind.ema_short = m5_arr["ema5"][i]
+                ind.ema_long = m5_arr["ema15"][i]
+                ind.rsi = m5_arr["rsi14"][i]
+                ind.price = price
+                ind.hma = m5_arr["hma"][i]
+                ind.hma_prev = m5_arr["hma_prev"][i]
+                ind.atr_m5_val = m5_arr["atr_m5"][i]
+                vol_now = m5_arr["tick_volume"][i]
+                vol_avg = m5_arr["vol_avg"][i]
+                ind.volume_ok = vol_now > vol_avg * 0.8 if pd.notna(vol_avg) and vol_avg > 0 else True
 
             try:
                 buy = strategy.buy_condition(ind)
