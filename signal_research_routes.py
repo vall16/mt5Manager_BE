@@ -370,7 +370,27 @@ def _get_sl_tp_ranges(symbol: str):
     return 100, 600, 50, 200, 1200, 100
 
 
-def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_overbought, sl_pts, tp_pts, direction, lot, balance, pip, contract, spread_pips=0.0, volume_filter=False, sessions=None, ema_cache=None, rsi_arr=None, sess_arr=None, vol_ok_arr=None):
+def _prepare_split_cache(dfx, ema_periods, rsi_periods, volume_filter, sessions):
+    """Precalcola indicatori/filtri una sola volta per un dataframe."""
+    from indicators.ta import compute_ema, compute_rsi
+    from backtest import _get_session_label
+    import numpy as np
+    import pandas as pd
+
+    ema_cache = {p: compute_ema(dfx, p).to_numpy(dtype=float) for p in ema_periods}
+    rsi_cache = {p: compute_rsi(dfx, p).to_numpy(dtype=float) for p in rsi_periods}
+    vol_arr = None
+    if volume_filter:
+        vol = dfx["tick_volume"].to_numpy(dtype=float)
+        vol_avg = pd.Series(vol).rolling(20).mean().to_numpy()
+        vol_arr = np.nan_to_num(vol > vol_avg)
+    sess_arr = None
+    if sessions:
+        sess_arr = [_get_session_label(t) for t in dfx["time"].to_numpy()]
+    return ema_cache, rsi_cache, vol_arr, sess_arr
+
+
+def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_overbought, sl_pts, tp_pts, direction, lot, balance, pip, contract, spread_pips=0.0, volume_filter=False, sessions=None, ema_cache=None, rsi_arr=None, sess_arr=None, vol_ok_arr=None, rsi_cache=None):
     import numpy as np
     import pandas as pd
     from indicators.ta import compute_ema, compute_rsi
@@ -391,7 +411,12 @@ def _run_generic_backtest(df, ema_fast, ema_slow, rsi_period, rsi_oversold, rsi_
     ema_s = ema_cache[ema_slow]
 
     if rsi_arr is None:
-        rsi_arr = compute_rsi(df, rsi_period).to_numpy(dtype=float)
+        if rsi_cache is not None and rsi_period in rsi_cache:
+            rsi_arr = rsi_cache[rsi_period]
+        else:
+            rsi_arr = compute_rsi(df, rsi_period).to_numpy(dtype=float)
+            if rsi_cache is not None:
+                rsi_cache[rsi_period] = rsi_arr
     rsi = rsi_arr
 
     if vol_ok_arr is None and volume_filter:
@@ -538,27 +563,9 @@ def _run_auto_discover(session_id: str, config: dict):
                   for d in directions]
 
     # Precalcola indicatori e filtri una sola volta per split (grande speedup)
-    from indicators.ta import compute_ema, compute_rsi
-    from backtest import _get_session_label
-    import numpy as np
-    import pandas as pd
-
-    def _prepare_cache(dfx):
-        periods = set(ema_fast_vals) | set(ema_slow_vals)
-        ema_cache = {p: compute_ema(dfx, p).to_numpy(dtype=float) for p in periods}
-        rsi_arr = compute_rsi(dfx, 14).to_numpy(dtype=float)
-        vol_arr = None
-        if volume_filter:
-            vol = dfx["tick_volume"].to_numpy(dtype=float)
-            vol_avg = pd.Series(vol).rolling(20).mean().to_numpy()
-            vol_arr = np.nan_to_num(vol > vol_avg)
-        sess_arr = None
-        if sessions:
-            sess_arr = [_get_session_label(t) for t in dfx["time"].to_numpy()]
-        return ema_cache, rsi_arr, vol_arr, sess_arr
-
-    cache_is = _prepare_cache(df_is)
-    cache_oos = _prepare_cache(df_oos)
+    ema_periods = set(ema_fast_vals) | set(ema_slow_vals)
+    cache_is = _prepare_split_cache(df_is, ema_periods, {14}, volume_filter, sessions)
+    cache_oos = _prepare_split_cache(df_oos, ema_periods, {14}, volume_filter, sessions)
 
     total = len(all_combos)
     is_results = []
@@ -576,7 +583,7 @@ def _run_auto_discover(session_id: str, config: dict):
                 df_is, ef, es, 14, ro, rb, sl, tp, dirn,
                 config["lot"], initial, pip, contract,
                 spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
-                ema_cache=cache_is[0], rsi_arr=cache_is[1], vol_ok_arr=cache_is[2], sess_arr=cache_is[3],
+                ema_cache=cache_is[0], rsi_arr=None, vol_ok_arr=cache_is[2], sess_arr=cache_is[3], rsi_cache=cache_is[1],
             )
             metrics = _summarize_trades(trades, initial)
             if metrics["trades"] < min_trades:
@@ -603,7 +610,7 @@ def _run_auto_discover(session_id: str, config: dict):
                 df_oos, ef, es, 14, ro, rb, sl, tp, dirn,
                 config["lot"], initial, pip, contract,
                 spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
-                ema_cache=cache_oos[0], rsi_arr=cache_oos[1], vol_ok_arr=cache_oos[2], sess_arr=cache_oos[3],
+                ema_cache=cache_oos[0], rsi_arr=None, vol_ok_arr=cache_oos[2], sess_arr=cache_oos[3], rsi_cache=cache_oos[1],
             )
             oos = _summarize_trades(trades_oos, initial)
         except Exception as e:
@@ -652,6 +659,411 @@ def _run_auto_discover(session_id: str, config: dict):
                 }
 
     global_log(f"[AutoDiscover] Fine ricerca per {symbol}: {len(is_results)} combinazioni sopra min_trade, {len(results)} validate OOS, {len(target_hits)} sopra il target", file=AUTO_LOG_FILE)
+
+
+# ── Agent Discover (LLM-guided search) ─────────────────────────
+
+class AgentDiscoverRequest(BaseModel):
+    symbol: str
+    days: int = 90
+    lot: float = 0.01
+    balance: float = 1000
+    direction: str = "both"
+    target_return: float = 30.0
+    min_trades: int = 20
+    volume_filter: bool = False
+    sessions_filter: str = ""
+    use_spread: bool = True
+    iterations: int = 4
+    batch_size: int = 6
+    model: str = "openrouter/free"
+
+
+def _agent_bounds(symbol: str):
+    sl_min, sl_max, _sl_step, tp_min, tp_max, _tp_step = _get_sl_tp_ranges(symbol)
+    return {
+        "ema_fast": (3, 30),
+        "ema_slow": (10, 100),
+        "rsi_period": (7, 21),
+        "rsi_oversold": (20, 48),
+        "rsi_overbought": (52, 80),
+        "sl": (sl_min, sl_max),
+        "tp": (tp_min, tp_max),
+    }
+
+
+def _random_agent_config(bounds, rng, direction):
+    ef = rng.randint(*bounds["ema_fast"])
+    es = rng.randint(max(ef + 2, bounds["ema_slow"][0]), bounds["ema_slow"][1])
+    ro = rng.randint(*bounds["rsi_oversold"])
+    rb = rng.randint(max(ro + 4, bounds["rsi_overbought"][0]), bounds["rsi_overbought"][1])
+    sl = rng.randint(*bounds["sl"])
+    tp = rng.randint(max(sl + 1, bounds["tp"][0]), bounds["tp"][1])
+    return {
+        "ema_fast": int(ef), "ema_slow": int(es),
+        "rsi_period": int(rng.randint(*bounds["rsi_period"])),
+        "rsi_oversold": int(ro), "rsi_overbought": int(rb),
+        "sl": int(sl), "tp": int(tp),
+        "direction": direction if direction != "both" else rng.choice(["buy", "sell"]),
+    }
+
+
+def _sanitize_agent_config(raw, bounds, direction):
+    def _clamp(v, lo, hi, default):
+        try:
+            return max(int(lo), min(int(hi), int(v)))
+        except (TypeError, ValueError):
+            return default
+
+    ef = _clamp(raw.get("ema_fast"), *bounds["ema_fast"], 9)
+    es = _clamp(raw.get("ema_slow"), max(ef + 2, bounds["ema_slow"][0]), bounds["ema_slow"][1], 30)
+    rsi_p = _clamp(raw.get("rsi_period"), *bounds["rsi_period"], 14)
+    ro = _clamp(raw.get("rsi_oversold"), *bounds["rsi_oversold"], 35)
+    rb = _clamp(raw.get("rsi_overbought"), max(ro + 2, bounds["rsi_overbought"][0]), bounds["rsi_overbought"][1], 65)
+    sl = _clamp(raw.get("sl"), *bounds["sl"], bounds["sl"][0])
+    tp = _clamp(raw.get("tp"), max(sl + 1, bounds["tp"][0]), bounds["tp"][1], bounds["tp"][0] + 100)
+    d = str(raw.get("direction", direction)).lower()
+    if d not in ("buy", "sell", "both"):
+        d = direction
+    return {
+        "ema_fast": ef, "ema_slow": es, "rsi_period": rsi_p,
+        "rsi_oversold": ro, "rsi_overbought": rb, "sl": sl, "tp": tp, "direction": d,
+    }
+
+
+def _config_key(c):
+    return (c["ema_fast"], c["ema_slow"], c["rsi_period"], c["rsi_oversold"], c["rsi_overbought"], c["sl"], c["tp"], c["direction"])
+
+
+def _llm_propose_configs(prompt, batch_size, model):
+    """Chiama l'LLM (OpenRouter) e chiede JSON {reasoning, configs}. Ritorna (reasoning, configs|None)."""
+    import os
+    import json
+    import re
+
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        global_log("[AgentDiscover] OPENROUTER_API_KEY mancante, fallback a proposte casuali", file=AUTO_LOG_FILE)
+        return None, None
+
+    from openai import OpenAI
+    client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=2000,
+        )
+        content = response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"[AgentDiscover] Errore LLM: {e}")
+        global_log(f"[AgentDiscover] Errore LLM: {e}", file=AUTO_LOG_FILE)
+        return None, None
+
+    try:
+        content = content.strip()
+        fence = re.search(r"```(?:json)?\s*(.*?)```", content, re.DOTALL)
+        if fence:
+            content = fence.group(1)
+        start, end = content.find("{"), content.rfind("}")
+        if start == -1 or end == -1:
+            raise ValueError("JSON non trovato")
+        parsed = json.loads(content[start:end + 1])
+        reasoning = str(parsed.get("reasoning", ""))[:1500]
+        configs = parsed.get("configs") or []
+        return reasoning, configs
+    except Exception as e:
+        logging.error(f"[AgentDiscover] Risposta LLM non valida ({e}): {content[:300]}")
+        return None, None
+
+
+def _run_agent_discover(session_id: str, config: dict):
+    import random
+    from backtest import fetch_data, INSTRUMENT, STRATEGIES
+
+    mt5_api_url = config["mt5_api_url"]
+    symbol = config["symbol"]
+    days = config["days"]
+    direction = config.get("direction", "both")
+    min_trades = config.get("min_trades", 20)
+    volume_filter = config.get("volume_filter", False)
+    use_spread = config.get("use_spread", True)
+    sessions = [s.strip() for s in config.get("sessions_filter", "").split(",") if s.strip()] or None
+    iterations = max(1, config.get("iterations", 4))
+    batch_size = max(2, config.get("batch_size", 6))
+    model = config.get("model", "openrouter/free")
+    cancel = lambda: research_sessions.get(session_id, {}).get("cancelled", False)
+
+    from backtest import STRATEGIES
+    strat = next(iter(STRATEGIES.values()))
+    print(f"[AgentDiscover] Fetching {days} days of {symbol}...")
+    global_log(f"[AgentDiscover] Avvio agente AI per {symbol} ({days} giorni), {iterations} iterazioni x {batch_size}", file=AUTO_LOG_FILE)
+    try:
+        dfs = fetch_data(symbol, strat, days, mt5_api_url)
+    except Exception as e:
+        with research_lock:
+            if session_id in research_sessions:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {"error": f"Impossibile scaricare dati per {symbol}: {e}"}
+        return
+
+    df = dfs.get("m15") or dfs.get("m1") or dfs.get("m5")
+    if df is None:
+        with research_lock:
+            if session_id in research_sessions:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {"error": f"Nessun timeframe disponibile per {symbol}"}
+        return
+
+    instr = INSTRUMENT.get(symbol, {"pip": 0.01, "contract": 100})
+    pip = instr["pip"]
+    contract = instr["contract"]
+    spread_pips = SPREAD_PIPS.get(symbol.upper(), 0.0) if use_spread else 0.0
+    target = config.get("target_return", 30.0)
+    initial = config["balance"]
+    bounds = _agent_bounds(symbol)
+
+    split = max(1, int(len(df) * 0.70))
+    df_is = df.iloc[:split].reset_index(drop=True)
+    df_oos = df.iloc[split:].reset_index(drop=True)
+    ema_periods = set(range(bounds["ema_fast"][0], bounds["ema_slow"][1] + 1))
+    rsi_periods = set(range(bounds["rsi_period"][0], bounds["rsi_period"][1] + 1))
+    cache_is = _prepare_split_cache(df_is, ema_periods, rsi_periods, volume_filter, sessions)
+    cache_oos = _prepare_split_cache(df_oos, ema_periods, rsi_periods, volume_filter, sessions)
+
+    def _eval(c):
+        trades, _ = _run_generic_backtest(
+            df_is, c["ema_fast"], c["ema_slow"], c["rsi_period"],
+            c["rsi_oversold"], c["rsi_overbought"], c["sl"], c["tp"], c["direction"],
+            config["lot"], initial, pip, contract,
+            spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
+            ema_cache=cache_is[0], rsi_cache=cache_is[1], vol_ok_arr=cache_is[2], sess_arr=cache_is[3],
+        )
+        m_is = _summarize_trades(trades, initial)
+        if m_is["trades"] < min_trades:
+            return None, None
+        trades_oos, _ = _run_generic_backtest(
+            df_oos, c["ema_fast"], c["ema_slow"], c["rsi_period"],
+            c["rsi_oversold"], c["rsi_overbought"], c["sl"], c["tp"], c["direction"],
+            config["lot"], initial, pip, contract,
+            spread_pips=spread_pips, volume_filter=volume_filter, sessions=sessions,
+            ema_cache=cache_oos[0], rsi_cache=cache_oos[1], vol_ok_arr=cache_oos[2], sess_arr=cache_oos[3],
+        )
+        m_oos = _summarize_trades(trades_oos, initial)
+        return m_is, m_oos
+
+    rng = random.Random()
+    tested = {}
+    results = []
+    best_oos = -1e9
+    stale_rounds = 0
+    reasoning = ""
+    evals_done = 0
+    total_evals = iterations * batch_size
+
+    def _add(c, m_is, m_oos):
+        nonlocal best_oos, stale_rounds
+        key = _config_key(c)
+        tested[key] = True
+        label = f"EMA{c['ema_fast']}/{c['ema_slow']} RSI{c['rsi_period']}<{c['rsi_oversold']} RSI>{c['rsi_overbought']}"
+        row = {
+            "label": label,
+            "ema_fast": int(c["ema_fast"]), "ema_slow": int(c["ema_slow"]),
+            "rsi_period": int(c["rsi_period"]),
+            "rsi_oversold": int(c["rsi_oversold"]), "rsi_overbought": int(c["rsi_overbought"]),
+            "sl": int(c["sl"]), "tp": int(c["tp"]), "direction": c["direction"],
+            "trades": int(m_is["trades"]),
+            "win_rate": float(round(m_is["win_rate"], 1)),
+            "return_pct": float(round(m_is["return_pct"], 1)),
+            "max_dd": float(round(m_is["max_dd"], 1)),
+            "sharpe": float(round(m_is["sharpe"], 2)),
+            "oos_trades": int(m_oos["trades"]),
+            "oos_win_rate": float(round(m_oos["win_rate"], 1)),
+            "oos_return_pct": float(round(m_oos["return_pct"], 1)),
+            "oos_max_dd": float(round(m_oos["max_dd"], 1)),
+            "oos_sharpe": float(round(m_oos["sharpe"], 2)),
+            "target_hit": bool(m_oos["return_pct"] >= target),
+        }
+        results.append(row)
+        if row["oos_trades"] >= max(3, min_trades // 2) and row["oos_return_pct"] > best_oos:
+            best_oos = row["oos_return_pct"]
+            stale_rounds = 0
+        else:
+            stale_rounds += 1
+        return row
+
+    # FASE 1: seed random (per dare all'LLM dati reali da analizzare)
+    seed_pool = []
+    while len(seed_pool) < batch_size:
+        c = _random_agent_config(bounds, rng, direction)
+        if _config_key(c) not in tested:
+            seed_pool.append(c)
+
+    for round_idx in range(iterations):
+        if cancel():
+            with research_lock:
+                if session_id in research_sessions:
+                    research_sessions[session_id]["status"] = "cancelled"
+            return
+
+        # Proposte: prima iterazione = seed, poi LLM (o random se fallisce)
+        proposals = []
+        if round_idx == 0:
+            proposals = seed_pool
+        else:
+            hist = sorted(results, key=lambda r: -r["oos_return_pct"])[:15]
+            hist_txt = "\n".join(
+                f"- EMA{r['ema_fast']}/{r['ema_slow']} RSI{r.get('rsi_period',14)}<{r['rsi_oversold']} >{r['rsi_overbought']} "
+                f"{r['direction']} SL={r['sl']} TP={r['tp']}: IS {r['return_pct']:+.1f}% ({r['trades']}t, WR {r['win_rate']:.0f}%, DD {r['max_dd']:.1f}%) | "
+                f"OOS {r['oos_return_pct']:+.1f}% ({r['oos_trades']}t, WR {r['oos_win_rate']:.0f}%)"
+                for r in hist
+            )
+            prompt = f"""Sei un quant researcher che ottimizza strategie di trading con validazione walk-forward.
+Stai cercando parametri per la strategia EMA + RSI su {symbol} ({days} giorni, split 70/30 con costi spread {'ATTIVI' if use_spread else 'DISATTIVI'}).
+Balance iniziale ${initial}, lotto {config['lot']}, minimo {min_trades} trade in-sample.
+
+## BOUNDS PARAMETRI (rispettali rigorosamente)
+- ema_fast: {bounds['ema_fast'][0]}-{bounds['ema_fast'][1]}
+- ema_slow: {bounds['ema_slow'][0]}-{bounds['ema_slow'][1]} (SEMPRE > ema_fast)
+- rsi_period: {bounds['rsi_period'][0]}-{bounds['rsi_period'][1]}
+- rsi_oversold: {bounds['rsi_oversold'][0]}-{bounds['rsi_oversold'][1]}
+- rsi_overbought: {bounds['rsi_overbought'][0]}-{bounds['rsi_overbought'][1]} (SEMPRE > oversold)
+- sl: {bounds['sl'][0]}-{bounds['sl'][1]} punti
+- tp: {bounds['tp'][0]}-{bounds['tp'][1]} punti (SEMPRE > sl)
+- direction: buy oppure sell oppure both
+
+## RISULTATI GIA' TESTATI (migliori per return OOS)
+{hist_txt}
+
+## OBIETTIVO
+Analizza cosa ha funzionato in-sample e cosa NON ha retto out-of-sample (differenza IS vs OOS = overfitting).
+Proponi {batch_size} NUOVE configurazioni, diverse tra loro e NON già testate, che secondo te potrebbero
+reggere meglio OOS. Varia i parametri con intelligenza (es. SL più stretto se OOS perde molto, direzione diversa
+se una direzione domina, RSI più estremo per meno trade ma più puliti, ecc.).
+
+Rispondi SOLO con JSON valido in questo formato esatto:
+{{"reasoning": "breve spiegazione in italiano (max 200 parole)", "configs": [{{"ema_fast": 9, "ema_slow": 50, "rsi_period": 14, "rsi_oversold": 35, "rsi_overbought": 65, "sl": 200, "tp": 900, "direction": "buy"}}]}}"""
+            llm_reasoning, raw_cfgs = _llm_propose_configs(prompt, batch_size, model)
+            if raw_cfgs:
+                reasoning = llm_reasoning or reasoning
+                for rc in raw_cfgs:
+                    c = _sanitize_agent_config(rc if isinstance(rc, dict) else {}, bounds, direction)
+                    if _config_key(c) not in tested:
+                        proposals.append(c)
+            if len(proposals) < batch_size:
+                while len(proposals) < batch_size:
+                    c = _random_agent_config(bounds, rng, direction)
+                    if _config_key(c) not in tested:
+                        proposals.append(c)
+
+        for c in proposals:
+            if cancel():
+                with research_lock:
+                    if session_id in research_sessions:
+                        research_sessions[session_id]["status"] = "cancelled"
+                return
+            try:
+                m_is, m_oos = _eval(c)
+                if m_is is None:
+                    tested[_config_key(c)] = True
+                    continue
+                _add(c, m_is, m_oos)
+            except Exception as e:
+                logging.error(f"[AgentDiscover] Errore EMA{c['ema_fast']}/{c['ema_slow']} SL={c['sl']} TP={c['tp']}: {e}")
+                continue
+            finally:
+                evals_done += 1
+                pct = int(evals_done / total_evals * 100)
+                with research_lock:
+                    if session_id in research_sessions:
+                        research_sessions[session_id]["progress"] = pct
+
+        global_log(f"[AgentDiscover] Round {round_idx + 1}/{iterations}: {len(results)} config valide finora, best OOS {best_oos:+.2f}%", file=AUTO_LOG_FILE)
+
+        if round_idx > 0 and stale_rounds >= 2 * batch_size:
+            global_log("[AgentDiscover] Nessun miglioramento, stop anticipato", file=AUTO_LOG_FILE)
+            break
+
+    results.sort(key=lambda r: -(r["oos_return_pct"] if r["oos_trades"] else -999))
+    target_hits = [r for r in results if r["target_hit"]]
+
+    with research_lock:
+        if session_id in research_sessions:
+            if research_sessions[session_id]["cancelled"]:
+                research_sessions[session_id]["status"] = "cancelled"
+            elif not results:
+                research_sessions[session_id]["status"] = "error"
+                research_sessions[session_id]["result"] = {
+                    "error": f"Nessuna configurazione ha raggiunto il minimo di {min_trades} trade per {symbol}."
+                }
+            else:
+                research_sessions[session_id]["status"] = "done"
+                research_sessions[session_id]["result"] = {
+                    "results": results,
+                    "target_hits": [r["label"] for r in target_hits],
+                    "target_return": target,
+                    "mode": "agent",
+                    "analysis": reasoning,
+                    "iterations_used": min(round_idx + 1, iterations),
+                    "tested_count": len(tested),
+                }
+
+    global_log(f"[AgentDiscover] Fine agente per {symbol}: {len(results)} config valide, {len(tested)} testate, best OOS {best_oos:+.2f}%", file=AUTO_LOG_FILE)
+
+
+@router.post("/signal-research/agent-discover")
+def start_agent_discover(req: AgentDiscoverRequest):
+    mt5_api_url = None
+    from db import get_connection
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT ss.ip, ss.port
+            FROM traders t
+            JOIN servers ss ON ss.id = t.slave_server_id
+            LIMIT 1
+        """)
+        row = cursor.fetchone()
+        if row and row[0] and row[1]:
+            mt5_api_url = f"http://{row[0]}:{row[1]}"
+    finally:
+        cursor.close()
+        conn.close()
+
+    if not mt5_api_url:
+        return JSONResponse(status_code=400, content={"error": "No MT5 API URL found"})
+
+    session_id = str(uuid.uuid4())[:8]
+    config = {
+        "symbol": req.symbol,
+        "days": req.days,
+        "lot": req.lot,
+        "balance": req.balance,
+        "direction": req.direction,
+        "target_return": req.target_return,
+        "min_trades": req.min_trades,
+        "volume_filter": req.volume_filter,
+        "sessions_filter": req.sessions_filter,
+        "use_spread": req.use_spread,
+        "iterations": req.iterations,
+        "batch_size": req.batch_size,
+        "model": req.model,
+        "mt5_api_url": mt5_api_url,
+    }
+
+    with research_lock:
+        research_sessions[session_id] = {
+            "status": "running",
+            "result": None,
+            "cancelled": False,
+            "progress": 0,
+            "config": config,
+        }
+
+    t = threading.Thread(target=_run_agent_discover, args=(session_id, config), daemon=True)
+    t.start()
+    return {"session_id": session_id}
 
 
 @router.post("/signal-research/auto-discover")
@@ -906,7 +1318,7 @@ def export_auto_discover_pdf(req: AutoDiscoverPdfRequest):
         pdf.set_font("Helvetica", "B", 10)
         if best.get("target_hit"):
             pdf.set_text_color(0, 130, 0)
-            rec = f"Target raggiunto: {best['label']} SL={best['sl']} TP={best['tp']} → OOS {best.get('oos_return_pct', best.get('return_pct', 0)):+.1f}%"
+            rec = f"Target raggiunto: {best['label']} SL={best['sl']} TP={best['tp']} -> OOS {best.get('oos_return_pct', best.get('return_pct', 0)):+.1f}%"
         elif best.get("sharpe", 0) >= 1:
             pdf.set_text_color(0, 100, 200)
             rec = f"Raccomandata: {best['label']} SL={best['sl']} TP={best['tp']}"
