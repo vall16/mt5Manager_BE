@@ -246,7 +246,7 @@ def compute_regime(atr_m15_pct, is_spike=False):
 
 
 def regime_ok(regime: str) -> bool:
-    return regime in ("TREND", "NORMAL")
+    return regime in ("TREND", "NORMAL","NEWS")
 
 
 # ─────────────────────── STRATEGY BASE CLASS ───────────────────────
