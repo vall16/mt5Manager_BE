@@ -474,7 +474,7 @@ def run_backtest(strategy, dfs, symbol, lot, balance, cancel_flag=None, progress
                         ind.hma_prev = m15_arr["hma_prev"][idx_m15]
                         ind.atr_m15 = m15_arr["atr_m15"][idx_m15]
                         ind.atr_m15_pct = m15_arr["atr_m15_pct"][idx_m15]
-                        ind.regime = compute_regime(ind.atr_m15_pct, getattr(ind, "is_spike", False))
+                        ind.regime = compute_regime(ind.atr_m15_pct, is_spike=getattr(ind, "is_spike", False))
                         ind.ema_short_prev = m15_arr["ema5"][idx_m15 - 1] if idx_m15 >= 1 else None
                         ind.ema_long_prev = m15_arr["ema20_m15"][idx_m15 - 1] if idx_m15 >= 1 else None
                         ind.price_prev = m15_arr["close"][idx_m15 - 1] if idx_m15 >= 1 else None

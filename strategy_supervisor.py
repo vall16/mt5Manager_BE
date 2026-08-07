@@ -158,7 +158,7 @@ def _market_snapshot(symbol: str, slave_url: str) -> dict:
         regime = "NORMAL"
         if df_m15 is not None and not df_m15.empty:
             atr_m15_pct = _safe_float(compute_rolling_percentile(compute_atr(df_m15), REGIME_WINDOW))
-            regime = compute_regime(atr_m15_pct, False)
+            regime = compute_regime(atr_m15_pct, is_spike=False)
 
         return {
             "ok": True,

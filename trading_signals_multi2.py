@@ -230,15 +230,14 @@ def log(trader_id: int, msg: str):
 REGIME_WINDOW = 192  # finestra percentile ATR M15 (~2 giorni)
 
 
-def compute_regime(atr_m15_pct, is_spike=False):
-    """Classifica lo stato di volatilità: RANGE | NORMAL | TREND | NEWS."""
-    if is_spike:
+def compute_regime(atr_m15_pct, trend_score=None, is_spike=False):
+    """Classifica lo stato di volatilità: RANGE | NORMAL | TREND | NEWS.
+    TREND richiede ATR alto E direzione reale (EMA50 M15 in movimento)."""
+    if is_spike or atr_m15_pct > 0.90:
         return "NEWS"
     if atr_m15_pct is None or pd.isna(atr_m15_pct):
         return "NORMAL"
-    if atr_m15_pct > 0.90:
-        return "NEWS"
-    if atr_m15_pct > 0.75:
+    if atr_m15_pct > 0.60 and trend_score is not None and abs(trend_score) > 0.35:
         return "TREND"
     if atr_m15_pct > 0.25:
         return "NORMAL"
@@ -246,7 +245,7 @@ def compute_regime(atr_m15_pct, is_spike=False):
 
 
 def regime_ok(regime: str) -> bool:
-    return regime in ("TREND", "NORMAL","NEWS")
+    return regime in ("TREND", "NORMAL", "NEWS")
 
 
 # ─────────────────────── STRATEGY BASE CLASS ───────────────────────
@@ -537,15 +536,17 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         hma_m5 = compute_hma(df_m5).iloc[-2]
         hma_m5_prev = compute_hma(df_m5).iloc[-3]
 
-        ema_m15 = compute_ema(df_m15, 50).iloc[-2]
+        ema_m15_series = compute_ema(df_m15, 50)
+        ema_m15 = ema_m15_series.iloc[-2]
         price_m15 = df_m15["close"].iloc[-2]
 
         atr_series = compute_atr(df_m1)
         atr = atr_series.iloc[-2]
-        volatilty_expansion = atr > atr_series.rolling(10).mean().iloc[-2]
+        atr_prev_mean = atr_series.rolling(10).mean().shift(1).iloc[-2]
+        volatilty_expansion = atr > atr_prev_mean
 
         candle_body = abs(df_m1["close"].iloc[-2] - df_m1["open"].iloc[-2])
-        is_spike = candle_body > (atr * 3)
+        is_spike = candle_body > (atr * 4)
 
         # ATR M5
         df_m5_tmp = df_m5.copy()
@@ -557,10 +558,16 @@ class SuperXauNoCloseStrategy(SignalStrategy):
         ), axis=1)
         atr_m5_val = df_m5_tmp["tr"].rolling(14).mean().iloc[-2]
 
-        # ── Regime di volatilità (percentile ATR M15) ──
+        # ── Regime di volatilità (percentile ATR M15 + direzione EMA50) ──
         atr_m15_series = compute_atr(df_m15)
+        atr_m15 = atr_m15_series.iloc[-2]
         atr_m15_pct = compute_rolling_percentile(atr_m15_series, REGIME_WINDOW).iloc[-2]
-        regime = compute_regime(atr_m15_pct, is_spike)
+        ema_m15_prev = ema_m15_series.iloc[-10]
+        if atr_m15 > 0 and pd.notna(atr_m15):
+            trend_score = (ema_m15 - ema_m15_prev) / atr_m15
+        else:
+            trend_score = 0.0
+        regime = compute_regime(atr_m15_pct, trend_score, is_spike)
 
         return Indicators(
             ema_fast=ema_fast,
@@ -575,28 +582,31 @@ class SuperXauNoCloseStrategy(SignalStrategy):
             is_spike=is_spike,
             atr_m5_val=atr_m5_val,
             atr_m15_pct=atr_m15_pct,
+            trend_score=trend_score,
             regime=regime,
         )
 
     def buy_condition(self, ind: Indicators) -> bool:
+        rsi_hi = 80 if ind.regime == "TREND" else 70
         return (
             ind.ema_fast > ind.ema_slow
             and ind.macd > ind.macd_sig
             and ind.hma_m5 > ind.hma_m5_prev
             and ind.trend_macro_up
-            and 45 < ind.rsi_m1 < 70
+            and 45 < ind.rsi_m1 < rsi_hi
             and ind.volatilty_expansion
             and not ind.is_spike
             and (not self.regime_filter or regime_ok(ind.regime))
         )
 
     def sell_condition(self, ind: Indicators) -> bool:
+        rsi_lo = 25 if ind.regime == "TREND" else 30
         return (
             ind.ema_fast < ind.ema_slow
             and ind.macd < ind.macd_sig
             and ind.hma_m5 < ind.hma_m5_prev
             and not ind.trend_macro_up
-            and 30 < ind.rsi_m1 < 55
+            and rsi_lo < ind.rsi_m1 < 55
             and ind.volatilty_expansion
             and not ind.is_spike
             and (not self.regime_filter or regime_ok(ind.regime))
@@ -873,7 +883,7 @@ class SuperXauProStrategy(SignalStrategy):
         # ── Regime di volatilità (percentile ATR M15) ──
         atr_m15_series = compute_atr(df_m15)
         atr_m15_pct = compute_rolling_percentile(atr_m15_series, REGIME_WINDOW).iloc[-2]
-        regime = compute_regime(atr_m15_pct, is_spike)
+        regime = compute_regime(atr_m15_pct, is_spike=is_spike)
 
         return Indicators(
             ema_fast=ema_fast,
